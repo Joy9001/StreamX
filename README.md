@@ -18,3 +18,7 @@
 - Use `Tailwind CSS` classes
 - We are using `Vite`
 - Put all images/videos/fonts in the `assets` or `public` folder
+
+## Branches
+
+- devansh
