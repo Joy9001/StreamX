@@ -7,7 +7,8 @@
 		"node": ">=16"
 	},
 	"scripts": {
-		"dev": "nodemon server.js"
+		"dev": "nodemon server.js",
+		"format": "prettier . --write"
 	},
 	"keywords": [],
 	"author": "",
