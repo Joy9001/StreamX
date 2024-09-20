@@ -22,3 +22,6 @@
 ## Braches
 
 - joy
+- rishabh
+- devansh
+- priyanshu
