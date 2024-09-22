@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-const editor_gig_plans = mongoose.schema({
-    editor_id:Number,
+const editor_gig_plans = mongoose.Schema({
+    email:String,
     basic:{
         price:Number,
         desc:String,
@@ -29,3 +29,5 @@ const editor_gig_plans = mongoose.schema({
         }
     }  
 });
+const editor_plans = mongoose.model('editor_gig_plans',editor_gig_plans);
+export default editor_plans;

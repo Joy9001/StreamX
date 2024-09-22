@@ -1,8 +1,14 @@
 import mongoose from 'mongoose';
+
 const EditorGig_Schema = mongoose.Schema({
-    name:String,
-    address:String,
-    languages:{
+    name: String,
+    email: {
+        type: String,
+        required: true,
+        unique: true 
+    },
+    address: String,
+    languages: {
         type: [String],
         required: true
     },
@@ -22,7 +28,8 @@ const EditorGig_Schema = mongoose.Schema({
         type: String,
         required: false
     },
-    Rating: Number
+    rating: Number
 });
-const Editor_Gig = mongoose.model("EditorGig_Schema",EditorGig_Schema);
+
+const Editor_Gig = mongoose.model("EditorGig", EditorGig_Schema);
 export default Editor_Gig;
