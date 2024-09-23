@@ -59,7 +59,7 @@ function Navbar() {
           </ul>
         </div>
         <div className="navbar-end">
-          <a className="btn bg-blue-100 text-blue-600">Button</a>
+          <a className="btn bg-blue-100 text-blue-600">Settings</a>
         </div>
       </div>
     </>
