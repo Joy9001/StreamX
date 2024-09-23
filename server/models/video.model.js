@@ -2,9 +2,6 @@ import { model, Schema } from 'mongoose'
 
 const videoSchema = new Schema(
 	{
-		id: {
-			type: Schema.Types.String,
-		},
 		ownerId: {
 			type: Schema.Types.ObjectId,
 			required: [true, 'Owner Id is required'],
@@ -12,20 +9,26 @@ const videoSchema = new Schema(
 		},
 		editorId: {
 			type: Schema.Types.ObjectId,
-			required: [true, 'Editor Id is required'],
+			required: false,
 			ref: 'Editor',
 		},
 		editorAccess: {
 			type: Schema.Types.Boolean,
+			required: false,
 			default: false,
 		},
-		videoUrl: {
+		url: {
 			type: Schema.Types.String,
+			required: [true, 'Video URL is required'],
 			default: '',
+		},
+		metaData: {
+			type: Object,
+			required: [true, 'Video Metadata is required'],
 		},
 		playListId: {
 			type: Schema.Types.ObjectId,
-			required: [true, 'Playlist Id is required'],
+			required: false,
 		},
 		ytData: {
 			type: Object,
@@ -34,11 +37,11 @@ const videoSchema = new Schema(
 		uploadStatus: {
 			type: Schema.Types.String,
 			enum: ['None', 'Uploading', 'Uploaded', 'Failed'],
-			default: false,
+			default: 'None',
 		},
 		scheduleUpload: {
 			type: Schema.Types.Date,
-			default: Date.now(),
+			required: false,
 		},
 		ApprovalStatus: {
 			type: Schema.Types.String,
