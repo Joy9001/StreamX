@@ -3,8 +3,12 @@ import React from "react";
 function Search() {
   return (
     <div>
-      <label className="input input-bordered flex border-solid border-2 border-gray-300 items-center w-5/12 bg-white mt-10 ml-16 gap-2 transition-shadow duration-200 hover:shadow-lg">
-        <input type="text" className="grow" placeholder="Search" />
+      <label className="input input-bordered flex border-solid border-2 border-gray-300 items-center w-5/12 bg-white mt-10 ml-16 gap-2  duration-200 ">
+        <input
+          type="text"
+          className="grow"
+          placeholder="Search for any Skill, domain or name... "
+        />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 16 16"

@@ -1,13 +1,15 @@
 import React from "react";
 import Navbar from "./components/navbar";
 import Search from "./components/Search";
-import Card from "./components/Card";
+import { Route, Routes } from "react-router-dom";
+import Cards from "./components/Cards";
+
 function App() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar></Navbar>
       <Search></Search>
-      <Card></Card>
+      <Cards></Cards>
     </div>
   );
 }
