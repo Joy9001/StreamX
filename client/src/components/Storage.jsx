@@ -1,13 +1,16 @@
 import { useRef } from 'react'
 import { useRecoilValue } from 'recoil'
 import { drawerState } from '../states/drawerState.js'
+import { navbarOpenState } from '../states/navbarState.js'
 import ContentTable from './ContentTable'
+import Navbar from './Navbar.jsx'
 import RecentCard from './RecentCard'
 import StorageNav from './StorageNav.jsx'
 import VideoDrawer from './VideoDrawer'
 
 function Storage() {
   const drawer = useRecoilValue(drawerState)
+  const navOpen = useRecoilValue(navbarOpenState)
   const fileInputRef = useRef(null)
 
   function handleNewBtnClick() {
@@ -15,15 +18,20 @@ function Storage() {
   }
 
   return (
-    <div className='storage-main flex'>
-      <div className='navbar h-screen w-[15%] border-2 border-solid border-red-500'>
-        Navbar
+    <div className='storage-main flex h-screen'>
+      <div
+        className={`navbar h-full transition-all duration-300 ${
+          navOpen ? 'w-[15%]' : 'w-[5%]'
+        } pl-0`}>
+        <Navbar />
       </div>
 
       {/* Main */}
-      <div className='storage-container flex w-[85%] border-2 border-solid border-blue-500'>
+      <div className={`storage-container flex flex-grow`}>
         <div
-          className={`storage-main ${!drawer ? 'w-full' : 'w-[82%]'} border-2 border-solid border-green-500 p-2`}>
+          className={`storage-main flex-grow p-2 transition-all duration-300 ${
+            drawer ? 'mr-4' : 'mr-0'
+          }`}>
           {/* Inside Nav */}
           <StorageNav />
 
@@ -91,10 +99,12 @@ function Storage() {
         </div>
 
         {/* Drawer */}
-        <div
-          className={`storage-drawer no-scrollbar w-[18%] overflow-scroll border-2 border-solid border-yellow-500 ${!drawer ? 'hidden' : ''}`}>
-          <VideoDrawer />
-        </div>
+        {drawer && (
+          <div
+            className={`storage-drawer no-scrollbar w-[18%] overflow-scroll`}>
+            <VideoDrawer />
+          </div>
+        )}
       </div>
     </div>
   )
