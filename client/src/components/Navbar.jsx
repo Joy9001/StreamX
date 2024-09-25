@@ -46,7 +46,7 @@ function Navbar() {
         className={`${
           open ? 'w-full' : 'w-20'
         } relative flex h-screen flex-shrink-0 flex-col justify-between bg-gray-100 p-5 pt-6 transition-all duration-300`}>
-        <div>
+        <div className='flex w-full flex-col items-center justify-center'>
           {/* Arrow toggle button */}
           <ChevronLeft
             className={`absolute -right-3 top-9 h-7 w-7 cursor-pointer rounded-full border-2 border-gray-50 bg-white text-black shadow-xl ${
@@ -56,7 +56,7 @@ function Navbar() {
           />
 
           {/* Logo and title */}
-          <div className='flex items-center gap-x-4'>
+          <div className={`flex items-center gap-x-4 ${open && 'mr-16'}`}>
             <img
               src='./src/assets/logoX.png'
               alt='Logo'
@@ -69,7 +69,8 @@ function Navbar() {
               </h1>
             )}
           </div>
-          <ul className='flex flex-col items-center justify-center pt-6'>
+          <ul
+            className={`flex w-full flex-col items-center justify-center pt-6 *:w-full ${open ? '*:justify-left' : '*:justify-center'}`}>
             {Menus.map((menu, index) => (
               <li
                 key={index}
