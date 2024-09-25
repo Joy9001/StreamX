@@ -36,7 +36,7 @@ const videoSchema = new Schema(
 		},
 		uploadStatus: {
 			type: Schema.Types.String,
-			enum: ['None', 'Uploading', 'Uploaded', 'Failed'],
+			enum: ['None', 'Pending', 'Uploading', 'Uploaded', 'Failed'],
 			default: 'None',
 		},
 		scheduleUpload: {
