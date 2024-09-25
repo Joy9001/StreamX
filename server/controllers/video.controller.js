@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { storage } from '../helpers/firebase.helper.js'
 import Video from '../models/video.model.js'
 
-const getAllController = async (_req, res) => {
+const getAllController = async (req, res) => {
 	ownerid = '66efdc9aadf813b060a6c470'
 	try {
 		const videos = await Video.find({ ownerId: ownerid }).lean()
