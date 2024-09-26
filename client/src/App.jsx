@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 import { useRecoilValue } from 'recoil'
 import Login from './components/Auth/Login.jsx'
 import LoginEditor from './components/Auth/LoginEditor.jsx'
@@ -42,7 +42,7 @@ function App() {
   ])
   return (
     <>
-      <RouterProvider router={router} />
+      <ProfileForm />
     </>
   )
 }

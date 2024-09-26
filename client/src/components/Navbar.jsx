@@ -5,9 +5,8 @@ import {
   MoreVertical,
   Settings,
   User,
-  Video,
+  Video
 } from 'lucide-react'
-import PropTypes from 'prop-types'
 import { useEffect, useRef, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { navbarOpenState } from '../states/navbarState.js'
@@ -40,14 +39,19 @@ function Navbar({ title }) {
 
   return (
     <>
+    <>
       {/* NAVBAR */}
       <div
         className={`${
           open ? 'w-full' : 'w-20'
         } relative flex h-screen flex-shrink-0 flex-col justify-between bg-gray-100 p-5 pt-6 transition-all duration-300`}>
         <div className='flex w-full flex-col items-center justify-center'>
+          open ? 'w-full' : 'w-20'
+        } relative flex h-screen flex-shrink-0 flex-col justify-between bg-gray-100 p-5 pt-6 transition-all duration-300`}>
+        <div className='flex w-full flex-col items-center justify-center'>
           {/* Arrow toggle button */}
           <ChevronLeft
+            className={`absolute -right-3 top-9 h-7 w-7 cursor-pointer rounded-full border-2 border-gray-50 bg-white text-black shadow-xl ${
             className={`absolute -right-3 top-9 h-7 w-7 cursor-pointer rounded-full border-2 border-gray-50 bg-white text-black shadow-xl ${
               !open && 'rotate-180'
             }`}
@@ -56,9 +60,11 @@ function Navbar({ title }) {
 
           {/* Logo and title */}
           <div className={`flex items-center gap-x-4 ${open && 'mr-16'}`}>
+          <div className={`flex items-center gap-x-4 ${open && 'mr-16'}`}>
             <img
               src='./src/assets/logoX.png'
               alt='Logo'
+              className={`w-14 cursor-pointer rounded-full bg-black duration-500`}
               className={`w-14 cursor-pointer rounded-full bg-black duration-500`}
             />
             {open && (
@@ -67,7 +73,15 @@ function Navbar({ title }) {
                 Stream<span className='text-xl font-bold text-red-600'>X</span>
               </h1>
             )}
+            {open && (
+              <h1
+                className={`origin-left text-xl font-bold duration-300 ${!open && 'scale-0'}`}>
+                Stream<span className='text-xl font-bold text-red-600'>X</span>
+              </h1>
+            )}
           </div>
+          <ul
+            className={`flex w-full flex-col items-center justify-center pt-6 *:w-full ${open ? '*:justify-left' : '*:justify-center'}`}>
           <ul
             className={`flex w-full flex-col items-center justify-center pt-6 *:w-full ${open ? '*:justify-left' : '*:justify-center'}`}>
             {Menus.map((menu, index) => (
@@ -87,9 +101,11 @@ function Navbar({ title }) {
         {/* User profile section */}
         <div
           className={`mt-auto flex items-center gap-x-4 ${open ? 'justify-between' : 'justify-center'}`}>
+          className={`mt-auto flex items-center gap-x-4 ${open ? 'justify-between' : 'justify-center'}`}>
           <img
             src='https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
             alt='User'
+            className='h-10 w-10 rounded-full'
             className='h-10 w-10 rounded-full'
           />
           {open && (
@@ -101,6 +117,7 @@ function Navbar({ title }) {
               <div className='relative'>
                 <MoreVertical
                   className='h-5 w-5 cursor-pointer'
+                  className='h-5 w-5 cursor-pointer'
                   onClick={() => setShowPopup(!showPopup)}
                 />
                 {showPopup && (
@@ -108,17 +125,25 @@ function Navbar({ title }) {
                     ref={popupRef}
                     className='absolute bottom-full right-0 mb-2 w-48 overflow-hidden rounded-md bg-gray-200 text-white shadow-lg'>
                     <div className='border-b border-gray-700 px-4 py-2 font-semibold text-gray-700'>
+                    className='absolute bottom-full right-0 mb-2 w-48 overflow-hidden rounded-md bg-gray-200 text-white shadow-lg'>
+                    <div className='border-b border-gray-700 px-4 py-2 font-semibold text-gray-700'>
                       My Account
                     </div>
                     <ul>
+                      <li className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
+                        <User className='mr-2 h-4 w-4' />
                       <li className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
                         <User className='mr-2 h-4 w-4' />
                         Profile
                       </li>
                       <li className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
                         <HelpCircle className='mr-2 h-4 w-4' />
+                      <li className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
+                        <HelpCircle className='mr-2 h-4 w-4' />
                         Support
                       </li>
+                      <li className='flex cursor-pointer items-center px-4 py-2 text-red-500 hover:bg-accent'>
+                        <LogOut className='mr-2 h-4 w-4' />
                       <li className='flex cursor-pointer items-center px-4 py-2 text-red-500 hover:bg-accent'>
                         <LogOut className='mr-2 h-4 w-4' />
                         Log out
@@ -131,6 +156,7 @@ function Navbar({ title }) {
           )}
         </div>
       </div>
+    </>
     </>
   )
 }
