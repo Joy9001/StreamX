@@ -18,17 +18,23 @@
 		"connect-mongo": "^5.1.0",
 		"cookie-session": "^2.0.0",
 		"cors": "^2.8.5",
+		"axios": "^1.7.7",
+		"cors": "^2.8.5",
 		"dotenv": "^16.4.5",
 		"express": "^4.21.0",
 		"firebase": "^10.13.2",
+		"google-auth-library": "^9.14.1",
+		"googleapis": "^144.0.0",
 		"http-status-codes": "^2.3.0",
 		"express": "^4.21.0",
 		"express-session": "^1.18.0",
 		"mongoose": "^8.6.2",
 		"passport": "^0.5.2",
-		"passport-google-oauth20": "^2.0.0"
+		"passport-google-oauth20": "^2.0.0",
+		"multer": "^1.4.5-lts.1"
 	},
 	"devDependencies": {
+		"morgan": "^1.10.0",
 		"nodemon": "^3.1.4"
 	}
 }

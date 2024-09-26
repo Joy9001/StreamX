@@ -1,6 +1,8 @@
+import { filesize } from 'filesize'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
+import userCircle from '../assets/user-circle.svg'
 import { drawerContentState, drawerState } from '../states/drawerState.js'
 import ContenetTableRowOptions from './ContentTableRowOptions'
 
@@ -10,7 +12,7 @@ function ContentTableRow({ content }) {
   const setDrawerContentState = useRecoilState(drawerContentState)[1]
 
   useEffect(() => {
-    switch (content.ytStatus) {
+    switch (content.ytUploadStatus) {
       case 'None':
         setYtBtn(
           <button className='btn border-red-500 bg-white text-red-500 hover:border-red-500 hover:text-red-500'>
@@ -134,16 +136,28 @@ function ContentTableRow({ content }) {
         )
         break
     }
-  }, [content.ytStatus])
+  }, [content.ytUploadStatus])
 
   function handleRowClick() {
     setDrawerState(true)
     setDrawerContentState(content)
   }
 
+  function handleYtUpload() {
+    // axios
+    //   .post('/api/yt/upload', { videoId: content._id })
+    //   .then((res) => {
+    //     console.log(res.data)
+    //   })
+    //   .catch((err) => {
+    //     console.log(err)
+    //   })
+    console.log('uploading to youtube')
+  }
+
   return (
-    <tr onClick={handleRowClick} className='cursor-pointer hover:bg-gray-100'>
-      <td>
+    <tr className='cursor-pointer hover:bg-gray-100'>
+      <td onClick={handleRowClick}>
         <div className='flex items-center gap-3'>
           <div className='flex items-center justify-center'>
             <div className='mask mask-squircle flex h-12 w-12 items-center justify-center'>
@@ -177,55 +191,62 @@ function ContentTableRow({ content }) {
               </div>
             </div>
           </div>
-          <div className='flex items-center justify-center'>
-            <div className='font-bold'>{content.title}</div>
+          <div className='flex items-center justify-center truncate'>
+            <div className='font-bold'>{content.metaData.name}</div>
           </div>
         </div>
       </td>
-      <td>
+      <td onClick={handleRowClick}>
         <div className='flex items-center space-x-2'>
           <div className='avatar'>
             <div className='w-8 rounded-full'>
-              <img alt={content.owner} src={content.ownerPic} />
+              <img
+                alt={content.owner || 'owner'}
+                src={content.ownerPic || userCircle}
+              />
             </div>
           </div>
-          <span className='text-sm'>{content.owner}</span>
+          <span className='text-sm'>{content.owner || '-'}</span>
         </div>
       </td>
-      <td>
+      <td onClick={handleRowClick}>
         <div className='flex items-center space-x-2'>
           <div className='avatar'>
             <div className='w-8 rounded-full'>
-              <img alt={content.editor} src={content.editorPic} />
+              <img
+                alt={content.editor || 'editor'}
+                src={content.editorPic || userCircle}
+              />
             </div>
           </div>
-          <span className='text-sm'>{content.editor}</span>
+          <span className='text-sm'>{content.editor || '-'}</span>
         </div>
       </td>
-      <td>
-        <span className='text-sm'>{content.updatedAt}</span>
+      <td onClick={handleRowClick}>
+        <span className='text-sm'>
+          {new Date(content.updatedAt).toLocaleDateString()}
+        </span>
       </td>
-      <td>
-        <span className='text-sm'>{content.size}</span>
+      <td onClick={handleRowClick}>
+        <span className='text-sm'>{filesize(content.metaData.size)}</span>
       </td>
-      <td className='w-40'>{ytBtn}</td>
+      <td className='w-40' onClick={handleYtUpload}>
+        {ytBtn}
+      </td>
       <td className='w-40'>
-        <ContenetTableRowOptions />
+        <span className='text-sm'>{content.approvalStatus}</span>
+      </td>
+      <td className='w-40'>
+        <ContenetTableRowOptions
+          editor={content.editor}
+          videoId={content._id}
+        />
       </td>
     </tr>
   )
 }
 
 ContentTableRow.propTypes = {
-  content: PropTypes.shape({
-    title: PropTypes.string,
-    owner: PropTypes.string,
-    ownerPic: PropTypes.string,
-    editor: PropTypes.string,
-    editorPic: PropTypes.string,
-    updatedAt: PropTypes.string,
-    size: PropTypes.string,
-    ytStatus: PropTypes.string,
-  }).isRequired,
+  content: PropTypes.object.isRequired,
 }
 export default ContentTableRow

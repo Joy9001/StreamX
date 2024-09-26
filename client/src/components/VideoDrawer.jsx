@@ -1,7 +1,9 @@
+import { filesize } from 'filesize'
 import { useState } from 'react'
 import ReactPlayer from 'react-player'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import keySvg from '../assets/key.svg'
+import userCircle from '../assets/user-circle.svg'
 import { drawerContentState, drawerState } from '../states/drawerState.js'
 
 const VideoDrawer = () => {
@@ -20,7 +22,7 @@ const VideoDrawer = () => {
   return drawerContent ? (
     <div className='no-scrollbar w-full overflow-auto rounded-lg bg-neutral-50 p-4'>
       <header className='flex items-center justify-between'>
-        <h2 className='text-md font-semibold'>{drawerContent.title}</h2>
+        <h2 className='text-md font-semibold'>{drawerContent.metaData.name}</h2>
         <span
           className='material-symbols-outlined cursor-pointer'
           onClick={handleCrossClick}>
@@ -60,7 +62,6 @@ const VideoDrawer = () => {
           light={light}
           controls={true}
           onReady={() => setLight(true)}
-          playing={true}
         />
       </figure>
 
@@ -69,7 +70,10 @@ const VideoDrawer = () => {
         <div className='mb-4 flex items-center gap-2'>
           <div className='avatar'>
             <div className='w-10 rounded-full'>
-              <img src={drawerContent.editorPic} alt={drawerContent.editor} />
+              <img
+                src={drawerContent.editorPic || userCircle}
+                alt={drawerContent.editor || 'editor'}
+              />
             </div>
           </div>
         </div>
@@ -87,36 +91,40 @@ const VideoDrawer = () => {
         <div className='flex flex-col gap-3 text-sm'>
           <div>
             <span className='font-medium'>Location</span>
-            <p>{drawerContent.location}</p>
+            <p>{drawerContent.location || 'Storage'}</p>
           </div>
           <div>
             <span className='font-medium'>Type</span>
-            <p>{drawerContent.type}</p>
+            <p>{drawerContent.metaData.contentType}</p>
           </div>
           <div>
             <span className='font-medium'>Size</span>
-            <p>{drawerContent.size}</p>
+            <p>{filesize(drawerContent.metaData.size)}</p>
           </div>
           <div>
             <span className='flex items-center'>
               <span className='font-medium'>Owner</span>
               <div className='avatar'>
                 <div className='ml-2 w-8 rounded-full'>
-                  <img src={drawerContent.ownerPic} alt={drawerContent.owner} />
+                  <img
+                    src={drawerContent.ownerPic || userCircle}
+                    alt={drawerContent.owner || 'owner'}
+                  />
                 </div>
               </div>
-              <span className='ml-2'>{drawerContent.owner}</span>
+              <span className='ml-2'>{drawerContent.owner || '-'}</span>
             </span>
           </div>
           <div>
             <span className='font-medium'>Modified</span>
             <p>
-              {drawerContent.updatedAt} by {drawerContent.owner}
+              {new Date(drawerContent.updatedAt).toLocaleString()} by{' '}
+              {drawerContent.owner || '-'}
             </p>
           </div>
           <div>
             <span className='font-medium'>Created</span>
-            <p>{drawerContent.createdAt}</p>
+            <p>{new Date(drawerContent.createdAt).toLocaleString()}</p>
           </div>
         </div>
       </section>
@@ -124,11 +132,21 @@ const VideoDrawer = () => {
       <hr className='my-4 border-neutral-200' />
 
       <section>
-        <h3 className='text-md mb-4 font-semibold'>Youtube Upload Status</h3>
+        <h3 className='text-md mb-4 font-semibold'>Status</h3>
         <div className='flex flex-col text-sm'>
-          <span className='font-medium'>Status</span>
+          <span className='font-medium'>Youtube Upload Status</span>
           <span className=''>
-            {drawerContent.ytStatus == 'None' ? '-' : drawerContent.ytStatus}
+            {drawerContent.ytUploadStatus == 'None'
+              ? '-'
+              : drawerContent.ytStatus}
+          </span>
+        </div>
+        <div className='flex flex-col text-sm'>
+          <span className='font-medium'>Approve Status</span>
+          <span className=''>
+            {drawerContent.approvalStatus == 'None'
+              ? '-'
+              : drawerContent.approvalStatus}
           </span>
         </div>
       </section>

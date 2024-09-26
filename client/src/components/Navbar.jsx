@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useRecoilState } from 'recoil'
-import { navbarOpenState } from '../states/navbarState'
+import { navbarOpenState } from '../states/navbarState.js'
 
 function Navbar() {
   const [open, setOpen] = useRecoilState(navbarOpenState)

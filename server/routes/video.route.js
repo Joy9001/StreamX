@@ -3,11 +3,16 @@ import {
 	deleteController,
 	downloadController,
 	getAllController,
+	recentController,
 	uploadController,
 } from '../controllers/video.controller.js'
+import { upload } from '../middlewares/multer.middleware.js'
 const router = Router()
 
 router.get('/all', getAllController)
-router.post('/upload', uploadController)
-router.delete('/delete/:id', deleteController)
+router.get('/recent', recentController)
+router.post('/upload', upload.single('file'), uploadController)
+router.delete('/delete', deleteController)
 router.post('/download/:id', downloadController)
+
+export default router

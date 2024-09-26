@@ -34,7 +34,7 @@ const videoSchema = new Schema(
 			type: Object,
 			required: false,
 		},
-		uploadStatus: {
+		ytUploadStatus: {
 			type: Schema.Types.String,
 			enum: ['None', 'Pending', 'Uploading', 'Uploaded', 'Failed'],
 			default: 'None',
@@ -43,7 +43,7 @@ const videoSchema = new Schema(
 			type: Schema.Types.Date,
 			required: false,
 		},
-		ApprovalStatus: {
+		approvalStatus: {
 			type: Schema.Types.String,
 			enum: ['None', 'Pending', 'Approved', 'Rejected'],
 			default: 'None',

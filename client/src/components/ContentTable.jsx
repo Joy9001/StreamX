@@ -1,5 +1,26 @@
+import axios from 'axios'
+import { useEffect } from 'react'
+import { useRecoilState } from 'recoil'
+import { allVidState } from '../states/videoState.js'
 import ContentTableRow from './ContenetTableRow'
+
 function ContentTable() {
+  const [allVideos, setAllVideos] = useRecoilState(allVidState)
+
+  useEffect(() => {
+    async function fetchAllVideos() {
+      try {
+        const res = await axios.get('http://localhost:3000/api/videos/all')
+        console.log('all', res.data)
+        setAllVideos(res.data.videos)
+      } catch (error) {
+        console.error('Error fetching all videos:', error)
+      }
+    }
+
+    fetchAllVideos()
+  }, [setAllVideos])
+
   return (
     <>
       <div className='no-scrollbar h-[30rem] overflow-x-auto'>
@@ -13,106 +34,14 @@ function ContentTable() {
               <th>Last Modified</th>
               <th>File size</th>
               <th>YT Status</th>
+              <th>Aproval Status</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {/* row 1 */}
-            <ContentTableRow
-              content={{
-                title: 'Dummy.mp4',
-                url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                owner: 'Joy Mridha',
-                ownerPic:
-                  'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
-                editor: 'Jokeward',
-                editorPic:
-                  'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
-                createdAt: '2021-08-01',
-                updatedAt: '2021-09-01',
-                location: 'Storage',
-                type: 'Video',
-                size: '1.5GB',
-                ytStatus: 'None',
-              }}
-            />
-            {/* row 2 */}
-            <ContentTableRow
-              content={{
-                title: 'Dummy.mp4',
-                url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                owner: 'Joy Mridha',
-                ownerPic:
-                  'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
-                editor: 'Jokeward',
-                editorPic:
-                  'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
-                createdAt: '2021-08-01',
-                updatedAt: '2021-09-01',
-                location: 'Storage',
-                type: 'Video',
-                size: '1.5GB',
-                ytStatus: 'Pending',
-              }}
-            />
-            {/* row 3 */}
-            <ContentTableRow
-              content={{
-                title: 'Dummy.mp4',
-                url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                owner: 'Joy Mridha',
-                ownerPic:
-                  'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
-                editor: 'Jokeward',
-                editorPic:
-                  'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
-                createdAt: '2021-08-01',
-                updatedAt: '2021-09-01',
-                location: 'Storage',
-                type: 'Video',
-                size: '1.5GB',
-                ytStatus: 'Uploading',
-              }}
-            />
-            {/* row 4 */}
-            <ContentTableRow
-              content={{
-                title: 'Dummy.mp4',
-                url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                owner: 'Joy Mridha',
-                ownerPic:
-                  'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
-                editor: 'Jokeward',
-                editorPic:
-                  'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
-                createdAt: '2021-08-01',
-                updatedAt: '2021-09-01',
-                location: 'Storage',
-                type: 'Video',
-                size: '1.5GB',
-                ytStatus: 'Uploaded',
-              }}
-            />
-            {/* row 5 */}
-            <ContentTableRow
-              content={{
-                title: 'Dummy.mp4',
-                url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                owner: 'Joy Mridha',
-                ownerPic:
-                  'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
-                editor: 'Jokeward',
-                editorPic:
-                  'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
-                createdAt: '2021-08-01',
-                updatedAt: '2021-09-01',
-                location: 'Storage',
-                type: 'Video',
-                size: '1.5GB',
-                ytStatus: 'Failed',
-              }}
-            />
-            {/* ////////////////// */}
+            {allVideos.map((video) => (
+              <ContentTableRow key={video._id} content={video} />
+            ))}
           </tbody>
         </table>
       </div>
