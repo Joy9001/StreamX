@@ -1,15 +1,19 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
+// import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 function Login() {
   // State to manage input values
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const navigate = useNavigate()
 
   // Handler for Google login
   const handleGoogleLogin = () => {
     console.log('Google login initiated. Preparing Google OAuth flow...')
-    window.open('http://localhost:5000/auth/google/callback', '_self')
+    window.location.href = 'http://localhost:5000/auth/google'
+    // navigate('http://localhost:5000/auth/google/callback')
   }
 
   // Handler for normal login form submission

@@ -35,24 +35,20 @@ router.get(
   })
 );
 
-router.get("/logout", async function (req, res, next) {
+router.get("/logout", async (req, res, next) => {
   try {
-    await new Promise((resolve, reject) => {
-      req.logout(function (err) {
-        if (err) reject(err);
-        resolve();
-      });
+    req.logout();
+    req.session.destroy(function (err) {
+      if (err) {
+        return next(err);
+      }
+
+      req.session = null;
+      res.clearCookie("connect.sid");
+      return res.status(200).json({ error: false, message: "Logged Out" });
     });
-    await new Promise((resolve, reject) => {
-      req.session.destroy(function (err) {
-        if (err) reject(err);
-        resolve();
-      });
-    });
-    return res.redirect("/");
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: true, message: "Failed to log out" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

@@ -1,8 +1,7 @@
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import passport from "passport";
 import dotenv from "dotenv";
-import User from "../model/users.model.js";
-import mongoose from "mongoose";
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import Owner from "../model/users.model.js";
 
 dotenv.config();
 
@@ -18,28 +17,34 @@ const passportStrategy = () => {
       },
       async function (accessToken, refreshToken, profile, callback) {
         console.log("Google user profile:", profile);
+        console.log("Access token:", accessToken);
+        console.log("Refresh token:", refreshToken);
+
         const googleId = profile.id;
         const name = profile.displayName;
         const email = profile.emails[0].value;
         const provider = profile.provider;
 
         try {
-          const finduser = await User.findOne({ googleId });
+          const finduser = await Owner.findOne({ googleId });
           if (!finduser) {
             console.log("New user detected. Creating new user...");
-            const newUser = await User({ googleId, username: name, email });
+            const newUser = await Owner({ googleId, username: name, email });
             await newUser.save();
 
-            const user = await User.findOne({ googleId });
+            const user = await Owner.findOne({ googleId });
 
             const userSession = {
               _id: user._id,
             };
             return callback(null, userSession);
           } else {
-            console.log("User already exists. Reusing existing user...");
+            console.log("Owner already exists. Reusing existing user...");
+
             const userSession = {
-              _id: user._id,
+              _id: finduser._id,
+              accessToken: accessToken,
+              refreshToken: refreshToken || "",
             };
             return callback(null, userSession);
           }

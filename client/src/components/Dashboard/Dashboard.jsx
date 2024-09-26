@@ -61,22 +61,17 @@ const Dashboard = () => {
             <Link
               href='#'
               className='text-muted-foreground transition-colors hover:text-foreground'>
-              Orders
+              Owner
             </Link>
             <Link
               href='#'
               className='text-muted-foreground transition-colors hover:text-foreground'>
-              Products
+              Editor
             </Link>
             <Link
               href='#'
               className='text-muted-foreground transition-colors hover:text-foreground'>
-              Customers
-            </Link>
-            <Link
-              href='#'
-              className='text-muted-foreground transition-colors hover:text-foreground'>
-              Analytics
+              Videos
             </Link>
           </nav>
           <Sheet>
@@ -129,7 +124,7 @@ const Dashboard = () => {
                 <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
                 <Input
                   type='search'
-                  placeholder='Search products...'
+                  placeholder='Search...'
                   className='pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]'
                 />
               </div>
@@ -148,7 +143,6 @@ const Dashboard = () => {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Logout</DropdownMenuItem>
               </DropdownMenuContent>
@@ -165,7 +159,7 @@ const Dashboard = () => {
                 <DollarSign className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>$45,231.89</div>
+                <div className='text-2xl font-bold'>$50,240</div>
                 <p className='text-xs text-muted-foreground'>
                   +20.1% from last month
                 </p>
@@ -174,38 +168,36 @@ const Dashboard = () => {
             <Card x-chunk='dashboard-01-chunk-1'>
               <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                 <CardTitle className='text-sm font-medium'>
-                  Subscriptions
+                  Total Users
                 </CardTitle>
                 <Users className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>+2350</div>
+                <div className='text-2xl font-bold'>1024</div>
                 <p className='text-xs text-muted-foreground'>
-                  +180.1% from last month
+                  +110.1% from last month
                 </p>
               </CardContent>
             </Card>
             <Card x-chunk='dashboard-01-chunk-2'>
               <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle className='text-sm font-medium'>Sales</CardTitle>
+                <CardTitle className='text-sm font-medium'>Editors</CardTitle>
                 <CreditCard className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>+12,234</div>
+                <div className='text-2xl font-bold'>234</div>
                 <p className='text-xs text-muted-foreground'>
-                  +19% from last month
+                  +5% from last month
                 </p>
               </CardContent>
             </Card>
             <Card x-chunk='dashboard-01-chunk-3'>
               <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle className='text-sm font-medium'>
-                  Active Now
-                </CardTitle>
+                <CardTitle className='text-sm font-medium'>Videos</CardTitle>
                 <Activity className='h-4 w-4 text-muted-foreground' />
               </CardHeader>
               <CardContent>
-                <div className='text-2xl font-bold'>+573</div>
+                <div className='text-2xl font-bold'>2359</div>
                 <p className='text-xs text-muted-foreground'>
                   +201 since last hour
                 </p>

@@ -1,13 +1,14 @@
-import connectMongo from "./db/connectMongo.db.js";
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import cors from "cors";
 import passport from "passport";
+import connectMongo from "./db/connectMongo.db.js";
 // import cookieSession from "cookie-session";
+import MongoStore from "connect-mongo";
+import session from "express-session";
+import isAuthenticated from "./middlewares/auth.middleware.js";
 import authRoute from "./routes/auth.js";
 import passportStrategy from "./strategy/passport.js";
-import session from "express-session";
-import MongoStore from "connect-mongo";
 
 const app = express();
 
@@ -31,14 +32,14 @@ const sessionMiddleware = session({
   saveUninitialized: false,
   rolling: true,
   cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
   },
   store: MongoStore.create({
-      mongoUrl: process.env.MONGO_DB_URI,
-      collectionName: 'sessions',
+    mongoUrl: process.env.MONGO_DB_URI,
+    collectionName: "sessions",
   }),
-})
-app.use(sessionMiddleware)
+});
+app.use(sessionMiddleware);
 // app.use(
 //   cookieSession({
 //     name: "session",
@@ -51,6 +52,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/auth", authRoute);
+
+app.get("/", isAuthenticated, (req, res) => {
+  res.send(`Hello!`);
+});
 
 app.listen(5000, () => {
   console.log("listening port 5000");
