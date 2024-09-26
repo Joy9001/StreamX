@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { useState } from 'react'
+import { NavLink } from 'react-router-dom'
 
 function SignUp() {
   // State to manage input values
@@ -11,7 +11,7 @@ function SignUp() {
   // Handler for Google sign-up
   const handleGoogleSignUp = () => {
     console.log('Google sign-up initiated. Preparing Google OAuth flow...')
-    window.open('http://localhost:5000/auth/google/callback', '_self')
+    window.open('http://localhost:3000/auth/google/callback', '_self')
   }
 
   // Handler for sign-up form submission
@@ -44,10 +44,10 @@ function SignUp() {
   return (
     <div
       data-theme='pastel'
-      className='min-h-screen flex items-center justify-center bg-base-200'>
+      className='flex min-h-screen items-center justify-center bg-base-200'>
       <div className='card w-full max-w-lg bg-base-100 shadow-xl'>
         <div className='card-body'>
-          <h2 className='text-3xl font-bold text-center text-primary-content'>
+          <h2 className='text-center text-3xl font-bold text-primary-content'>
             Sign Up
           </h2>
 
@@ -116,7 +116,7 @@ function SignUp() {
                 required
               />
               {password !== confirmPassword && (
-                <p className='text-red-500 mt-1'>Passwords do not match!</p>
+                <p className='mt-1 text-red-500'>Passwords do not match!</p>
               )}
             </div>
 
@@ -144,14 +144,14 @@ function SignUp() {
             <NavLink
               to='/login'
               onClick={handleLoginRedirect}
-              className='link link-hover text-primary'>
+              className='link-hover link text-primary'>
               Login
             </NavLink>
           </p>
           <NavLink
             to='/'
             onClick={handleBackToHome}
-            className='text-center mt-2 link link-hover'>
+            className='link-hover link mt-2 text-center'>
             Back to Home
           </NavLink>
         </div>

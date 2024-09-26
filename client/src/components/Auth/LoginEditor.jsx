@@ -3,19 +3,19 @@ import { useRecoilState } from 'recoil'
 import { userState } from '../../states/loginState.js'
 // import axios from 'axios'
 
-function Login() {
+function LoginEditor() {
   // State to manage input values
   // const [email, setEmail] = useState('')
   // const [password, setPassword] = useState('')
   const navigate = useNavigate()
   const setUser = useRecoilState(userState)[1]
 
-  setUser('owner')
+  setUser('editor')
 
   // Handler for Google login
   const handleGoogleLogin = () => {
     console.log('Google login initiated. Preparing Google OAuth flow...')
-    window.location.href = 'http://localhost:3000/auth/owner/google/callback'
+    window.location.href = 'http://localhost:3000/auth/editor/google/callback'
     // navigate('http://localhost:3000/auth/google/callback')
   }
 
@@ -57,7 +57,7 @@ function Login() {
       <div className='card w-96 bg-base-100 shadow-xl'>
         <div className='card-body'>
           <h2 className='mb-6 text-center text-3xl font-bold text-primary-content'>
-            Login As Owner
+            Login As Editor
           </h2>
 
           {/* Form */}
@@ -137,14 +137,13 @@ function Login() {
             Login As{' '}
             <NavLink
               onClick={() => {
-                navigate('/login/editor')
+                navigate('/login/owner')
               }}
               className='link-hover link text-primary'>
-              Editor
+              Owner
             </NavLink>
           </p>
           <NavLink
-            to='/'
             onClick={handleBackToHome}
             className='link-hover link mt-2 text-center'>
             Back to Home
@@ -155,4 +154,4 @@ function Login() {
   )
 }
 
-export default Login
+export default LoginEditor

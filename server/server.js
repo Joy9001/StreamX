@@ -10,10 +10,11 @@ import isAuthenticated from './middlewares/auth.middleware.js'
 import authRoute from './routes/auth.js'
 import VideoRouter from './routes/video.route.js'
 import YTRouter from './routes/yt.route.js'
-import passportStrategy from './strategy/passport.js'
+import { passportEditorStrategy, passportOwnerStrategy } from './strategy/passport.js'
 
 dotenv.config()
-passportStrategy()
+passportEditorStrategy()
+passportOwnerStrategy()
 
 const PORT = process.env.PORT || 3000
 
@@ -23,7 +24,8 @@ app.use(morgan('dev'))
 app.use(
 	cors({
 		origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
-		credentidals: true,
+		methods: ['GET', 'POST', 'PUT', 'DELETE'],
+		credentials: true,
 	})
 )
 app.use(express.urlencoded({ extended: true }))
@@ -53,7 +55,7 @@ app.get('/', isAuthenticated, (req, res) => {
 
 app.use('/api/videos', isAuthenticated, VideoRouter)
 app.use('/api/yt', isAuthenticated, YTRouter)
-app.use('/auth', isAuthenticated, authRoute)
+app.use('/auth', authRoute)
 
 app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`)

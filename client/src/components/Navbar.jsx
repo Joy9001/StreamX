@@ -1,28 +1,27 @@
 import {
-  BarChart2,
   ChevronLeft,
   HelpCircle,
-  LayoutDashboard,
   LogOut,
   MoreVertical,
   Settings,
   User,
   Video,
 } from 'lucide-react'
+import PropTypes from 'prop-types'
 import { useEffect, useRef, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { navbarOpenState } from '../states/navbarState.js'
 
-function Navbar() {
+function Navbar({ title }) {
   const [open, setOpen] = useRecoilState(navbarOpenState)
   const [showPopup, setShowPopup] = useState(false)
   const popupRef = useRef(null)
 
   const Menus = [
-    { title: 'Dashboard', icon: LayoutDashboard },
+    // { title: 'Dashboard', icon: LayoutDashboard },
     { title: 'Profile', icon: User },
-    { title: 'Analytics', icon: BarChart2 },
-    { title: 'Videos', icon: Video },
+    // { title: 'Analytics', icon: BarChart2 },
+    { title: 'Storage', icon: Video },
     { title: 'Settings', icon: Settings },
   ]
 
@@ -74,7 +73,7 @@ function Navbar() {
             {Menus.map((menu, index) => (
               <li
                 key={index}
-                className={`mt-2 flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm ease-in hover:bg-secondary hover:duration-300`}>
+                className={`mt-2 flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm ease-in hover:bg-secondary hover:duration-300 ${title == menu.title ? 'bg-secondary' : ''}`}>
                 <menu.icon className='h-5 w-5' />
                 <span
                   className={`${!open && 'hidden'} origin-left duration-200`}>
@@ -134,6 +133,10 @@ function Navbar() {
       </div>
     </>
   )
+}
+
+Navbar.propTypes = {
+  title: PropTypes.string,
 }
 
 export default Navbar

@@ -10,7 +10,9 @@ function ContentTable() {
   useEffect(() => {
     async function fetchAllVideos() {
       try {
-        const res = await axios.get('http://localhost:3000/api/videos/all')
+        const res = await axios.get('http://localhost:3000/api/videos/all', {
+          withCredentials: true,
+        })
         console.log('all', res.data)
         setAllVideos(res.data.videos)
       } catch (error) {

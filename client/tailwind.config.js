@@ -1,4 +1,5 @@
 import daisyui from 'daisyui'
+import tailwindcssAnimate from 'tailwindcss-animate'
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
@@ -20,14 +21,6 @@ export default {
         popover: {
           DEFAULT: 'hsl(var(--popover))',
           foreground: 'hsl(var(--popover-foreground))',
-        },
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
-        },
-        secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
         },
         muted: {
           DEFAULT: 'hsl(var(--muted))',
@@ -54,7 +47,7 @@ export default {
       },
     },
   },
-  plugins: [require('daisyui'), require('tailwindcss-animate')],
+  plugins: [daisyui, tailwindcssAnimate],
   daisyui: {
     themes: ['cupcake', 'dark', 'cmyk', 'pastel'],
   },

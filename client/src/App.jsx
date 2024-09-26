@@ -1,32 +1,39 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import Home from './components/Home.jsx'
+import { useRecoilValue } from 'recoil'
 import Login from './components/Auth/Login.jsx'
-import SignUp from './components/Auth/SignUp.jsx'
+import LoginEditor from './components/Auth/LoginEditor.jsx'
 import Logout from './components/Auth/Logout.jsx'
-import Dashboard from './components/Dashboard/Dashboard.jsx'
 import Storage from './components/Storage.jsx'
+import { loginState, userState } from './states/loginState.js'
 
 function App() {
+  const isLoggedIn = useRecoilValue(loginState)
+  const user = useRecoilValue(userState)
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <Home />,
+      element: isLoggedIn ? (
+        user == 'owner' ? (
+          <Storage />
+        ) : (
+          <LoginEditor />
+        )
+      ) : (
+        <Login />
+      ),
     },
     {
-      path: '/login',
-      element: <Login />,
+      path: '/login/owner',
+      element: isLoggedIn ? <Storage /> : <Login />,
     },
     {
-      path: '/signup',
-      element: <SignUp />,
+      path: '/login/editor',
+      element: isLoggedIn ? <Storage /> : <LoginEditor />,
     },
     {
       path: '/logout',
+      // element: isLoggedIn ? <Logout /> : <Login />,
       element: <Logout />,
-    },
-    {
-      path: '/dashboard',
-      element: <Dashboard />,
     },
     {
       path: '/storage',

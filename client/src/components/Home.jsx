@@ -1,13 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { useState, useEffect } from 'react'
-import axios from 'axios'
 
 function Home() {
   // const [user, setUser] = useState(null)
 
   // const getUser = async () => {
   //   try {
-  //     const url = 'http://localhost:5000/auth/login/success'
+  //     const url = 'http://localhost:3000/auth/login/success'
   //     const { data } = await axios.get(url, { withCredentials: true })
   //     setUser(data.user._json)
   //   } catch (err) {

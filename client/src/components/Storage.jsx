@@ -1,5 +1,7 @@
+import { loginState } from '@/states/loginState.js'
 import axios from 'axios'
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { drawerState } from '../states/drawerState.js'
 import { navbarOpenState } from '../states/navbarState.js'
@@ -17,6 +19,21 @@ function Storage() {
   const [uploading, setUploading] = useState(false)
   const [recentVideos, setRecentVideos] = useRecoilState(recentVidState)
   const setAllVideos = useRecoilState(allVidState)[1]
+  const navigate = useNavigate()
+  const setLoginState = useRecoilState(loginState)[1]
+
+  const [searchParams] = useSearchParams()
+  const login = searchParams.get('login')
+
+  useEffect(() => {
+    if (login !== 'true') {
+      setLoginState(false)
+      navigate('/')
+    } else {
+      console.log('User logged in')
+      setLoginState(true)
+    }
+  }, [login, navigate, setLoginState])
 
   function handleNewBtnClick() {
     fileInputRef.current.click()
@@ -38,6 +55,7 @@ function Storage() {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
+            withCredentials: true,
           }
         )
 
@@ -59,7 +77,9 @@ function Storage() {
   useEffect(() => {
     async function fetchRecentVideos() {
       try {
-        const res = await axios.get('http://localhost:3000/api/videos/recent')
+        const res = await axios.get('http://localhost:3000/api/videos/recent', {
+          withCredentials: true,
+        })
         console.log(res.data)
         setRecentVideos(res.data.videos)
       } catch (error) {
@@ -76,7 +96,7 @@ function Storage() {
         className={`navbar h-full transition-all duration-300 ${
           navOpen ? 'w-[15%]' : 'w-[5%]'
         } pl-0`}>
-        <Navbar />
+        <Navbar title='Storage' />
       </div>
 
       {/* Main */}
