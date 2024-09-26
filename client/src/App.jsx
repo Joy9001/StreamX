@@ -1,8 +1,9 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { useRecoilValue } from 'recoil'
 import Login from './components/Auth/Login.jsx'
 import LoginEditor from './components/Auth/LoginEditor.jsx'
 import Logout from './components/Auth/Logout.jsx'
+import Profile from './components/Profile.jsx'
 import Storage from './components/Storage.jsx'
 import { loginState, userState } from './states/loginState.js'
 
@@ -39,10 +40,14 @@ function App() {
       path: '/storage',
       element: <Storage />,
     },
+    {
+      path: '/profile/owner',
+      element: <Profile />,
+    },
   ])
   return (
     <>
-      <ProfileForm />
+      <RouterProvider router={router} />
     </>
   )
 }
