@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import express from 'express'
 import morgan from 'morgan'
 import connectMongo from './db/connectMongo.db.js'
+import VideoRouter from './routes/video.route.js'
 
 dotenv.config()
 
@@ -21,8 +22,10 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 app.get('/', (req, res) => {
-	res.send('Hello World!')
+	res.send('Backend is up!')
 })
+
+app.use('/api/videos', VideoRouter)
 
 app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`)
