@@ -4,6 +4,7 @@ import languageIcon from "../assets/language.svg";
 import starIcon from "../assets/star.svg";
 import checkIcon from "../assets/tick.svg";
 import crossIcon from "../assets/cross.svg";
+import Drawer from "./Drawer.jsx";
 
 function Card({ data }) {
   const [selectedPlan, setSelectedPlan] = useState("Basic");
@@ -240,20 +241,17 @@ function Card({ data }) {
       {/* Drawer Component */}
       {isDrawerOpen && (
         <div
-          className={`fixed top-0 right-0 z-50 h-screen w-3/5 bg-white shadow-lg transition-transform transform ${
+          className={`fixed top-0 right-0 z-50 h-screen w-3/5 bg-white shadow-lg transition-transform transform overflow-y-auto ${
             isDrawerOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
           <div className="drawer-header flex justify-between p-4">
-            <h2 className="text-lg font-bold">Profile Details</h2>
             <button onClick={toggleDrawer} className="text-black">
               X
             </button>
           </div>
           <div className="drawer-content p-4">
-            {/* Add your detailed profile content here */}
-            <h3 className="font-bold text-xl">More about {data.name}</h3>
-            <p>{data.bio}</p>
+            <Drawer editorData={data}></Drawer>
           </div>
         </div>
       )}
