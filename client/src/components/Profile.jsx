@@ -1,13 +1,13 @@
-import ProfileHeader from './ProfileHeader.jsx'
-import UserProfile from './UserProfile.jsx'
-import HiredEditors from './HiredEditors.jsx'
-import Radial from './Radial.jsx'
-import RecentCard from './RecentCard.jsx'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRef } from 'react'
-import Navbar from './Navbar.jsx'
 import { useRecoilValue } from 'recoil'
 import { navbarOpenState } from '../states/navbarState.js'
+import HiredEditors from './HiredEditors.jsx'
+import Navbar from './Navbar.jsx'
+import ProfileHeader from './ProfileHeader.jsx'
+import Radial from './Radial.jsx'
+import RecentCard from './RecentCard.jsx'
+import UserProfile from './UserProfile.jsx'
 
 function Profile() {
   const scrollContainerRef = useRef(null)
@@ -29,7 +29,7 @@ function Profile() {
           className={`navbar h-full transition-all duration-300 ${
             navOpen ? 'w-[15%]' : 'w-[5%]'
           } pl-0`}>
-          <Navbar />
+          <Navbar title='Profile' />
         </div>
         <div className='profileContainer'>
           {/* Header */}
@@ -38,8 +38,8 @@ function Profile() {
           </div>
 
           {/* Body */}
-          <div className='profileBody flex flex-col bg-gray-50 h-screen gap-y-4'>
-            <div className='profileInfo flex my-8 justify-evenly h-[20rem]'>
+          <div className='profileBody flex h-screen flex-col gap-y-4 bg-gray-50'>
+            <div className='profileInfo my-8 flex h-[20rem] justify-evenly'>
               <UserProfile />
               <HiredEditors />
               <Radial />
@@ -47,12 +47,12 @@ function Profile() {
             <div className='relative'>
               <button
                 onClick={() => scroll('left')}
-                className='absolute left-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10'>
+                className='absolute left-0 top-1/2 z-10 -translate-y-1/2 transform rounded-full bg-white p-2 shadow-md'>
                 <ChevronLeft size={12} />
               </button>
               <div
                 ref={scrollContainerRef}
-                className='storage-recent-body no-scrollbar m-2 flex overflow-x-scroll border-2 border-blue-300 rounded-md pt-4 px-4 shadow-xl'>
+                className='storage-recent-body no-scrollbar m-2 flex overflow-x-scroll rounded-md border-2 border-blue-300 px-4 pt-4 shadow-xl'>
                 <RecentCard />
                 <RecentCard />
                 <RecentCard />
@@ -63,7 +63,7 @@ function Profile() {
               </div>
               <button
                 onClick={() => scroll('right')}
-                className='absolute right-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10'>
+                className='absolute right-0 top-1/2 z-10 -translate-y-1/2 transform rounded-full bg-white p-2 shadow-md'>
                 <ChevronRight size={12} />
               </button>
             </div>

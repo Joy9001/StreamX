@@ -8,6 +8,7 @@ import passport from 'passport'
 import connectMongo from './db/connectMongo.db.js'
 import isAuthenticated from './middlewares/auth.middleware.js'
 import authRoute from './routes/auth.js'
+import OwnerRouter from './routes/owner.route.js'
 import VideoRouter from './routes/video.route.js'
 import YTRouter from './routes/yt.route.js'
 import { passportEditorStrategy, passportOwnerStrategy } from './strategy/passport.js'
@@ -56,6 +57,7 @@ app.get('/', isAuthenticated, (req, res) => {
 app.use('/api/videos', isAuthenticated, VideoRouter)
 app.use('/api/yt', isAuthenticated, YTRouter)
 app.use('/auth', authRoute)
+app.use('/api', OwnerRouter)
 
 app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`)

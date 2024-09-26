@@ -39,7 +39,7 @@ function RecentCard({ video }) {
             </svg>
           </div>
           <span className='ml-3 truncate text-sm font-medium'>
-            {video.metaData.name}
+            {video ? video.metaData.name : 'dummy.mp4'}
           </span>
         </div>
         <figure className='m-2 flex h-32 items-center justify-center rounded-xl shadow-inner'>
@@ -47,7 +47,11 @@ function RecentCard({ video }) {
             className='react-player flex h-32 w-full overflow-hidden rounded object-cover'
             width='100%'
             height='8rem'
-            url={video.url}
+            url={
+              video
+                ? video.url
+                : 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+            }
             light={light}
             controls={true}
             onReady={() => setLight(true)}
@@ -59,7 +63,7 @@ function RecentCard({ video }) {
 }
 
 RecentCard.propTypes = {
-  video: PropTypes.object.isRequired,
+  video: PropTypes.object,
 }
 
 export default RecentCard

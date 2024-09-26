@@ -12,6 +12,7 @@ import PropTypes from 'prop-types'
 import { useEffect, useRef, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { navbarOpenState } from '../states/navbarState.js'
+// import { useNavigate } from 'react-router-dom'
 
 function Navbar({ title }) {
   const [open, setOpen] = useRecoilState(navbarOpenState)
@@ -59,7 +60,7 @@ function Navbar({ title }) {
           {/* Logo and title */}
           <div className={`flex items-center gap-x-4 ${open && 'mr-16'}`}>
             <img
-              src='./src/assets/logoX.png'
+              src='http://localhost:5173/src/assets/logoX.png'
               alt='Logo'
               className={`w-14 cursor-pointer rounded-full bg-black duration-500`}
             />
