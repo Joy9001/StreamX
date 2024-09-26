@@ -13,6 +13,7 @@ import YTRouter from './routes/yt.route.js'
 import passportStrategy from './strategy/passport.js'
 
 dotenv.config()
+passportStrategy()
 
 const PORT = process.env.PORT || 3000
 
@@ -28,28 +29,6 @@ app.use(
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
-app.get('/', (req, res) => {
-	res.send('Backend is up!')
-})
-
-app.use('/api/videos', VideoRouter)
-app.use('/api/yt', YTRouter)
-
-app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`)
-	connectMongo().then(() => {
-		console.log('MongoDB connected')
-	})
-})
-passportStrategy()
-
-app.use(
-	cors({
-		origin: 'http://localhost:5173',
-		methods: 'GET,POST,PUT,DELETE',
-		credentials: true,
-	})
-)
 const sessionMiddleware = session({
 	secret: process.env.SESSION_SECRET,
 	resave: true,
@@ -64,23 +43,21 @@ const sessionMiddleware = session({
 	}),
 })
 app.use(sessionMiddleware)
-// app.use(
-//   cookieSession({
-//     name: "session",
-//     keys: ["cyberwolve"],
-//     maxAge: 5 * 60 * 1000,
-//   })
-// );
 
 app.use(passport.initialize())
 app.use(passport.session())
 
-app.use('/auth', authRoute)
-
 app.get('/', isAuthenticated, (req, res) => {
-	res.send(`Hello!`)
+	res.send('Backend is up!')
 })
 
-app.listen(5000, () => {
-	console.log('listening port 5000')
+app.use('/api/videos', isAuthenticated, VideoRouter)
+app.use('/api/yt', isAuthenticated, YTRouter)
+app.use('/auth', isAuthenticated, authRoute)
+
+app.listen(PORT, () => {
+	console.log(`Server is running on port ${PORT}`)
+	connectMongo().then(() => {
+		console.log('MongoDB connected')
+	})
 })
