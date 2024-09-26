@@ -4,6 +4,7 @@ import express from 'express'
 import morgan from 'morgan'
 import connectMongo from './db/connectMongo.db.js'
 import VideoRouter from './routes/video.route.js'
+import YTRouter from './routes/yt.route.js'
 
 dotenv.config()
 
@@ -26,6 +27,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/videos', VideoRouter)
+app.use('/api/yt', YTRouter)
 
 app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`)

@@ -6,7 +6,7 @@ import {
 	recentController,
 	uploadController,
 } from '../controllers/video.controller.js'
-import { upload } from '../helpers/multer.helper.js'
+import { upload } from '../middlewares/multer.middleware.js'
 const router = Router()
 
 router.get('/all', getAllController)
