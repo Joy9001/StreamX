@@ -4,6 +4,7 @@ import Login from './components/Auth/Login.jsx'
 import SignUp from './components/Auth/SignUp.jsx'
 import Logout from './components/Auth/Logout.jsx'
 import Dashboard from './components/Dashboard/Dashboard.jsx'
+import Storage from './components/Storage.jsx'
 
 function App() {
   const router = createBrowserRouter([
@@ -26,6 +27,10 @@ function App() {
     {
       path: '/dashboard',
       element: <Dashboard />,
+    },
+    {
+      path: '/storage',
+      element: <Storage />,
     },
   ])
   return (

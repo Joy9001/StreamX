@@ -12,7 +12,7 @@ import passportStrategy from "./strategy/passport.js";
 
 const app = express();
 
-dotenv.config();
+dotenv.config()
 
 connectMongo().then(() => {
   console.log("Connected to MongoDB");
