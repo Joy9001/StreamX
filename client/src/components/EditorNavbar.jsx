@@ -1,5 +1,5 @@
 import React from "react";
-function Navbar() {
+function EditorNavbar() {
   return (
     <>
       <div className="navbar bg-white shadow-lg">
@@ -66,4 +66,4 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+export default EditorNavbar;
