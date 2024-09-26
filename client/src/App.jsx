@@ -49,6 +49,14 @@ function App() {
       path: '/settings',
       element: <ProfileForm />,
     },
+    {
+      path: '/HireEditor',
+      element: <HiredEditor />,
+    },
+    {
+      path: '/AdminPanel',
+      element: <AdminPanel />,
+    },
   ])
   return (
     <>

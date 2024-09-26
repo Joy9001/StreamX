@@ -58,6 +58,9 @@ app.use('/api/videos', isAuthenticated, VideoRouter)
 app.use('/api/yt', isAuthenticated, YTRouter)
 app.use('/auth', authRoute)
 app.use('/api', OwnerRouter)
+app.use('/editor_gig', editor_gig_route)
+app.use('/editorProfile', editorProfileRoute)
+app.use('/user', UserRoute)
 
 app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`)
