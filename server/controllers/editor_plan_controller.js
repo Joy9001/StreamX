@@ -14,11 +14,10 @@ export const Editor_gig_plans = async (req, res) => {
             });
         }
 
-        // Update the plan if it exists, or create a new one
         const updatedPlan = await editor_plans.findOneAndUpdate(
-            { email }, // Filter
+            { email }, 
             { basic, standard, premium }, // Update
-            { new: true, upsert: true } // Options
+            { new: true, upsert: true } 
         );
 
         res.status(201).json({

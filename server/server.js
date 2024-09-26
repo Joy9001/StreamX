@@ -1,6 +1,8 @@
 import express from 'express';
 import connectMongo from './db/connectMongo.db.js';
 import editor_gig_route from './routes/editor_gig_router.js';
+import editorProfileRoute from './routes/editorProfileRoute.js';
+import UserRoute from './routes/UserRoute.js'
 import cors from 'cors';
 import dotenv from 'dotenv';
 const app = express();
@@ -13,6 +15,9 @@ connectMongo().then(() => {
 	console.log('Connected to MongoDB');
 });
 app.use("/editor_gig",editor_gig_route);
+app.use("/editorProfile",editorProfileRoute);
+app.use("/user",UserRoute);
+
 
 app.listen(port,()=>{
     console.log(`listening on port ${port}`);
