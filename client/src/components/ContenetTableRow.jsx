@@ -143,6 +143,18 @@ function ContentTableRow({ content }) {
     setDrawerContentState(content)
   }
 
+  function handleYtUpload() {
+    // axios
+    //   .post('/api/yt/upload', { videoId: content._id })
+    //   .then((res) => {
+    //     console.log(res.data)
+    //   })
+    //   .catch((err) => {
+    //     console.log(err)
+    //   })
+    console.log('uploading to youtube')
+  }
+
   return (
     <tr className='cursor-pointer hover:bg-gray-100'>
       <td onClick={handleRowClick}>
@@ -218,7 +230,9 @@ function ContentTableRow({ content }) {
       <td onClick={handleRowClick}>
         <span className='text-sm'>{filesize(content.metaData.size)}</span>
       </td>
-      <td className='w-40'>{ytBtn}</td>
+      <td className='w-40' onClick={handleYtUpload}>
+        {ytBtn}
+      </td>
       <td className='w-40'>
         <span className='text-sm'>{content.approvalStatus}</span>
       </td>
