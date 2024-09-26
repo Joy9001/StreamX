@@ -4,6 +4,7 @@ import Login from './components/Auth/Login.jsx'
 import LoginEditor from './components/Auth/LoginEditor.jsx'
 import Logout from './components/Auth/Logout.jsx'
 import Profile from './components/Profile.jsx'
+import ProfileForm from './components/ProfileForm.jsx'
 import Storage from './components/Storage.jsx'
 import { loginState, userState } from './states/loginState.js'
 
@@ -43,6 +44,10 @@ function App() {
     {
       path: '/profile/owner',
       element: <Profile />,
+    },
+    {
+      path: '/settings',
+      element: <ProfileForm />,
     },
   ])
   return (

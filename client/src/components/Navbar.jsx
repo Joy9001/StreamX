@@ -10,22 +10,23 @@ import {
 } from 'lucide-react'
 import PropTypes from 'prop-types'
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
 import { navbarOpenState } from '../states/navbarState.js'
-// import { useNavigate } from 'react-router-dom'
 
 function Navbar({ title }) {
   const [open, setOpen] = useRecoilState(navbarOpenState)
   const [showPopup, setShowPopup] = useState(false)
   const popupRef = useRef(null)
+  const navigate = useNavigate()
 
   const Menus = [
     // { title: 'Dashboard', icon: LayoutDashboard },
-    { title: 'Profile', icon: User },
+    { title: 'Profile', icon: User, route: '/profile/owner' },
     // { title: 'Analytics', icon: BarChart2 },
-    { title: 'Storage', icon: Video },
+    { title: 'Storage', icon: Video, route: '/storage?login=true' },
     { title: 'Hire Editors', icon: Briefcase },
-    { title: 'Settings', icon: Settings },
+    { title: 'Settings', icon: Settings, route: '/settings' },
   ]
 
   useEffect(() => {
@@ -76,7 +77,8 @@ function Navbar({ title }) {
             {Menus.map((menu, index) => (
               <li
                 key={index}
-                className={`mt-2 flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm ease-in hover:bg-secondary hover:duration-300 ${title == menu.title ? 'bg-secondary' : ''}`}>
+                className={`mt-2 flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm ease-in hover:bg-secondary hover:duration-300 ${title == menu.title ? 'bg-secondary' : ''}`}
+                onClick={() => navigate(`${menu.route}`)}>
                 <menu.icon className='h-5 w-5' />
                 <span
                   className={`${!open && 'hidden'} origin-left duration-200`}>
