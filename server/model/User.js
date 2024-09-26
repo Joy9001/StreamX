@@ -13,6 +13,27 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['superuser', 'admin', 'testuser'],
   },
+  Id: {
+    type: String,
+    required: true,
+  },
+  permissions: {
+    owner: {
+      edit: { type: Boolean, default: false },
+      delete: { type: Boolean, default: false },
+    },
+    editor: {
+      edit: { type: Boolean, default: false },
+      delete: { type: Boolean, default: false },
+    },
+    editorGig: {
+      edit: { type: Boolean, default: false },
+      delete: { type: Boolean, default: false },
+    },
+    video: {
+      delete: { type: Boolean, default: false },
+    },
+  },
 }, {
   timestamps: true,
 });
