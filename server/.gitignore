@@ -169,3 +169,4 @@ node_modules/
 /tailwindcss
 .prettierrc
 IMP.md
+.secrets/
