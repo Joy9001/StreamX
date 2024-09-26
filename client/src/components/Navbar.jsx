@@ -1,18 +1,20 @@
-import { useState, useRef, useEffect } from 'react'
 import {
-  ChevronLeft,
-  LayoutDashboard,
-  User,
   BarChart2,
-  Video,
-  Settings,
-  MoreVertical,
-  LogOut,
+  ChevronLeft,
   HelpCircle,
+  LayoutDashboard,
+  LogOut,
+  MoreVertical,
+  Settings,
+  User,
+  Video,
 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { useRecoilState } from 'recoil'
+import { navbarOpenState } from '../states/navbarState.js'
 
 function Navbar() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useRecoilState(navbarOpenState)
   const [showPopup, setShowPopup] = useState(false)
   const popupRef = useRef(null)
 
@@ -38,39 +40,42 @@ function Navbar() {
   }, [])
 
   return (
-    <div className='flex'>
+    <>
       {/* NAVBAR */}
       <div
         className={`${
-          open ? 'w-72' : 'w-20'
-        } h-screen p-5 pt-6 bg-gray-100 relative transition-all duration-300 flex-shrink-0 flex flex-col justify-between`}>
-        <div>
+          open ? 'w-full' : 'w-20'
+        } relative flex h-screen flex-shrink-0 flex-col justify-between bg-gray-100 p-5 pt-6 transition-all duration-300`}>
+        <div className='flex w-full flex-col items-center justify-center'>
           {/* Arrow toggle button */}
           <ChevronLeft
-            className={`absolute cursor-pointer -right-3 top-9 w-7 h-7 border-2 border-gray-50 rounded-full bg-white text-black shadow-xl ${
+            className={`absolute -right-3 top-9 h-7 w-7 cursor-pointer rounded-full border-2 border-gray-50 bg-white text-black shadow-xl ${
               !open && 'rotate-180'
             }`}
             onClick={() => setOpen(!open)}
           />
 
           {/* Logo and title */}
-          <div className='flex gap-x-4 items-center'>
+          <div className={`flex items-center gap-x-4 ${open && 'mr-16'}`}>
             <img
               src='./src/assets/logoX.png'
               alt='Logo'
-              className={`w-14 cursor-pointer duration-500 bg-black rounded-full`}
+              className={`w-14 cursor-pointer rounded-full bg-black duration-500`}
             />
-            <h1
-              className={`origin-left font-bold text-xl duration-300 ${!open && 'scale-0'}`}>
-              Stream<span className='text-red-600 font-bold text-xl'>X</span>
-            </h1>
+            {open && (
+              <h1
+                className={`origin-left text-xl font-bold duration-300 ${!open && 'scale-0'}`}>
+                Stream<span className='text-xl font-bold text-red-600'>X</span>
+              </h1>
+            )}
           </div>
-          <ul className='pt-6'>
+          <ul
+            className={`flex w-full flex-col items-center justify-center pt-6 *:w-full ${open ? '*:justify-left' : '*:justify-center'}`}>
             {Menus.map((menu, index) => (
               <li
                 key={index}
-                className={`flex items-center gap-x-4 p-2 text-sm hover:bg-secondary hover:duration-300 ease-in rounded-md mt-2 cursor-pointer`}>
-                <menu.icon className='w-5 h-5' />
+                className={`mt-2 flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm ease-in hover:bg-secondary hover:duration-300`}>
+                <menu.icon className='h-5 w-5' />
                 <span
                   className={`${!open && 'hidden'} origin-left duration-200`}>
                   {menu.title}
@@ -82,11 +87,11 @@ function Navbar() {
 
         {/* User profile section */}
         <div
-          className={`flex items-center gap-x-4 p-2 mt-auto ${open ? 'justify-between' : 'justify-center'}`}>
+          className={`mt-auto flex items-center gap-x-4 ${open ? 'justify-between' : 'justify-center'}`}>
           <img
             src='https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
             alt='User'
-            className='w-10 h-10 rounded-full'
+            className='h-10 w-10 rounded-full'
           />
           {open && (
             <>
@@ -96,27 +101,27 @@ function Navbar() {
               </div>
               <div className='relative'>
                 <MoreVertical
-                  className='w-5 h-5 cursor-pointer'
+                  className='h-5 w-5 cursor-pointer'
                   onClick={() => setShowPopup(!showPopup)}
                 />
                 {showPopup && (
                   <div
                     ref={popupRef}
-                    className='absolute bottom-full right-0 mb-2 w-48 bg-gray-200 text-white shadow-lg rounded-md overflow-hidden'>
-                    <div className='px-4 py-2 font-semibold border-b border-gray-700 text-gray-700'>
+                    className='absolute bottom-full right-0 mb-2 w-48 overflow-hidden rounded-md bg-gray-200 text-white shadow-lg'>
+                    <div className='border-b border-gray-700 px-4 py-2 font-semibold text-gray-700'>
                       My Account
                     </div>
                     <ul>
-                      <li className='px-4 py-2 text-gray-700 cursor-pointer flex items-center  hover:bg-secondary '>
-                        <User className='w-4 h-4 mr-2' />
+                      <li className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
+                        <User className='mr-2 h-4 w-4' />
                         Profile
                       </li>
-                      <li className='px-4 py-2 text-gray-700 cursor-pointer flex items-center  hover:bg-secondary'>
-                        <HelpCircle className='w-4 h-4 mr-2' />
+                      <li className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
+                        <HelpCircle className='mr-2 h-4 w-4' />
                         Support
                       </li>
-                      <li className='px-4 py-2 hover:bg-accent cursor-pointer flex items-center text-red-500'>
-                        <LogOut className='w-4 h-4 mr-2' />
+                      <li className='flex cursor-pointer items-center px-4 py-2 text-red-500 hover:bg-accent'>
+                        <LogOut className='mr-2 h-4 w-4' />
                         Log out
                       </li>
                     </ul>
@@ -127,12 +132,7 @@ function Navbar() {
           )}
         </div>
       </div>
-
-      {/* Main Content */}
-      <div className='p-7 text-2xl font-semibold flex-1 h-screen'>
-        <h1>DashBoard</h1>
-      </div>
-    </div>
+    </>
   )
 }
 
