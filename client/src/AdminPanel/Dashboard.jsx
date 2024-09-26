@@ -72,14 +72,13 @@ export function Dashboard() {
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEditor, setCurrentEditor] = useState(null);
+  const [isCreating, setIsCreating] = useState(false); // Differentiate between editing and creating
 
   useEffect(() => {
     const fetchEditorData = async () => {
       try {
         const response = await axios.get("http://localhost:4000/editorProfile");
-        console.log(response);
         setEditorData(response.data);
-
         setLoading(false);
       } catch (err) {
         console.error("Error fetching editor data:", err);
@@ -90,13 +89,14 @@ export function Dashboard() {
 
     fetchEditorData();
   }, []);
+
   const handleEditClick = async (editor) => {
     try {
       const response = await axios.get(
         `http://localhost:4000/editorProfile/${editor.email}`
       );
-      console.log("fdsc", response);
       setCurrentEditor(response.data); // Set the editor details for the modal
+      setIsCreating(false); // Set to false, as we are editing
       setIsModalOpen(true); // Open the modal
     } catch (err) {
       console.error("Error fetching editor data:", err);
@@ -104,13 +104,73 @@ export function Dashboard() {
     }
   };
 
+  const handleAddEditorClick = () => {
+    setCurrentEditor(null); // Clear current editor
+    setIsCreating(true); // Set to true, as we are creating a new editor
+    setIsModalOpen(true); // Open the modal
+  };
+
   const handleModalClose = () => {
     setIsModalOpen(false); // Close the modal
   };
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    setIsModalOpen(false);
+  const handleFormSubmit = async (newEditorData) => {
+    if (isCreating) {
+      // Logic for creating a new editor
+      try {
+        const response = await axios.post(
+          "http://localhost:4000/editorProfile",
+          newEditorData
+        );
+        setEditorData((prevData) => [...prevData, response.data]); // Update the state with the new editor
+        alert("New editor created successfully.");
+      } catch (err) {
+        console.error("Error creating editor:", err);
+        alert("Error creating editor. Please try again.");
+      }
+    } else {
+      // Logic for updating an existing editor
+      try {
+        const response = await axios.put(
+          `http://localhost:4000/editorProfile/${currentEditor.email}`,
+          newEditorData
+        );
+        setEditorData((prevData) =>
+          prevData.map((editor) =>
+            editor.email === currentEditor.email ? response.data : editor
+          )
+        ); // Update the specific editor
+        alert("Editor updated successfully.");
+      } catch (err) {
+        console.error("Error updating editor:", err);
+        alert("Error updating editor. Please try again.");
+      }
+    }
+    setIsModalOpen(false); // Close the modal after the operation
+  };
+
+  const deleteEditor = async (email) => {
+    try {
+      const response = await fetch(
+        `http://localhost:4000/editorProfile/${email}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete editor");
+      }
+
+      console.log(`Editor with email ${email} deleted successfully.`);
+      // Update the state to remove the deleted editor
+      setEditorData((prevData) =>
+        prevData.filter((editor) => editor.email !== email)
+      );
+    } catch (error) {
+      console.error("Error deleting editor:", error);
+      // Optionally notify the user of the error here
+    }
   };
 
   if (loading) return <p>Loading...</p>;
@@ -258,25 +318,6 @@ export function Dashboard() {
               </nav>
             </SheetContent>
           </Sheet>
-          <Breadcrumb className="hidden md:flex">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="#">Dashboard</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="#">Products</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>All Products</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
           <div className="relative ml-auto flex-1 md:grow-0">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -331,7 +372,7 @@ export function Dashboard() {
                 <Button size="sm" className="h-7 gap-1">
                   <PlusCircle className="h-3.5 w-3.5" />
                   <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Add Admin
+                    Add Editor
                   </span>
                 </Button>
               </div>
@@ -342,6 +383,14 @@ export function Dashboard() {
                   <CardTitle>Admin</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  <Button
+                    onClick={handleAddEditorClick}
+                    size="sm"
+                    className="mb-4"
+                  >
+                    <PlusCircle className="h-3.5 w-3.5" />
+                    Add Editor
+                  </Button>
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -404,7 +453,11 @@ export function Dashboard() {
                                 >
                                   Edit
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>Delete</DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => deleteEditor(editor.email)}
+                                >
+                                  Delete
+                                </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
@@ -412,10 +465,11 @@ export function Dashboard() {
                       ))}
                     </TableBody>
                   </Table>
-                  {isModalOpen && currentEditor && (
+                  {isModalOpen && (
                     <Modal
                       currentEditor={currentEditor}
                       onClose={handleModalClose}
+                      onSave={handleFormSubmit}
                     />
                   )}
                 </CardContent>

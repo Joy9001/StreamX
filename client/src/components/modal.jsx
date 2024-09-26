@@ -1,36 +1,37 @@
 import React from "react";
 
 function Modal({ currentEditor, onClose, onSave }) {
-  const updateEditorData = async (updatedEditor) => {
+  const handleEditorData = async (editorData) => {
+    const method = currentEditor ? "PUT" : "POST";
+    const endpoint = currentEditor
+      ? `http://localhost:4000/editorProfile/${editorData.email}`
+      : `http://localhost:4000/editorProfile`;
+
     try {
-      const response = await fetch(
-        `http://localhost:4000/editorProfile/${updatedEditor.email}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedEditor),
-        }
-      );
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(editorData),
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to update editor data");
+        throw new Error("Failed to save editor data");
       }
 
       const data = await response.json();
-      console.log("Editor updated successfully:", data);
-      onSave(updatedEditor); // Notify parent about the updated editor data
+      console.log("Editor saved successfully:", data);
+      onSave(data);
     } catch (error) {
-      console.error("Error updating editor:", error);
-      // Optionally notify user of the error here
+      console.error("Error saving editor:", error);
     }
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    const updatedEditor = {
+    const editorData = {
       name: e.target.name.value,
       email: e.target.email.value,
       phone: e.target.phone.value,
@@ -39,14 +40,16 @@ function Modal({ currentEditor, onClose, onSave }) {
       specializations: e.target.specializations.value.split(", "),
     };
 
-    await updateEditorData(updatedEditor); // Call the function to update editor data
-    onClose(); // Close the modal after submission
+    await handleEditorData(editorData);
+    onClose();
   };
 
   return (
     <dialog open className="modal">
       <div className="modal-box">
-        <h3 className="font-bold text-lg">Edit Editor</h3>
+        <h3 className="font-bold text-lg">
+          {currentEditor ? "Edit Editor" : "Add New Editor"}
+        </h3>
 
         <form onSubmit={handleFormSubmit}>
           <div className="py-4">
@@ -56,6 +59,7 @@ function Modal({ currentEditor, onClose, onSave }) {
               name="name"
               defaultValue={currentEditor?.name || ""}
               className="input input-bordered w-full mb-4"
+              required
             />
 
             <label className="block mb-2">Email</label>
@@ -64,7 +68,8 @@ function Modal({ currentEditor, onClose, onSave }) {
               name="email"
               defaultValue={currentEditor?.email || ""}
               className="input input-bordered w-full mb-4"
-              readOnly
+              readOnly={!!currentEditor} // Make email read-only if editing
+              required
             />
 
             <label className="block mb-2">Phone</label>
@@ -73,6 +78,7 @@ function Modal({ currentEditor, onClose, onSave }) {
               name="phone"
               defaultValue={currentEditor?.phone || ""}
               className="input input-bordered w-full mb-4"
+              required
             />
 
             <label className="block mb-2">Location</label>
@@ -107,7 +113,7 @@ function Modal({ currentEditor, onClose, onSave }) {
 
             <div className="modal-action">
               <button type="submit" className="btn btn-primary">
-                Save Changes
+                {currentEditor ? "Save Changes" : "Add Editor"}
               </button>
             </div>
           </div>
