@@ -25,7 +25,7 @@ function Navbar({ title }) {
     { title: 'Profile', icon: User, route: '/profile/owner' },
     // { title: 'Analytics', icon: BarChart2 },
     { title: 'Storage', icon: Video, route: '/storage?login=true' },
-    { title: 'Hire Editors', icon: Briefcase },
+    { title: 'Hire Editors', icon: Briefcase, route: '/HireEditor' },
     { title: 'Settings', icon: Settings, route: '/settings' },
   ]
 
