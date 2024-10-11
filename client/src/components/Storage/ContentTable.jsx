@@ -1,7 +1,7 @@
+import { allVidState } from '@/states/videoState.js'
 import axios from 'axios'
 import { useEffect } from 'react'
 import { useRecoilState } from 'recoil'
-import { allVidState } from '../states/videoState.js'
 import ContentTableRow from './ContenetTableRow'
 
 function ContentTable() {

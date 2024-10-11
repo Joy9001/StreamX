@@ -1,7 +1,7 @@
+import { allVidState, recentVidState } from '@/states/videoState'
 import axios from 'axios'
 import PropTypes from 'prop-types'
 import { useRecoilState } from 'recoil'
-import { allVidState, recentVidState } from '../states/videoState'
 
 function ContenetTableRowOptions({ editor, videoId }) {
   const setRecentVideos = useRecoilState(recentVidState)[1]

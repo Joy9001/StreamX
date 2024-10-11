@@ -6,7 +6,7 @@ import HiredEditors from './HiredEditors.jsx'
 import Navbar from './Navbar.jsx'
 import ProfileHeader from './ProfileHeader.jsx'
 import Radial from './Radial.jsx'
-import RecentCard from './RecentCard.jsx'
+import RecentCard from './Storage/RecentCard.jsx'
 import UserProfile from './UserProfile.jsx'
 
 function Profile() {
