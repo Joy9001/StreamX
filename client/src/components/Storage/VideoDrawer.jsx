@@ -1,10 +1,10 @@
+import keySvg from '@/assets/key.svg'
+import userCircle from '@/assets/user-circle.svg'
 import { filesize } from 'filesize'
 import { useState } from 'react'
 import ReactPlayer from 'react-player'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import keySvg from '../assets/key.svg'
-import userCircle from '../assets/user-circle.svg'
-import { drawerContentState, drawerState } from '../states/drawerState.js'
+import { drawerContentState, drawerState } from '../../states/drawerState.js'
 
 const VideoDrawer = () => {
   const [light, setLight] = useState(

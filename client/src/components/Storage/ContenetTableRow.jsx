@@ -1,9 +1,9 @@
+import userCircle from '@/assets/user-circle.svg'
+import { drawerContentState, drawerState } from '@/states/drawerState.js'
 import { filesize } from 'filesize'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
-import userCircle from '../assets/user-circle.svg'
-import { drawerContentState, drawerState } from '../states/drawerState.js'
 import ContenetTableRowOptions from './ContentTableRowOptions'
 
 function ContentTableRow({ content }) {

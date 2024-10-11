@@ -1,4 +1,4 @@
-import storageIcon from '../assets/storage.svg'
+import storageIcon from '@/assets/storage.svg'
 
 function StorageNav() {
   return (

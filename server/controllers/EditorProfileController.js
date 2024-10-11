@@ -1,4 +1,4 @@
-import EditorProfile from '../model/EditorProfile.js'
+import EditorProfile from '../models/EditorProfile.js'
 
 export const createEditorProfile = async (req, res) => {
 	const { name, email, phone, location, image, software, specializations } = req.body

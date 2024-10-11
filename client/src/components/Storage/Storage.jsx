@@ -1,16 +1,16 @@
-import { loginState } from '@/states/loginState.js'
+// import { loginState } from '@/states/loginState.js'
 import axios from 'axios'
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+// import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { drawerState } from '../states/drawerState.js'
-import { navbarOpenState } from '../states/navbarState.js'
-import { allVidState, recentVidState } from '../states/videoState.js'
-import ContentTable from './ContentTable'
-import Navbar from './Navbar.jsx'
-import RecentCard from './RecentCard'
+import { drawerState } from '../../states/drawerState.js'
+import { navbarOpenState } from '../../states/navbarState.js'
+import { allVidState, recentVidState } from '../../states/videoState.js'
+import Navbar from '../Navbar.jsx'
+import ContentTable from './ContentTable.jsx'
+import RecentCard from './RecentCard.jsx'
 import StorageNav from './StorageNav.jsx'
-import VideoDrawer from './VideoDrawer'
+import VideoDrawer from './VideoDrawer.jsx'
 
 function Storage() {
   const drawer = useRecoilValue(drawerState)
@@ -19,21 +19,21 @@ function Storage() {
   const [uploading, setUploading] = useState(false)
   const [recentVideos, setRecentVideos] = useRecoilState(recentVidState)
   const setAllVideos = useRecoilState(allVidState)[1]
-  const navigate = useNavigate()
-  const setLoginState = useRecoilState(loginState)[1]
+  // const navigate = useNavigate()
+  // const setLoginState = useRecoilState(loginState)[1]
 
-  const [searchParams] = useSearchParams()
-  const login = searchParams.get('login')
+  // const [searchParams] = useSearchParams()
+  // const login = searchParams.get('login')
 
-  useEffect(() => {
-    if (login !== 'true') {
-      setLoginState(false)
-      navigate('/')
-    } else {
-      console.log('User logged in')
-      setLoginState(true)
-    }
-  }, [login, navigate, setLoginState])
+  // useEffect(() => {
+  //   if (login !== 'true') {
+  //     setLoginState(false)
+  //     navigate('/')
+  //   } else {
+  //     console.log('User logged in')
+  //     setLoginState(true)
+  //   }
+  // }, [login, navigate, setLoginState])
 
   function handleNewBtnClick() {
     fileInputRef.current.click()

@@ -8,7 +8,7 @@ function RecentCard({ video }) {
   )
   return (
     <>
-      <div className='card my-2 mr-4 min-w-52 max-w-52 border-2 border-solid border-neutral bg-base-100 shadow-md'>
+      <div className='card my-2 mr-4 min-w-56 max-w-56 border-2 border-solid border-neutral bg-base-100 shadow-md'>
         <div className='ml-2 flex items-center p-2 text-center'>
           <div className='vid-icon flex items-center justify-center'>
             <svg
