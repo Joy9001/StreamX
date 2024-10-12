@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useEffect } from 'react'
 import { useRecoilState } from 'recoil'
 import ContentTableRow from './ContenetTableRow'
+import { YTVideoUploadForm } from './YTVideoUploadForm'
 
 function ContentTable() {
   const [allVideos, setAllVideos] = useRecoilState(allVidState)
@@ -46,6 +47,19 @@ function ContentTable() {
             ))}
           </tbody>
         </table>
+
+        <dialog id='my_modal_3' className='modal'>
+          <div className='modal-box h-[90%] w-[50%] max-w-none'>
+            <form method='dialog'>
+              <button className='btn btn-circle btn-ghost btn-sm absolute right-2 top-2'>
+                ✕
+              </button>
+            </form>
+            {/* <h3 className='text-lg font-bold'>Hello!</h3>
+            <p className='py-4'>Press ESC key or click on ✕ button to close</p> */}
+            <YTVideoUploadForm />
+          </div>
+        </dialog>
       </div>
     </>
   )

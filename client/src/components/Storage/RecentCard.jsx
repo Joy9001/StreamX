@@ -54,7 +54,7 @@ function RecentCard({ video }) {
             }
             light={light}
             controls={true}
-            onReady={() => setLight(true)}
+            onReady={() => setLight(false)}
           />
         </figure>
       </div>
