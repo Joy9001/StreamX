@@ -10,4 +10,9 @@ const recentVidState = atom({
   default: [],
 })
 
-export { allVidState, recentVidState }
+const ytVideoUploadState = atom({
+  key: 'ytVideoState',
+  default: {},
+})
+
+export { allVidState, recentVidState, ytVideoUploadState }
