@@ -15,8 +15,8 @@ function Login() {
   // Handler for Google login
   const handleGoogleLogin = () => {
     console.log('Google login initiated. Preparing Google OAuth flow...')
-    // window.location.href = 'http://localhost:3000/auth/owner/google/callback'
-    navigate('http://localhost:3000/auth/google/callback')
+    window.location.href = 'http://localhost:3000/auth/owner/google/callback'
+    // navigate('http://localhost:3000/auth/google/callback')
   }
 
   // Handler for normal login form submission
