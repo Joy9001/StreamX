@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import passport from 'passport'
-
+import '../strategy/google.strategy.js'
 const router = Router()
 
 router.get('/login/success', (req, res) => {
@@ -47,9 +47,11 @@ router.get('/logout', async (req, res, next) => {
 			if (err) {
 				return next(err)
 			}
-
 			req.session = null
-			res.clearCookie('connect.sid')
+			console.log('Session destroyed')
+
+			res.clearCookie('connect.sid', { path: '/', httpOnly: true })
+			console.log('Cookie cleared')
 			return res.status(200).json({ error: false, message: 'Logged Out' })
 		})
 	} catch (error) {

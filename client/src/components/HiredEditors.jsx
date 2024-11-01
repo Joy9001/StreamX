@@ -1,9 +1,9 @@
 function HiredEditors() {
   return (
-    <div className='bg-gray-200 shadow-xl rounded-lg p-4 w-[20rem] min-w-sm h-full overflow-auto no-scrollbar flex flex-col border-blue-300 border-2'>
+    <div className='min-w-sm no-scrollbar flex h-full w-[20rem] flex-col overflow-auto rounded-lg border-2 border-blue-300 bg-gray-200 p-4 shadow-xl'>
       {/* Title and View All Link */}
-      <div className='flex justify-between items-center p-3'>
-        <div className='text-2xl p-2 hover:bg-primary duration-300 rounded-xl'>
+      <div className='flex items-center justify-between p-3'>
+        <div className='rounded-xl p-2 text-2xl duration-300 hover:bg-primary'>
           Hired Editors
         </div>
         <a className='link p-3'>View All</a>
@@ -11,11 +11,11 @@ function HiredEditors() {
       <hr className='p-3' />
 
       {/* Editor Profile */}
-      <div className='flex justify-between items-center p-2 mt-4'>
+      <div className='mt-4 flex items-center justify-between p-2'>
         <img
           src='https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
           alt='Editor Profile'
-          className='w-12 h-12 rounded-full'
+          className='h-12 w-12 rounded-full'
         />
         <div className='flex flex-col'>
           <h1 className='text-lg font-semibold'>Rishabh Raj</h1>
@@ -23,12 +23,12 @@ function HiredEditors() {
         </div>
         <div className='text-lg font-bold'>$10,000</div>
       </div>
-      <hr className='p-3 border-gray-300' />
-      <div className='flex justify-between items-center p-2 mt-4'>
+      <hr className='border-gray-300 p-3' />
+      <div className='mt-4 flex items-center justify-between p-2'>
         <img
           src='https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
           alt='Editor Profile'
-          className='w-12 h-12 rounded-full'
+          className='h-12 w-12 rounded-full'
         />
         <div className='flex flex-col'>
           <h1 className='text-lg font-semibold'>Rishabh Raj</h1>
@@ -36,12 +36,12 @@ function HiredEditors() {
         </div>
         <div className='text-lg font-bold'>$10,000</div>
       </div>
-      <hr className='p-3 border-gray-300' />
-      <div className='flex justify-between items-center p-2 mt-4'>
+      <hr className='border-gray-300 p-3' />
+      <div className='mt-4 flex items-center justify-between p-2'>
         <img
           src='https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
           alt='Editor Profile'
-          className='w-12 h-12 rounded-full'
+          className='h-12 w-12 rounded-full'
         />
         <div className='flex flex-col'>
           <h1 className='text-lg font-semibold'>Rishabh Raj</h1>

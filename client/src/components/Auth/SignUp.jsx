@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
@@ -26,6 +27,19 @@ function SignUp() {
       console.log('Attempting sign-up with name:', name, ', email:', email)
       console.log('Sign-up process initiated. Validating inputs...')
       // Add sign-up logic here, such as API call for registration
+      axios
+        .post('http://localhost:3000/jwt/register', {
+          name,
+          email,
+          password,
+        })
+        .then((user) => {
+          console.log('User registered successfully', user)
+          navigate('/login')
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     } else {
       console.log('Sign-up failed. One or more fields are empty.')
     }
@@ -142,7 +156,7 @@ function SignUp() {
           <p className='mt-4 text-center'>
             Already have an account?{' '}
             <NavLink
-              to='/login'
+              to='/login/owner'
               onClick={handleLoginRedirect}
               className='link-hover link text-primary'>
               Login

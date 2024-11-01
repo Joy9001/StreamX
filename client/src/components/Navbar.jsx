@@ -1,3 +1,4 @@
+import axios from 'axios'
 import {
   Briefcase,
   ChevronLeft,
@@ -26,6 +27,7 @@ function Navbar({ title }) {
     // { title: 'Analytics', icon: BarChart2 },
     { title: 'Storage', icon: Video, route: '/storage?login=true' },
     { title: 'Hire Editors', icon: Briefcase, route: '/HireEditor' },
+    { title: 'raas', icon: Settings, route: '/raas' },
     { title: 'Settings', icon: Settings, route: '/settings' },
   ]
 
@@ -41,6 +43,19 @@ function Navbar({ title }) {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+  const handleLogout = async () => {
+    // Clear cookies
+    document.cookie =
+      'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; samesite=strict;'
+    axios
+      .get('http://localhost:3000/auth/logout')
+      .then(() => {
+        navigate('/') // Redirect to login page
+      })
+      .catch((error) => {
+        console.error('Logout failed:', error)
+      })
+  }
 
   return (
     <>
@@ -124,7 +139,9 @@ function Navbar({ title }) {
                         <HelpCircle className='mr-2 h-4 w-4' />
                         Support
                       </li>
-                      <li className='flex cursor-pointer items-center px-4 py-2 text-red-500 hover:bg-accent'>
+                      <li
+                        onClick={handleLogout}
+                        className='flex cursor-pointer items-center px-4 py-2 text-red-500 hover:bg-accent'>
                         <LogOut className='mr-2 h-4 w-4' />
                         Log out
                       </li>

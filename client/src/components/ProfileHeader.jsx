@@ -32,16 +32,16 @@ function ProfileHeader() {
   return (
     //header
 
-    <div className='flex items-center bg-gray-50 justify-between'>
+    <div className='flex items-center justify-between bg-gray-50'>
       <div className='ml-24'>
         <h1 className='text-2xl font-bold'>
           Profile <span className='text-red-500'>Page</span>
         </h1>
       </div>
 
-      <div className='m-4 mx-8 flex gap-x-4 justify-center items-center'>
-        <div className='search_sapce p-2 '>
-          <label className='input input-bordered flex items-center gap-2 w-72 shadow-xl'>
+      <div className='m-4 mx-8 flex items-center justify-center gap-x-4'>
+        <div className='search_sapce p-2'>
+          <label className='input input-bordered flex w-72 items-center gap-2 shadow-xl'>
             <input type='text' placeholder='Search' className='grow' />
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -59,13 +59,13 @@ function ProfileHeader() {
         <div className='relative'>
           <List
             size={28}
-            className='text-gray-600 cursor-pointer'
+            className='cursor-pointer text-gray-600'
             onClick={() => setShowListPopup(!showListPopup)}
           />
           {showListPopup && (
             <div
               ref={listPopupRef}
-              className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10'>
+              className='absolute right-0 z-10 mt-2 w-48 rounded-md bg-white py-1 shadow-lg'>
               <div className='px-4 py-2 text-sm text-gray-700'>
                 A new request arrived
               </div>
@@ -74,17 +74,17 @@ function ProfileHeader() {
         </div>
         <div className='relative'>
           <div className='indicator'>
-            <span className='indicator-item badge badge-accent badge-sm'></span>
+            <span className='badge indicator-item badge-accent badge-sm'></span>
             <Bell
               size={28}
-              className='text-gray-600 cursor-pointer'
+              className='cursor-pointer text-gray-600'
               onClick={() => setShowBellPopup(!showBellPopup)}
             />
           </div>
           {showBellPopup && (
             <div
               ref={bellPopupRef}
-              className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10'>
+              className='absolute right-0 z-10 mt-2 w-48 rounded-md bg-white py-1 shadow-lg'>
               <div className='px-4 py-2 text-sm text-gray-700'>
                 A new request arrived
               </div>
