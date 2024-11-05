@@ -1,0 +1,163 @@
+import axios from 'axios'
+import {
+  Briefcase,
+  ChevronLeft,
+  HelpCircle,
+  LogOut,
+  MoreVertical,
+  Settings,
+  User,
+  Video,
+} from 'lucide-react'
+import PropTypes from 'prop-types'
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useRecoilState } from 'recoil'
+import { navbarOpenState } from '../states/navbarState.js'
+
+function Navbar({ title }) {
+  const [open, setOpen] = useRecoilState(navbarOpenState)
+  const [showPopup, setShowPopup] = useState(false)
+  const popupRef = useRef(null)
+  const navigate = useNavigate()
+
+  const Menus = [
+    // { title: 'Dashboard', icon: LayoutDashboard },
+    { title: 'Profile', icon: User, route: '/profile/owner' },
+    // { title: 'Analytics', icon: BarChart2 },
+    { title: 'Storage', icon: Video, route: '/storage?login=true' },
+    { title: 'Hire Editors', icon: Briefcase, route: '/HireEditor' },
+    { title: 'raas', icon: Settings, route: '/raas' },
+    { title: 'Settings', icon: Settings, route: '/settings' },
+  ]
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (popupRef.current && !popupRef.current.contains(event.target)) {
+        setShowPopup(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+  const handleLogout = async () => {
+    // Clear cookies
+    document.cookie =
+      'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; samesite=strict;'
+    axios
+      .get('http://localhost:3000/auth/logout')
+      .then(() => {
+        navigate('/') // Redirect to login page
+      })
+      .catch((error) => {
+        console.error('Logout failed:', error)
+      })
+  }
+
+  return (
+    <>
+      {/* NAVBAR */}
+      <div
+        className={`${
+          open ? 'w-full' : 'w-20'
+        } relative flex h-screen flex-shrink-0 flex-col justify-between bg-gray-100 p-5 pt-6 transition-all duration-300`}>
+        <div className='flex w-full flex-col items-center justify-center'>
+          {/* Arrow toggle button */}
+          <ChevronLeft
+            className={`absolute -right-3 top-9 h-7 w-7 cursor-pointer rounded-full border-2 border-gray-50 bg-white text-black shadow-xl ${
+              !open && 'rotate-180'
+            }`}
+            onClick={() => setOpen(!open)}
+          />
+
+          {/* Logo and title */}
+          <div className={`flex items-center gap-x-4 ${open && 'mr-16'}`}>
+            <img
+              src='http://localhost:5173/src/assets/logoX.png'
+              alt='Logo'
+              className={`w-14 cursor-pointer rounded-full bg-black duration-500`}
+            />
+            {open && (
+              <h1
+                className={`origin-left text-xl font-bold duration-300 ${!open && 'scale-0'}`}>
+                Stream<span className='text-xl font-bold text-red-600'>X</span>
+              </h1>
+            )}
+          </div>
+          <ul
+            className={`flex w-full flex-col items-center justify-center pt-6 *:w-full ${open ? '*:justify-left' : '*:justify-center'}`}>
+            {Menus.map((menu, index) => (
+              <li
+                key={index}
+                className={`mt-2 flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm ease-in hover:bg-secondary hover:duration-300 ${title == menu.title ? 'bg-secondary' : ''}`}
+                onClick={() => navigate(`${menu.route}`)}>
+                <menu.icon className='h-5 w-5' />
+                <span
+                  className={`${!open && 'hidden'} origin-left duration-200`}>
+                  {menu.title}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* User profile section */}
+        <div
+          className={`mt-auto flex items-center gap-x-4 ${open ? 'justify-between' : 'justify-center'}`}>
+          <img
+            src='https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
+            alt='User'
+            className='h-10 w-10 rounded-full'
+          />
+          {open && (
+            <>
+              <div className='flex flex-col'>
+                <span className='font-medium'>Rishabh Raj</span>
+                <span className='text-xs text-gray-500'>rishabh@gmail.com</span>
+              </div>
+              <div className='relative'>
+                <MoreVertical
+                  className='h-5 w-5 cursor-pointer'
+                  onClick={() => setShowPopup(!showPopup)}
+                />
+                {showPopup && (
+                  <div
+                    ref={popupRef}
+                    className='absolute bottom-full right-0 mb-2 w-48 overflow-hidden rounded-md bg-gray-200 text-white shadow-lg'>
+                    <div className='border-b border-gray-700 px-4 py-2 font-semibold text-gray-700'>
+                      My Account
+                    </div>
+                    <ul>
+                      <li className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
+                        <User className='mr-2 h-4 w-4' />
+                        Profile
+                      </li>
+                      <li className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
+                        <HelpCircle className='mr-2 h-4 w-4' />
+                        Support
+                      </li>
+                      <li
+                        onClick={handleLogout}
+                        className='flex cursor-pointer items-center px-4 py-2 text-red-500 hover:bg-accent'>
+                        <LogOut className='mr-2 h-4 w-4' />
+                        Log out
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </>
+  )
+}
+
+Navbar.propTypes = {
+  title: PropTypes.string,
+}
+export default Navbar

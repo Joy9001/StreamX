@@ -169,3 +169,5 @@ node_modules/
 /tailwindcss
 .prettierrc
 IMP.md
+.secrets/
+package-lock.json
