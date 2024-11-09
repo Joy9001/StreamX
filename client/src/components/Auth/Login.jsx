@@ -2,16 +2,15 @@ import axios from 'axios'
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
-import { userState } from '../../states/loginState.js'
+import { userTypeState } from '../../states/loginState.js'
 
 function Login() {
   // State to manage input values
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
-  const setUser = useRecoilState(userState)[1]
-
-  setUser('owner')
+  const setUserType = useRecoilState(userTypeState)[1]
+  setUserType('owner')
 
   // Handler for Google login
   const handleGoogleLogin = () => {

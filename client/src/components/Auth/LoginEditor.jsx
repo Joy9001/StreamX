@@ -2,16 +2,14 @@ import axios from 'axios'
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
-import { userState } from '../../states/loginState.js'
-
+import { userTypeState } from '../../states/loginState.js'
 function LoginEditor() {
   // State to manage input values
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
-  const setUser = useRecoilState(userState)[1]
-
-  setUser('editor')
+  const setUserType = useRecoilState(userTypeState)[1]
+  setUserType('editor')
 
   // Handler for Google login
   const handleGoogleLogin = () => {
@@ -31,7 +29,7 @@ function LoginEditor() {
       // Add login logic here, such as API call for authentication
       axios
         .post('http://localhost:3000/jwt/login', {
-          username,
+          email,
           password,
         })
         .then((user) => {
