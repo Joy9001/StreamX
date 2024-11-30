@@ -1,6 +1,6 @@
-import Cards from '../components/Cards.jsx'
-import EditorNavbar from '../components/EditorNavbar.jsx'
-import Search from '../components/Search.jsx'
+import Cards from './Cards.jsx'
+import EditorNavbar from './EditorNavbar.jsx'
+import Search from './Search.jsx'
 
 function HiredEditor() {
   return (
