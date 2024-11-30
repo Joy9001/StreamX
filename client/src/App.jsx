@@ -10,16 +10,16 @@ import ProfileForm from './components/ProfileForm.jsx'
 import Request_Approve from './components/Request&Apporved/main.jsx'
 import Storage from './components/Storage/Storage.jsx'
 import HiredEditor from './HiredEditor/HiredEditor.jsx'
-import { loginState, userState } from './states/loginState.js'
+import { loginState, userTypeState } from './states/loginState.js'
 
 function App() {
   const isLoggedIn = useRecoilValue(loginState)
-  const user = useRecoilValue(userState)
+  const userType = useRecoilValue(userTypeState)
   const router = createBrowserRouter([
     {
       path: '/',
       element: isLoggedIn ? (
-        user == 'owner' ? (
+        userType == 'owner' ? (
           <Storage />
         ) : (
           <LoginEditor />

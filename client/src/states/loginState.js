@@ -5,9 +5,9 @@ const loginState = atom({
   default: false,
 })
 
-const userState = atom({
-  key: 'userState',
+const userTypeState = atom({
+  key: 'userTypeState',
   default: 'owner',
 })
 
-export { loginState, userState }
+export { loginState, userTypeState }

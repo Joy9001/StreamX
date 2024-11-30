@@ -4,13 +4,13 @@ import { createEditorProfile } from '../controllers/EditorProfileController.js'
 import updateEditor from '../controllers/EditorProfileEdit.js'
 import { EditorData } from '../controllers/GetEditor.js'
 import GetEditorByEmail from '../controllers/GetEditorUsingMail.js'
-import isAuthenticated from '../middlewares/auth.middleware.js'
 
 const router = express.Router()
 
-router.post('/', isAuthenticated, createEditorProfile)
-router.get('/', isAuthenticated, EditorData)
-router.get('/:email', isAuthenticated, GetEditorByEmail)
-router.put('/:email', isAuthenticated, updateEditor)
-router.delete('/:email', isAuthenticated, deleteEditorByEmail)
+router.post('/', createEditorProfile)
+router.get('/', EditorData)
+router.get('/:email', GetEditorByEmail)
+router.put('/:email', updateEditor)
+router.delete('/:email', deleteEditorByEmail)
+
 export default router

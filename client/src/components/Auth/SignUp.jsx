@@ -1,8 +1,10 @@
 import axios from 'axios'
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 function SignUp() {
+  const navigate = useNavigate()
+
   // State to manage input values
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
