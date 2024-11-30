@@ -7,7 +7,6 @@ import session from 'express-session'
 import morgan from 'morgan'
 import passport from 'passport'
 import connectMongo from './db/connectMongo.db.js'
-import isAuthenticated from './middlewares/auth.middleware.js'
 import authRoute from './routes/auth.route.js'
 import editor_gig_route from './routes/editor_gig_router.js'
 import editorProfileRoute from './routes/editorProfileRoute.js'
@@ -55,12 +54,12 @@ app.use(passport.initialize())
 app.use(passport.session())
 // require("./strategy/jwtpassport.js");
 
-app.get('/', isAuthenticated, (req, res) => {
+app.get('/', (req, res) => {
 	res.send('Backend is up!')
 })
 
-app.use('/api/videos', isAuthenticated, VideoRouter)
-app.use('/api/yt', isAuthenticated, YTRouter)
+app.use('/api/videos', VideoRouter)
+app.use('/api/yt', YTRouter)
 app.use('/auth', authRoute)
 app.use('/jwt', jwtRoute)
 app.use('/api', OwnerRouter)
