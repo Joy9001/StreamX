@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import locationIcon from '../assets/location.svg'
-import languageIcon from '../assets/language.svg'
-import starIcon from '../assets/star.svg'
-import checkIcon from '../assets/tick.svg'
-import crossIcon from '../assets/cross.svg'
-import Drawer from './Drawer.jsx'
+import locationIcon from '../../assets/location.svg'
+import languageIcon from '../../assets/language.svg'
+import starIcon from '../../assets/star.svg'
+import checkIcon from '../../assets/tick.svg'
+import crossIcon from '../../assets/cross.svg'
+import Drawer from '../Drawer.jsx'
 
 function Card({ data }) {
   const [selectedPlan, setSelectedPlan] = useState('Basic')
