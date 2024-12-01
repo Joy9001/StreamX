@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import Card from './Card'
+import searchIcon from '../../assets/search-svgrepo-com.svg'
 
 function Cards() {
   const [editorData, setEditorData] = useState([])
@@ -60,14 +61,21 @@ function Cards() {
   return (
     <div>
       {/* Search Input */}
-      <div className='my-4 ml-14 flex'>
-        <input
-          type='text'
-          placeholder='Search for any Skill, domain, or name...'
-          className='input input-bordered w-1/2 rounded border-2 border-solid border-gray-300 p-2'
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      <div className='my-4 ml-14 flex items-center'>
+        <div className='relative w-1/2'>
+          <input
+            type='text'
+            placeholder='Search for any Skill, domain, or name...'
+            className='input input-bordered w-full rounded border-2 border-solid border-gray-300 p-2 pr-10'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <img
+            src={searchIcon}
+            alt="Search"
+            className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400"
+          />
+        </div>
       </div>
 
       {/* Render Filtered Cards */}

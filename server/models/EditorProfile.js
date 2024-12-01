@@ -14,21 +14,10 @@ const editorProfileSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  location: {
-    type: String,
-    required: true,
-  },
+
   image: {
     type: String,
     required: false,
-  },
-  software: {
-    type: [String],
-    required: true,
-  },
-  specializations: {
-    type: [String],
-    required: true,
   },
 }, { timestamps: true });
 
