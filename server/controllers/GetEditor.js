@@ -1,8 +1,8 @@
-import EditorProfile from '../models/EditorProfile.js'
+import Editor from '../models/editor.models.js'
 
 export const EditorData = async (req, res) => {
 	try {
-		const editorData = await EditorProfile.find()
+		const editorData = await Editor.find()
 		if (!editorData) {
 			return res.status(404).json({ message: 'No editor data found' })
 		}
