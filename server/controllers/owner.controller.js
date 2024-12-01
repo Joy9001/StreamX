@@ -1,4 +1,4 @@
-import { Owner } from '../models/owner.model.js'
+import Owner from '../models/owner.model.js'
 
 export const getOwnerProfile = async (req, res) => {
 	try {

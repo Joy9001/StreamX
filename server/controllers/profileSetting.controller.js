@@ -1,6 +1,6 @@
 import { deleteObject, getDownloadURL, listAll, ref, uploadBytesResumable } from 'firebase/storage'
 import { storage } from '../helpers/firebase.helper.js'
-import { Owner } from '../models/owner.model.js'
+import Owner from '../models/owner.model.js'
 
 // Controller for creating a new profile
 export const createOwnerProfile = async (req, res) => {
