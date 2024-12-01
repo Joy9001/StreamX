@@ -1,5 +1,5 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { useRecoilValue } from 'recoil'
+import { useAuth0 } from '@auth0/auth0-react'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import AdminPanel from './AdminPanel/AdminPanel.jsx'
 import Login from './components/Auth/Login.jsx'
 import LoginEditor from './components/Auth/LoginEditor.jsx'
@@ -7,46 +7,36 @@ import Logout from './components/Auth/Logout.jsx'
 import SignUp from './components/Auth/SignUp.jsx'
 import Profile from './components/Profile.jsx'
 import ProfileForm from './components/ProfileForm.jsx'
-import Request_Approve from './components/Request&Apporved/main.jsx'
+import RequestApprove from './components/Request&Apporved/raas.jsx'
 import Storage from './components/Storage/Storage.jsx'
 import HiredEditor from './HiredEditor/HiredEditor.jsx'
-import { loginState, userTypeState } from './states/loginState.js'
 
 function App() {
-  const isLoggedIn = useRecoilValue(loginState)
-  const userType = useRecoilValue(userTypeState)
+  const { isAuthenticated } = useAuth0()
+
   const router = createBrowserRouter([
     {
       path: '/',
-      element: isLoggedIn ? (
-        userType == 'owner' ? (
-          <Storage />
-        ) : (
-          <LoginEditor />
-        )
-      ) : (
-        <Login />
-      ),
+      element: isAuthenticated ? <Navigate to='/storage' replace /> : <Login />,
     },
     {
       path: '/login/owner',
-      element: isLoggedIn ? <Storage /> : <Login />,
+      element: isAuthenticated ? <Storage /> : <Login />,
     },
     {
       path: '/raas',
-      element: <Request_Approve />,
+      element: <RequestApprove />,
     },
     {
       path: '/signup',
-      element: isLoggedIn ? <Storage /> : <SignUp />,
+      element: isAuthenticated ? <Storage /> : <SignUp />,
     },
     {
       path: '/login/editor',
-      element: isLoggedIn ? <Storage /> : <LoginEditor />,
+      element: isAuthenticated ? <Storage /> : <LoginEditor />,
     },
     {
       path: '/logout',
-      // element: isLoggedIn ? <Logout /> : <Login />,
       element: <Logout />,
     },
     {
