@@ -6,6 +6,7 @@ function Cards() {
   const [editorData, setEditorData] = useState([])
   const [plansData, setPlansData] = useState([])
   const [combinedData, setCombinedData] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,7 +19,7 @@ function Cards() {
         const plansRes = await axios.get(
           'http://localhost:3000/editor_gig/plans'
         )
-        setPlansData(plansRes.data || []) // Make sure this is correct
+        setPlansData(plansRes.data || [])
         console.log('Plans Response:', plansRes)
       } catch (err) {
         console.error('Error fetching data:', err)
@@ -51,11 +52,30 @@ function Cards() {
     }
   }, [editorData, plansData])
 
+  // Filter combined data based on search term
+  const filteredData = combinedData.filter((editor) =>
+    editor.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   return (
     <div>
-      {combinedData.map((editor) => (
-        <Card key={editor._id} data={editor} />
-      ))}
+      {/* Search Input */}
+      <div className='my-4 ml-14 flex'>
+        <input
+          type='text'
+          placeholder='Search for any Skill, domain, or name...'
+          className='input input-bordered w-1/2 rounded border-2 border-solid border-gray-300 p-2'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      {/* Render Filtered Cards */}
+      <div>
+        {filteredData.map((editor) => (
+          <Card key={editor._id} data={editor} />
+        ))}
+      </div>
     </div>
   )
 }

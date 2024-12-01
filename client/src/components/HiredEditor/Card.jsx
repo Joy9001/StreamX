@@ -12,7 +12,7 @@ function Card({ data }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   const toggleDrawer = () => {
-    setIsDrawerOpen(!isDrawerOpen)
+    setIsDrawerOpen((prevState) => !prevState)
   }
 
   const plans = data.plans
@@ -49,38 +49,29 @@ function Card({ data }) {
     'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4',
   ]
 
-  const nextVideo = () => {
+  const handleVideoChange = (direction) => {
     setCurrentVideoIndex((prevIndex) =>
-      prevIndex === videos.length - 1 ? 0 : prevIndex + 1
-    )
-  }
-
-  const prevVideo = () => {
-    setCurrentVideoIndex((prevIndex) =>
-      prevIndex === 0 ? videos.length - 1 : prevIndex - 1
+      direction === 'next'
+        ? (prevIndex + 1) % videos.length
+        : (prevIndex - 1 + videos.length) % videos.length
     )
   }
 
   return (
     <>
-      {/* Overlay to block interaction and blur the background when drawer is open */}
       {isDrawerOpen && (
         <div className='fixed inset-0 z-40 bg-gray-700 bg-opacity-80'></div>
       )}
 
       <div className='flex cursor-pointer'>
-        {/* Card */}
-        <div
-          className='Cards relative z-30 ml-14 mt-10 flex h-[50vh] w-8/12 flex-col items-center border-2 border-solid border-gray-300 bg-white'
-          onClick={toggleDrawer}>
+        <div className='Cards relative z-30 mb-10 ml-14 mt-10 flex h-[45vh] w-8/12 flex-col items-center border-2 border-solid border-gray-300 bg-white'>
           <div className='flex'>
             <div className='flex items-center'>
               <button
-                onClick={prevVideo}
+                onClick={() => handleVideoChange('prev')}
                 className='mr-0 rounded-full p-2 text-black shadow-md transition hover:bg-gray-400'>
                 &lt;
               </button>
-
               <div className='Profilevideo mt-2 h-60 w-60 flex-shrink-0 overflow-hidden'>
                 <video
                   key={currentVideoIndex}
@@ -92,13 +83,12 @@ function Card({ data }) {
                 />
               </div>
               <button
-                onClick={nextVideo}
+                onClick={() => handleVideoChange('next')}
                 className='rounded-full p-2 text-black shadow-md transition hover:bg-gray-400'>
                 &gt;
               </button>
             </div>
 
-            {/* Card Body */}
             <div className='card-body'>
               <h2 className='card-title ml-4 text-3xl font-bold text-black'>
                 {data.name}
@@ -123,19 +113,13 @@ function Card({ data }) {
                   <p className='font-bold'>{data.languages.join(', ')}</p>
                 </div>
               </div>
-
-              {/* Description Section - Drawer will open when clicked */}
-
               <div className='description mt-6 text-gray-800'>
                 <p>
                   {data.bio}... <span className='text-blue-700'>Read More</span>
                 </p>
               </div>
-
-              {/* Action Buttons */}
             </div>
           </div>
-          {/* Skills */}
           <div className='skills mb-4 ml-4 mt-8 flex'>
             <div className='flex flex-wrap gap-2'>
               {data.skills.map((skill, index) => (
@@ -147,7 +131,9 @@ function Card({ data }) {
               ))}
             </div>
             <div className='w-50 ml-20 flex gap-4'>
-              <button className='rounded bg-blue-500 px-4 py-2 text-white transition hover:bg-blue-600'>
+              <button
+                className='rounded bg-blue-500 px-4 py-2 text-white transition hover:bg-blue-600'
+                onClick={toggleDrawer}>
                 View Profile
               </button>
               <button className='rounded bg-green-500 px-4 py-2 text-white transition hover:bg-green-600'>
@@ -157,8 +143,7 @@ function Card({ data }) {
           </div>
         </div>
 
-        {/* Plans Section - No drawer trigger here */}
-        <div className='plan mr-20 mt-10 h-[50vh] max-w-80 border-2 border-solid border-gray-300 bg-white shadow-xl'>
+        <div className='plan mr-20 mt-10 h-[45vh] max-w-80 border-2 border-solid border-gray-300 bg-white shadow-xl'>
           <div className='pricing-tabs mx-2 mt-8 grid grid-cols-3 gap-2'>
             {['Basic', 'Standard', 'Premium'].map((planName) => (
               <div
@@ -226,7 +211,6 @@ function Card({ data }) {
         </div>
       </div>
 
-      {/* Drawer Component */}
       {isDrawerOpen && (
         <div
           className={`fixed right-0 top-0 z-50 h-screen w-3/5 transform overflow-y-auto bg-white shadow-lg transition-transform ${
