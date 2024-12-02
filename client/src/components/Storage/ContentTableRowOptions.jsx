@@ -1,14 +1,16 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { setRecentVideos, setAllVideos } from '@/store/slices/videoSlice'
+import { setDrawerOpen } from '@/store/slices/uiSlice'
+import { setAllVideos, setRecentVideos } from '@/store/slices/videoSlice'
 import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 function ContentTableRowOptions({ editor, videoId }) {
   const dispatch = useDispatch()
   const recentVideos = useSelector((state) => state.video.recentVideos)
   const allVideos = useSelector((state) => state.video.allVideos)
+  const userData = useSelector((state) => state.user.userData)
   const [accessToken, setAccessToken] = useState(null)
   const { getAccessTokenSilently } = useAuth0()
 
@@ -36,6 +38,7 @@ function ContentTableRowOptions({ editor, videoId }) {
           withCredentials: true,
           data: {
             id: videoId,
+            userId: userData._id,
           },
         }
       )
@@ -48,6 +51,8 @@ function ContentTableRowOptions({ editor, videoId }) {
     } catch (error) {
       console.error('Error deleting video:', error)
       alert('Failed to delete video!')
+    } finally {
+      dispatch(setDrawerOpen(false))
     }
   }
 
