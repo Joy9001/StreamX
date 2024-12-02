@@ -1,25 +1,18 @@
-import axios from 'axios'
-import {
-  Briefcase,
-  ChevronLeft,
-  HelpCircle,
-  LogOut,
-  MoreVertical,
-  Settings,
-  User,
-  Video,
-} from 'lucide-react'
+import { useAuth0 } from '@auth0/auth0-react'
+import { Briefcase, ChevronLeft, Settings, User, Video } from 'lucide-react'
 import PropTypes from 'prop-types'
-import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
-import { navbarOpenState } from '../states/navbarState.js'
+import { navbarOpenState } from '../../states/navbarState.js'
+import NavLogin from './NavLogin.jsx'
+import NavProfile from './NavProfile.jsx'
 
 function Navbar({ title }) {
   const [open, setOpen] = useRecoilState(navbarOpenState)
-  const [showPopup, setShowPopup] = useState(false)
-  const popupRef = useRef(null)
+
   const navigate = useNavigate()
+  const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0()
+  console.log('user in navbar', user)
 
   const Menus = [
     // { title: 'Dashboard', icon: LayoutDashboard },
@@ -30,32 +23,6 @@ function Navbar({ title }) {
     { title: 'raas', icon: Settings, route: '/raas' },
     { title: 'Settings', icon: Settings, route: '/settings' },
   ]
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (popupRef.current && !popupRef.current.contains(event.target)) {
-        setShowPopup(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
-  const handleLogout = async () => {
-    // Clear cookies
-    document.cookie =
-      'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; samesite=strict;'
-    axios
-      .get('http://localhost:3000/auth/logout')
-      .then(() => {
-        navigate('/') // Redirect to login page
-      })
-      .catch((error) => {
-        console.error('Logout failed:', error)
-      })
-  }
 
   return (
     <>
@@ -112,45 +79,12 @@ function Navbar({ title }) {
             alt='User'
             className='h-10 w-10 rounded-full'
           />
-          {open && (
-            <>
-              <div className='flex flex-col'>
-                <span className='font-medium'>Rishabh Raj</span>
-                <span className='text-xs text-gray-500'>rishabh@gmail.com</span>
-              </div>
-              <div className='relative'>
-                <MoreVertical
-                  className='h-5 w-5 cursor-pointer'
-                  onClick={() => setShowPopup(!showPopup)}
-                />
-                {showPopup && (
-                  <div
-                    ref={popupRef}
-                    className='absolute bottom-full right-0 mb-2 w-48 overflow-hidden rounded-md bg-gray-200 text-white shadow-lg'>
-                    <div className='border-b border-gray-700 px-4 py-2 font-semibold text-gray-700'>
-                      My Account
-                    </div>
-                    <ul>
-                      <li className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
-                        <User className='mr-2 h-4 w-4' />
-                        Profile
-                      </li>
-                      <li className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
-                        <HelpCircle className='mr-2 h-4 w-4' />
-                        Support
-                      </li>
-                      <li
-                        onClick={handleLogout}
-                        className='flex cursor-pointer items-center px-4 py-2 text-red-500 hover:bg-accent'>
-                        <LogOut className='mr-2 h-4 w-4' />
-                        Log out
-                      </li>
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
+          {open &&
+            (isAuthenticated ? (
+              <NavProfile logout={logout} user={user} />
+            ) : (
+              <NavLogin loginWithRedirect={loginWithRedirect} />
+            ))}
         </div>
       </div>
     </>

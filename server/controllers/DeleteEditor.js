@@ -1,10 +1,10 @@
-import EditorProfile from '../models/EditorProfile.js'
+import Editor from '../models/editor.models.js'
 
 const deleteEditorByEmail = async (req, res) => {
 	const { email } = req.params
 
 	try {
-		const editor = await EditorProfile.findOneAndDelete({ email })
+		const editor = await Editor.findOneAndDelete({ email })
 
 		if (!editor) {
 			return res.status(404).json({ message: 'Editor not found' })
