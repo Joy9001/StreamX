@@ -16,7 +16,9 @@ const AuthenticationWrapper = ({ children }) => {
       if (isAuthenticated && JSON.stringify(userData) === '{}') {
         console.log('Fetching user metadata...')
         try {
-          const accessToken = await getAccessTokenSilently()
+          const accessToken = await getAccessTokenSilently({
+            cacheMode: 'on',
+          })
           console.log('Access token:', accessToken)
 
           // Get and Create user data in backend
