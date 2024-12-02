@@ -1,15 +1,14 @@
+import { setNavbarOpen } from '@/store/slices/uiSlice.js'
 import { useAuth0 } from '@auth0/auth0-react'
 import { Briefcase, ChevronLeft, Settings, User, Video } from 'lucide-react'
 import PropTypes from 'prop-types'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useRecoilState } from 'recoil'
-import { navbarOpenState } from '../../states/navbarState.js'
 import NavLogin from './NavLogin.jsx'
 import NavProfile from './NavProfile.jsx'
-
 function Navbar({ title }) {
-  const [open, setOpen] = useRecoilState(navbarOpenState)
-
+  const open = useSelector((state) => state.ui.navbarOpen)
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0()
   console.log('user in navbar', user)
@@ -21,7 +20,6 @@ function Navbar({ title }) {
     { title: 'Storage', icon: Video, route: '/storage?login=true' },
     { title: 'Hire Editors', icon: Briefcase, route: '/HireEditor' },
     { title: 'raas', icon: Settings, route: '/raas' },
-    
   ]
 
   return (
@@ -37,7 +35,7 @@ function Navbar({ title }) {
             className={`absolute -right-3 top-9 h-7 w-7 cursor-pointer rounded-full border-2 border-gray-50 bg-white text-black shadow-xl ${
               !open && 'rotate-180'
             }`}
-            onClick={() => setOpen(!open)}
+            onClick={() => dispatch(setNavbarOpen(!open))}
           />
 
           {/* Logo and title */}

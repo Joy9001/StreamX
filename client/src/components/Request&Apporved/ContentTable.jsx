@@ -1,10 +1,12 @@
-import { allVidState } from '@/states/videoState.js'
+import { setAllVideos } from '@/store/slices/videoSlice'
 import axios from 'axios'
 import { useEffect } from 'react'
-import { useRecoilState } from 'recoil'
+import { useDispatch, useSelector } from 'react-redux'
+import ContentTableRow from '../Storage/ContenetTableRow.jsx'
 
 function ContentTable() {
-  const [allVideos, setAllVideos] = useRecoilState(allVidState)
+  const allVideos = useSelector((state) => state.video.allVideos)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     async function fetchAllVideos() {
@@ -13,14 +15,14 @@ function ContentTable() {
           withCredentials: true,
         })
         console.log('all', res.data)
-        setAllVideos(res.data.videos)
+        dispatch(setAllVideos(res.data.videos))
       } catch (error) {
         console.error('Error fetching all videos:', error)
       }
     }
 
     fetchAllVideos()
-  }, [setAllVideos])
+  }, [dispatch])
 
   return (
     <>
@@ -38,9 +40,9 @@ function ContentTable() {
             </tr>
           </thead>
           <tbody>
-            {/* {allVideos.map((video) => (
+            {allVideos.map((video) => (
               <ContentTableRow key={video._id} content={video} />
-            ))} */}
+            ))}
           </tbody>
         </table>
       </div>

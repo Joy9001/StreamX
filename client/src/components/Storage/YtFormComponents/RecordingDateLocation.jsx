@@ -1,17 +1,15 @@
-import {
-  locationState,
-  recordingDateState,
-} from '@/states/YtFormStates/recordingState'
+import { setRecordingDate, setLocation } from '@/store/slices/ytFormSlice'
 import PropTypes from 'prop-types'
-import { useRecoilState } from 'recoil'
+import { useDispatch, useSelector } from 'react-redux'
 
 const RecordingDateLocation = () => {
-  const [recordingDate, setRecordingDate] = useRecoilState(recordingDateState)
-  const [location, setLocation] = useRecoilState(locationState)
+  const dispatch = useDispatch()
+  const recordingDate = useSelector((state) => state.ytForm.recordingDate)
+  const location = useSelector((state) => state.ytForm.location)
 
   const handleDateChange = (e) => {
     const date = new Date(e.target.value)
-    setRecordingDate(date)
+    dispatch(setRecordingDate(date))
   }
 
   return (
@@ -32,7 +30,9 @@ const RecordingDateLocation = () => {
           <input
             type='date'
             id='recordingDate'
-            value={recordingDate ? recordingDate.toISOString().split('T')[0] : ''}
+            value={
+              recordingDate ? recordingDate.toISOString().split('T')[0] : ''
+            }
             onChange={handleDateChange}
             className='w-full rounded-md border-2 border-solid border-black p-2'
           />
@@ -46,7 +46,7 @@ const RecordingDateLocation = () => {
             id='location'
             type='text'
             value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            onChange={(e) => dispatch(setLocation(e.target.value))}
             className='w-full rounded-md border-2 border-solid border-black p-2'
             placeholder='Enter location'
             aria-required='true'

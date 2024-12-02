@@ -3,20 +3,20 @@ import userCircle from '@/assets/user-circle.svg'
 import { filesize } from 'filesize'
 import { useState } from 'react'
 import ReactPlayer from 'react-player'
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { drawerContentState, drawerState } from '../../states/drawerState.js'
+import { useDispatch, useSelector } from 'react-redux'
+import { setDrawerOpen } from '@/store/slices/uiSlice'
 
 const VideoDrawer = () => {
   const [light, setLight] = useState(
     'https://via.placeholder.com/150x150.png?text=&bg=ffffff&shadow=true'
   )
 
-  const setDrawerState = useRecoilState(drawerState)[1]
-  const drawerContent = useRecoilValue(drawerContentState)
+  const dispatch = useDispatch()
+  const drawerContent = useSelector((state) => state.ui.drawerContent)
 
   // console.log('drawerContent', drawerContent)
   function handleCrossClick() {
-    setDrawerState(false)
+    dispatch(setDrawerOpen(false))
   }
 
   return drawerContent ? (

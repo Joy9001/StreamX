@@ -1,19 +1,12 @@
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { useRef } from 'react'
-import { useRecoilValue } from 'recoil'
-import { navbarOpenState } from '../../states/navbarState.js'
-import HiredEditors from '../HiredEditors.jsx'
+import { useSelector } from 'react-redux'
 import Navbar from '../NavBar/Navbar.jsx'
 import ProfileHeader from './ProfileHeader.jsx'
-import Radial from '../Radial.jsx'
-import RecentCard from '../Storage/RecentCard.jsx'
-
-import { Paper, Box, Typography, Button } from '@mui/material'
 import UiProfile from './UiProfile.jsx'
 
 function Profile() {
   const scrollContainerRef = useRef(null)
-  const navOpen = useRecoilValue(navbarOpenState)
+  const navOpen = useSelector((state) => state.ui.navbarOpen)
 
   // Dummy video data
   const dummyVideos = [

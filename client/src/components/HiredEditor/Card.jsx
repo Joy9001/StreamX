@@ -21,7 +21,7 @@ function Card({ data }) {
 
   // For demo purposes, let's use the first owner's videos
   const ownerVideos = dummyVideos.videos.filter(
-    video => video.ownerId === '507f1f77bcf86cd799439011'
+    (video) => video.ownerId === '507f1f77bcf86cd799439011'
   )
 
   const toggleDrawer = () => {
@@ -149,10 +149,9 @@ function Card({ data }) {
                 onClick={toggleDrawer}>
                 View Profile
               </button>
-              <button 
+              <button
                 className='rounded bg-green-500 px-4 py-2 text-white transition hover:bg-green-600'
-                onClick={() => setIsModelOpen(true)}
-              >
+                onClick={() => setIsModelOpen(true)}>
                 Book Now
               </button>
             </div>
@@ -244,83 +243,111 @@ function Card({ data }) {
       )}
 
       <Model isOpen={isModelOpen} onClose={() => setIsModelOpen(false)}>
-        <div className="p-8">
+        <div className='p-8'>
           {/* Header Section */}
-          <div className="border-b border-gray-200 pb-6">
-            <h2 className="text-3xl font-bold text-gray-900">Book {data.name}</h2>
-            <p className="mt-2 text-sm text-gray-500">Fill in the details below to send a booking request</p>
+          <div className='border-b border-gray-200 pb-6'>
+            <h2 className='text-3xl font-bold text-gray-900'>
+              Book {data.name}
+            </h2>
+            <p className='mt-2 text-sm text-gray-500'>
+              Fill in the details below to send a booking request
+            </p>
           </div>
 
-          <form className="mt-8 space-y-8">
+          <form className='mt-8 space-y-8'>
             {/* Editor Info Section */}
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Editor Information</h3>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div className='rounded-lg bg-gray-50 p-6'>
+              <h3 className='mb-4 text-lg font-medium text-gray-900'>
+                Editor Information
+              </h3>
+              <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Editor Name</label>
+                  <label className='block text-sm font-medium text-gray-700'>
+                    Editor Name
+                  </label>
                   <input
-                    type="text"
+                    type='text'
                     value={data.name}
                     disabled
-                    className="mt-1 block w-full rounded-lg border-gray-300 bg-white py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className='mt-1 block w-full rounded-lg border-gray-300 bg-white py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500'
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Current Rating</label>
-                  <div className="mt-1 flex items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-3">
-                    <img src={starIcon} alt="Rating" className="h-5 w-5" />
-                    <span className="font-medium text-gray-900">{data.rating}</span>
+                  <label className='block text-sm font-medium text-gray-700'>
+                    Current Rating
+                  </label>
+                  <div className='mt-1 flex items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-3'>
+                    <img src={starIcon} alt='Rating' className='h-5 w-5' />
+                    <span className='font-medium text-gray-900'>
+                      {data.rating}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Video Selection Section */}
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Select Video</h3>
-              <p className="text-sm text-gray-500 mb-4">Choose the video you want the editor to work on</p>
-              
-              <div className="mt-4 max-h-[300px] overflow-y-auto rounded-lg border border-gray-200 bg-white">
+            <div className='rounded-lg bg-gray-50 p-6'>
+              <h3 className='mb-2 text-lg font-medium text-gray-900'>
+                Select Video
+              </h3>
+              <p className='mb-4 text-sm text-gray-500'>
+                Choose the video you want the editor to work on
+              </p>
+
+              <div className='mt-4 max-h-[300px] overflow-y-auto rounded-lg border border-gray-200 bg-white'>
                 {ownerVideos.map((video, index) => (
                   <div
                     key={index}
-                    className={`relative flex cursor-pointer border-b border-gray-200 p-4 hover:bg-gray-50 last:border-b-0
-                      ${selectedVideo === video ? 'bg-blue-50 hover:bg-blue-50' : ''}`}
-                    onClick={() => setSelectedVideo(video)}
-                  >
-                    <div className="flex flex-1">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium text-gray-900">
+                    className={`relative flex cursor-pointer border-b border-gray-200 p-4 last:border-b-0 hover:bg-gray-50 ${selectedVideo === video ? 'bg-blue-50 hover:bg-blue-50' : ''}`}
+                    onClick={() => setSelectedVideo(video)}>
+                    <div className='flex flex-1'>
+                      <div className='min-w-0 flex-1'>
+                        <div className='flex items-center justify-between'>
+                          <p className='text-sm font-medium text-gray-900'>
                             {video.metaData.title}
                           </p>
-                          <div className="ml-4 flex-shrink-0">
-                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                              ${video.ytUploadStatus === 'Uploaded' ? 'bg-green-100 text-green-800' :
-                                video.ytUploadStatus === 'Failed' ? 'bg-red-100 text-red-800' :
-                                'bg-yellow-100 text-yellow-800'}`}>
+                          <div className='ml-4 flex-shrink-0'>
+                            <span
+                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                                video.ytUploadStatus === 'Uploaded'
+                                  ? 'bg-green-100 text-green-800'
+                                  : video.ytUploadStatus === 'Failed'
+                                    ? 'bg-red-100 text-red-800'
+                                    : 'bg-yellow-100 text-yellow-800'
+                              }`}>
                               {video.ytUploadStatus}
                             </span>
                           </div>
                         </div>
-                        <div className="mt-1">
-                          <p className="text-sm text-gray-500 line-clamp-2">{video.metaData.description}</p>
-                          <div className="mt-2 flex items-center text-xs text-gray-500">
-                            <span className="mr-4">Duration: {video.metaData.duration}</span>
-                            <span className="mr-4">Resolution: {video.metaData.resolution}</span>
+                        <div className='mt-1'>
+                          <p className='line-clamp-2 text-sm text-gray-500'>
+                            {video.metaData.description}
+                          </p>
+                          <div className='mt-2 flex items-center text-xs text-gray-500'>
+                            <span className='mr-4'>
+                              Duration: {video.metaData.duration}
+                            </span>
+                            <span className='mr-4'>
+                              Resolution: {video.metaData.resolution}
+                            </span>
                             <span>Size: {video.metaData.fileSize}</span>
                           </div>
                         </div>
                       </div>
-                      <div className={`ml-4 h-5 w-5 shrink-0 rounded-full border flex items-center justify-center
-                        ${selectedVideo === video
-                          ? 'border-transparent bg-blue-500 text-white'
-                          : 'border-gray-300 bg-white'}`}
-                      >
+                      <div
+                        className={`ml-4 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+                          selectedVideo === video
+                            ? 'border-transparent bg-blue-500 text-white'
+                            : 'border-gray-300 bg-white'
+                        }`}>
                         {selectedVideo === video && (
-                          <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="currentColor">
-                            <path d="M3.707 5.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L5 6.586 3.707 5.293z" />
+                          <svg
+                            className='h-3 w-3 text-white'
+                            viewBox='0 0 12 12'
+                            fill='currentColor'>
+                            <path d='M3.707 5.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L5 6.586 3.707 5.293z' />
                           </svg>
                         )}
                       </div>
@@ -331,39 +358,49 @@ function Card({ data }) {
             </div>
 
             {/* Plan Selection Section */}
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Select Plan</h3>
-              <p className="text-sm text-gray-500 mb-4">Choose from our predefined plans or set a custom price</p>
-              
-              <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className='rounded-lg bg-gray-50 p-6'>
+              <h3 className='mb-2 text-lg font-medium text-gray-900'>
+                Select Plan
+              </h3>
+              <p className='mb-4 text-sm text-gray-500'>
+                Choose from our predefined plans or set a custom price
+              </p>
+
+              <div className='mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3'>
                 {Object.entries(plans).map(([planName, planDetails]) => (
                   <div
                     key={planName}
-                    className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none
-                      ${selectedPlan === planName && !showCustomPrice 
-                        ? 'border-blue-500 ring-2 ring-blue-500' 
-                        : 'border-gray-300'}`}
+                    className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none ${
+                      selectedPlan === planName && !showCustomPrice
+                        ? 'border-blue-500 ring-2 ring-blue-500'
+                        : 'border-gray-300'
+                    }`}
                     onClick={() => {
                       setSelectedPlan(planName)
                       setShowCustomPrice(false)
-                    }}
-                  >
-                    <div className="flex flex-1">
-                      <div className="flex flex-col">
-                        <span className="block text-sm font-medium text-gray-900">{planName}</span>
-                        <span className="mt-1 flex items-center text-sm text-gray-500">
+                    }}>
+                    <div className='flex flex-1'>
+                      <div className='flex flex-col'>
+                        <span className='block text-sm font-medium text-gray-900'>
+                          {planName}
+                        </span>
+                        <span className='mt-1 flex items-center text-sm text-gray-500'>
                           {planDetails.price}
                         </span>
                       </div>
                     </div>
-                    <div className={`h-5 w-5 shrink-0 rounded-full border flex items-center justify-center
-                      ${selectedPlan === planName && !showCustomPrice
-                        ? 'border-transparent bg-blue-500 text-white'
-                        : 'border-gray-300 bg-white'}`}
-                    >
+                    <div
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+                        selectedPlan === planName && !showCustomPrice
+                          ? 'border-transparent bg-blue-500 text-white'
+                          : 'border-gray-300 bg-white'
+                      }`}>
                       {selectedPlan === planName && !showCustomPrice && (
-                        <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="currentColor">
-                          <path d="M3.707 5.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L5 6.586 3.707 5.293z" />
+                        <svg
+                          className='h-3 w-3 text-white'
+                          viewBox='0 0 12 12'
+                          fill='currentColor'>
+                          <path d='M3.707 5.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L5 6.586 3.707 5.293z' />
                         </svg>
                       )}
                     </div>
@@ -372,24 +409,26 @@ function Card({ data }) {
 
                 {/* Custom Price Option */}
                 <div
-                  className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none
-                    ${showCustomPrice ? 'border-blue-500 ring-2 ring-blue-500' : 'border-gray-300'}`}
-                  onClick={() => setShowCustomPrice(true)}
-                >
-                  <div className="flex flex-1">
-                    <div className="flex flex-col">
-                      <span className="block text-sm font-medium text-gray-900">Custom Price</span>
-                      <span className="mt-1 flex items-center text-sm text-gray-500">
+                  className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none ${showCustomPrice ? 'border-blue-500 ring-2 ring-blue-500' : 'border-gray-300'}`}
+                  onClick={() => setShowCustomPrice(true)}>
+                  <div className='flex flex-1'>
+                    <div className='flex flex-col'>
+                      <span className='block text-sm font-medium text-gray-900'>
+                        Custom Price
+                      </span>
+                      <span className='mt-1 flex items-center text-sm text-gray-500'>
                         Set your own price
                       </span>
                     </div>
                   </div>
-                  <div className={`h-5 w-5 shrink-0 rounded-full border flex items-center justify-center
-                    ${showCustomPrice ? 'border-transparent bg-blue-500 text-white' : 'border-gray-300 bg-white'}`}
-                  >
+                  <div
+                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${showCustomPrice ? 'border-transparent bg-blue-500 text-white' : 'border-gray-300 bg-white'}`}>
                     {showCustomPrice && (
-                      <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="currentColor">
-                        <path d="M3.707 5.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L5 6.586 3.707 5.293z" />
+                      <svg
+                        className='h-3 w-3 text-white'
+                        viewBox='0 0 12 12'
+                        fill='currentColor'>
+                        <path d='M3.707 5.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L5 6.586 3.707 5.293z' />
                       </svg>
                     )}
                   </div>
@@ -398,18 +437,20 @@ function Card({ data }) {
 
               {/* Custom Price Input */}
               {showCustomPrice && (
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700">Enter Custom Price (₹)</label>
-                  <div className="mt-1 relative rounded-lg shadow-sm">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                      <span className="text-gray-500 sm:text-sm">₹</span>
+                <div className='mt-4'>
+                  <label className='block text-sm font-medium text-gray-700'>
+                    Enter Custom Price (₹)
+                  </label>
+                  <div className='relative mt-1 rounded-lg shadow-sm'>
+                    <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
+                      <span className='text-gray-500 sm:text-sm'>₹</span>
                     </div>
                     <input
-                      type="number"
+                      type='number'
                       value={customPrice}
                       onChange={(e) => setCustomPrice(e.target.value)}
-                      className="block w-full rounded-lg border-gray-300 pl-7 py-3 focus:border-blue-500 focus:ring-blue-500"
-                      placeholder="0.00"
+                      className='block w-full rounded-lg border-gray-300 py-3 pl-7 focus:border-blue-500 focus:ring-blue-500'
+                      placeholder='0.00'
                     />
                   </div>
                 </div>
@@ -417,39 +458,41 @@ function Card({ data }) {
             </div>
 
             {/* Description Section */}
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Project Description</h3>
-              <p className="text-sm text-gray-500 mb-4">
-                Describe your project requirements, timeline, and any specific details the editor should know
+            <div className='rounded-lg bg-gray-50 p-6'>
+              <h3 className='mb-2 text-lg font-medium text-gray-900'>
+                Project Description
+              </h3>
+              <p className='mb-4 text-sm text-gray-500'>
+                Describe your project requirements, timeline, and any specific
+                details the editor should know
               </p>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
-                className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="I need help with..."
+                className='mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
+                placeholder='I need help with...'
               />
             </div>
 
             {/* Form Actions */}
-            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+            <div className='flex justify-end space-x-3 border-t border-gray-200 pt-6'>
               <button
-                type="button"
+                type='button'
                 onClick={() => {
-                  setSelectedVideo(null);
-                  setIsModelOpen(false);
+                  setSelectedVideo(null)
+                  setIsModelOpen(false)
                 }}
-                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
+                className='rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
                 Cancel
               </button>
               <button
-                type="submit"
+                type='submit'
                 onClick={async (e) => {
-                  e.preventDefault();
+                  e.preventDefault()
                   if (!selectedVideo) {
-                    alert('Please select a video to proceed');
-                    return;
+                    alert('Please select a video to proceed')
+                    return
                   }
 
                   try {
@@ -458,30 +501,34 @@ function Card({ data }) {
                       video_id: selectedVideo._id,
                       owner_id: selectedVideo.ownerId,
                       description: description,
-                      price: showCustomPrice ? Number(customPrice) : Number(plans[selectedPlan].price.replace('₹', '')),
-                      status: 'pending'
-                    };
+                      price: showCustomPrice
+                        ? Number(customPrice)
+                        : Number(plans[selectedPlan].price.replace('₹', '')),
+                      status: 'pending',
+                    }
 
-                    console.log('Sending request with data:', requestData); // Add logging
-                    const response = await axios.post('http://localhost:3000/requests/create', requestData);
-                    
+                    console.log('Sending request with data:', requestData) // Add logging
+                    const response = await axios.post(
+                      'http://localhost:3000/requests/create',
+                      requestData
+                    )
+
                     if (response.status === 201 || response.status === 200) {
-                      alert('Request sent successfully!');
-                      setIsModelOpen(false);
+                      alert('Request sent successfully!')
+                      setIsModelOpen(false)
                       // Reset form
-                      setSelectedVideo(null);
-                      setDescription('');
-                      setCustomPrice('');
-                      setShowCustomPrice(false);
+                      setSelectedVideo(null)
+                      setDescription('')
+                      setCustomPrice('')
+                      setShowCustomPrice(false)
                     }
                   } catch (error) {
-                    console.error('Error sending request:', error);
-                    console.error('Request data was:', requestData); // Add error logging
-                    alert('Failed to send request. Please try again.');
+                    console.error('Error sending request:', error)
+                    console.error('Request data was:', requestData) // Add error logging
+                    alert('Failed to send request. Please try again.')
                   }
                 }}
-                className="rounded-lg bg-blue-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
+                className='rounded-lg bg-blue-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
                 Send Request
               </button>
             </div>

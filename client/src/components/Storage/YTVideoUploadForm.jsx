@@ -1,7 +1,6 @@
-import { ytVideoUploadState } from '@/states/videoState'
+import { useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import ReactPlayer from 'react-player'
-import { useRecoilValue } from 'recoil'
 import AudienceRadioButtons from './YtFormComponents/AudienceRadioButtons'
 import CategoryDropdown from './YtFormComponents/CategoryDropdown'
 import LicenseOptions from './YtFormComponents/LicenseOptions'
@@ -11,7 +10,7 @@ import UploadFooter from './YtFormComponents/UploadFooter'
 import VisibilityOptions from './YtFormComponents/VisibilityOptions'
 
 export const YTVideoUploadForm = () => {
-  const ytVideoUpload = useRecoilValue(ytVideoUploadState)
+  const ytVideoUpload = useSelector((state) => state.video.ytVideoUpload)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [errors, setErrors] = useState({ title: false, description: false })

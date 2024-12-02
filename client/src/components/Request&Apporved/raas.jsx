@@ -1,13 +1,11 @@
-import { useRecoilValue } from 'recoil'
-import { drawerState } from '../../states/drawerState.js'
-import { navbarOpenState } from '../../states/navbarState.js'
+import { useSelector } from 'react-redux'
 import Navbar from '../NavBar/Navbar.jsx'
 import ContentTable from './ContentTable.jsx'
 import RaasNav from './raasNav.jsx'
 
 const RequestApprove = () => {
-  const navOpen = useRecoilValue(navbarOpenState)
-  const drawer = useRecoilValue(drawerState)
+  const navOpen = useSelector((state) => state.ui.navbarOpen)
+  const drawer = useSelector((state) => state.ui.drawer)
   return (
     <div className='storage-main flex h-screen'>
       <div

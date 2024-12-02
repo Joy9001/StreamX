@@ -2,12 +2,13 @@ import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react'
-import { useRecoilState } from 'recoil'
-import { userState } from '../../states/userState.js'
+import { useDispatch, useSelector } from 'react-redux'
+import { setUserData } from '@/store/slices/userSlice'
 
 const AuthenticationWrapper = ({ children }) => {
   const { isAuthenticated, user, getAccessTokenSilently } = useAuth0()
-  const [userData, setUserdata] = useRecoilState(userState)
+  const userData = useSelector((state) => state.user.userData)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     async function fetchUserData() {
@@ -36,7 +37,7 @@ const AuthenticationWrapper = ({ children }) => {
 
           if (res.status === 200) {
             console.log('User fetched successfully:', res.data.user)
-            setUserdata(res.data.user)
+            dispatch(setUserData(res.data.user))
           }
         } catch (error) {
           console.error(
@@ -48,7 +49,7 @@ const AuthenticationWrapper = ({ children }) => {
     }
 
     fetchUserData()
-  }, [isAuthenticated, userData, user, setUserdata, getAccessTokenSilently])
+  }, [isAuthenticated, userData, user, dispatch, getAccessTokenSilently])
 
   return children
 }

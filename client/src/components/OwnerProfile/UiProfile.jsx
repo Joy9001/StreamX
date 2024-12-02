@@ -11,7 +11,7 @@ const membershipStyles = {
   Free: 'bg-white text-gray-700 border border-gray-300',
   Bronze: 'bg-amber-700 text-white',
   Silver: 'bg-gray-400 text-white',
-  Gold: 'bg-yellow-500 text-white'
+  Gold: 'bg-yellow-500 text-white',
 }
 
 function UiProfile() {
@@ -21,44 +21,48 @@ function UiProfile() {
 
   return (
     <>
-      <div id="webcrumbs" className='overflow-auto no-scrollbar'> 
-        <div className="w-full p-8 rounded-lg bg-white">  
-          <div className="flex gap-8">
-            <div className="w-[300px] bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:-translate-y-1">
+      <div id='webcrumbs' className='no-scrollbar overflow-auto'>
+        <div className='w-full rounded-lg bg-white p-8'>
+          <div className='flex gap-8'>
+            <div className='w-[300px] rounded-lg bg-white p-6 shadow-lg transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl'>
               <img
                 src={currentProfile.profilePicture}
                 alt={currentProfile.name}
-                className="block mx-auto w-[100px] h-[100px] rounded-full object-cover border-4 border-primary-100"
+                className='border-primary-100 mx-auto block h-[100px] w-[100px] rounded-full border-4 object-cover'
               />
-              <h2 className="text-center text-xl font-bold mt-4 text-gray-800">{currentProfile.name}</h2>
-              <p className="text-center text-gray-600">{currentProfile.ytChannelName}</p>
-              <div className="flex justify-center mt-2">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${membershipStyles[currentProfile.membership]}`}>
+              <h2 className='mt-4 text-center text-xl font-bold text-gray-800'>
+                {currentProfile.name}
+              </h2>
+              <p className='text-center text-gray-600'>
+                {currentProfile.ytChannelName}
+              </p>
+              <div className='mt-2 flex justify-center'>
+                <span
+                  className={`rounded-full px-3 py-1 text-sm font-medium ${membershipStyles[currentProfile.membership]}`}>
                   {currentProfile.membership}
                 </span>
               </div>
-              <p className="text-center text-gray-500 text-sm mt-1">
+              <p className='mt-1 text-center text-sm text-gray-500'>
                 {currentProfile.bio}
               </p>
-              <div className="mt-6">
-                <button 
+              <div className='mt-6'>
+                <button
                   onClick={() => setShowProfileForm(true)}
-                  className="btn bg-pink-200 hover:bg-pink-300 border-none w-full text-gray-700"
-                >
+                  className='btn w-full border-none bg-pink-200 text-gray-700 hover:bg-pink-300'>
                   EDIT PROFILE
                 </button>
               </div>
             </div>
-      
-            <div className="flex-1 overflow-hidden no-scrollbar shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:-translate-y-1">
+
+            <div className='no-scrollbar flex-1 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl'>
               <UploadedVideosList videos={currentProfile?.uploadedVideos} />
             </div>
           </div>
-      
-          <div className="flex gap-8 mt-8">
+
+          <div className='mt-8 flex gap-8'>
             <SocialLinks profile={currentProfile} />
-      
-            <div className="flex gap-4 flex-1">
+
+            <div className='flex flex-1 gap-4'>
               <StorageCard />
               <HiredEditorsCard />
               <RequestsCard />
@@ -68,19 +72,20 @@ function UiProfile() {
       </div>
 
       {/* Profile Form Modal */}
-      <dialog id="profile_modal" className={`modal ${showProfileForm ? 'modal-open' : ''}`}>
-        <div className="modal-box w-11/12 max-w-5xl overflow-y-auto no-scrollbar max-h-[90vh]">
-          <form method="dialog">
-            <button 
-              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              onClick={() => setShowProfileForm(false)}
-            >
+      <dialog
+        id='profile_modal'
+        className={`modal ${showProfileForm ? 'modal-open' : ''}`}>
+        <div className='no-scrollbar modal-box max-h-[90vh] w-11/12 max-w-5xl overflow-y-auto'>
+          <form method='dialog'>
+            <button
+              className='btn btn-circle btn-ghost btn-sm absolute right-2 top-2'
+              onClick={() => setShowProfileForm(false)}>
               ✕
             </button>
           </form>
           <ProfileForm />
         </div>
-        <form method="dialog" className="modal-backdrop">
+        <form method='dialog' className='modal-backdrop'>
           <button onClick={() => setShowProfileForm(false)}>close</button>
         </form>
       </dialog>

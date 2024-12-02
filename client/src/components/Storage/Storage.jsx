@@ -1,11 +1,9 @@
 // import { loginState } from '@/states/loginState.js'
+import { setAllVideos, setRecentVideos } from '@/store/slices/videoSlice.js'
 import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
 import { useEffect, useRef, useState } from 'react'
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { drawerState } from '../../states/drawerState.js'
-import { navbarOpenState } from '../../states/navbarState.js'
-import { allVidState, recentVidState } from '../../states/videoState.js'
+import { useDispatch, useSelector } from 'react-redux'
 import Navbar from '../NavBar/Navbar.jsx'
 import ContentTable from './ContentTable.jsx'
 import RecentCard from './RecentCard.jsx'
@@ -13,14 +11,16 @@ import StorageNav from './StorageNav.jsx'
 import VideoDrawer from './VideoDrawer.jsx'
 
 function Storage() {
-  const drawer = useRecoilValue(drawerState)
-  const navOpen = useRecoilValue(navbarOpenState)
+  const drawer = useSelector((state) => state.ui.drawer)
+  const navOpen = useSelector((state) => state.ui.navbarOpen)
   const fileInputRef = useRef(null)
   const [uploading, setUploading] = useState(false)
-  const [recentVideos, setRecentVideos] = useRecoilState(recentVidState)
-  const setAllVideos = useRecoilState(allVidState)[1]
+  const recentVideos = useSelector((state) => state.video.recentVideos)
+  const allVideos = useSelector((state) => state.video.allVideos)
   const { getAccessTokenSilently } = useAuth0()
   const [accessToken, setAccessToken] = useState(null)
+
+  const dispatch = useDispatch()
 
   useEffect(() => {
     async function fetchAccessToken() {
@@ -61,8 +61,8 @@ function Storage() {
 
         console.log(res)
         setUploading(false)
-        setRecentVideos((prev) => [res.data.savedVideo, ...prev])
-        setAllVideos((prev) => [res.data.savedVideo, ...prev])
+        dispatch(setRecentVideos([res.data.savedVideo, ...recentVideos]))
+        dispatch(setAllVideos([res.data.savedVideo, ...allVideos]))
         alert(res.data.message)
       } catch (error) {
         console.error('Error uploading file:', error)

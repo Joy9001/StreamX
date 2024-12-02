@@ -1,11 +1,10 @@
-import { selectedCategoryState } from '@/states/YtFormStates/categoryState.js'
+import { setSelectedCategory } from '@/store/slices/ytFormSlice'
 import PropTypes from 'prop-types'
-import { useRecoilState } from 'recoil'
+import { useDispatch, useSelector } from 'react-redux'
 
 const CategoryDropdown = () => {
-  const [selectedCategory, setSelectedCategory] = useRecoilState(
-    selectedCategoryState
-  )
+  const selectedCategory = useSelector((state) => state.ytForm.selectedCategory)
+  const dispatch = useDispatch()
 
   // Mapping of categories with their corresponding IDs
   const categories = {
@@ -43,7 +42,7 @@ const CategoryDropdown = () => {
 
   // Handler to update selected category (ID)
   const handleCategoryChange = (e) => {
-    setSelectedCategory(categories[e.target.value])
+    dispatch(setSelectedCategory(categories[e.target.value]))
   }
 
   return (
@@ -74,7 +73,7 @@ const CategoryDropdown = () => {
 }
 
 CategoryDropdown.propTypes = {
-  selectedCategoryState: PropTypes.number, // The selected category ID
+  selectedCategory: PropTypes.number, // The selected category ID
 }
 
 export default CategoryDropdown

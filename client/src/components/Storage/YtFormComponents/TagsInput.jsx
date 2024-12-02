@@ -1,21 +1,22 @@
-import { tagsState } from '@/states/YtFormStates/tagsState.js'
+import { useDispatch, useSelector } from 'react-redux'
+import { setTags } from '@/store/slices/ytFormSlice'
 import PropTypes from 'prop-types'
 import { useState } from 'react'
-import { useRecoilState } from 'recoil'
 
 const TagsInput = () => {
-  const [tags, setTags] = useRecoilState(tagsState) // Using Recoil state for tags
+  const tags = useSelector((state) => state.ytForm.tags)
+  const dispatch = useDispatch()
   const [inputValue, setInputValue] = useState('')
 
   const handleAddTag = (e) => {
     if (e.key === 'Enter' && inputValue.trim() !== '') {
-      setTags([...tags, inputValue.trim()])
+      dispatch(setTags([...tags, inputValue.trim()]))
       setInputValue('') // Reset input field
     }
   }
 
   const handleRemoveTag = (index) => {
-    setTags(tags.filter((_, i) => i !== index))
+    dispatch(setTags(tags.filter((_, i) => i !== index)))
   }
 
   return (
@@ -60,7 +61,7 @@ const TagsInput = () => {
 }
 
 TagsInput.propTypes = {
-  tagsState: PropTypes.arrayOf(PropTypes.string), // Recoil state (tags) type validation
+  tags: PropTypes.arrayOf(PropTypes.string), // Redux state (tags) type validation
 }
 
 export default TagsInput

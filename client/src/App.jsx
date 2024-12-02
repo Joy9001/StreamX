@@ -2,14 +2,10 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import AdminPanel from './components/AdminPanel/AdminPanel.jsx'
 import Login from './components/Auth/Login.jsx'
-import LoginEditor from './components/Auth/LoginEditor.jsx'
-import Logout from './components/Auth/Logout.jsx'
-import SignUp from './components/Auth/SignUp.jsx'
+import HiredEditor from './components/HiredEditor/HiredEditor.jsx'
 import Profile from './components/OwnerProfile/Profile.jsx'
-import ProfileForm from './components/OwnerProfile/ProfileForm.jsx'
 import RequestApprove from './components/Request&Apporved/raas.jsx'
 import Storage from './components/Storage/Storage.jsx'
-import HiredEditor from './components/HiredEditor/HiredEditor.jsx'
 
 function App() {
   const { isAuthenticated } = useAuth0()
@@ -29,15 +25,11 @@ function App() {
     },
     {
       path: '/signup',
-      element: isAuthenticated ? <Storage /> : <SignUp />,
+      element: isAuthenticated ? <Storage /> : <Login />,
     },
     {
       path: '/login/editor',
-      element: isAuthenticated ? <Storage /> : <LoginEditor />,
-    },
-    {
-      path: '/logout',
-      element: <Logout />,
+      element: isAuthenticated ? <Storage /> : <Login />,
     },
     {
       path: '/storage',
@@ -47,7 +39,7 @@ function App() {
       path: '/profile/owner',
       element: <Profile />,
     },
-   
+
     {
       path: '/HireEditor',
       element: <HiredEditor />,

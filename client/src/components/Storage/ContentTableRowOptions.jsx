@@ -1,13 +1,14 @@
-import { allVidState, recentVidState } from '@/states/videoState'
+import { useDispatch, useSelector } from 'react-redux'
+import { setRecentVideos, setAllVideos } from '@/store/slices/videoSlice'
 import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
-import { useRecoilState } from 'recoil'
 
-function ContenetTableRowOptions({ editor, videoId }) {
-  const setRecentVideos = useRecoilState(recentVidState)[1]
-  const setAllVideos = useRecoilState(allVidState)[1]
+function ContentTableRowOptions({ editor, videoId }) {
+  const dispatch = useDispatch()
+  const recentVideos = useSelector((state) => state.video.recentVideos)
+  const allVideos = useSelector((state) => state.video.allVideos)
   const [accessToken, setAccessToken] = useState(null)
   const { getAccessTokenSilently } = useAuth0()
 
@@ -39,8 +40,10 @@ function ContenetTableRowOptions({ editor, videoId }) {
         }
       )
       console.log(res)
-      setRecentVideos((prev) => prev.filter((video) => video._id !== videoId))
-      setAllVideos((prev) => prev.filter((video) => video._id !== videoId))
+      dispatch(
+        setRecentVideos(recentVideos.filter((video) => video._id !== videoId))
+      )
+      dispatch(setAllVideos(allVideos.filter((video) => video._id !== videoId)))
       alert(res.data.message)
     } catch (error) {
       console.error('Error deleting video:', error)
@@ -87,9 +90,9 @@ function ContenetTableRowOptions({ editor, videoId }) {
   )
 }
 
-ContenetTableRowOptions.propTypes = {
+ContentTableRowOptions.propTypes = {
   editor: PropTypes.string,
   videoId: PropTypes.string,
 }
 
-export default ContenetTableRowOptions
+export default ContentTableRowOptions
