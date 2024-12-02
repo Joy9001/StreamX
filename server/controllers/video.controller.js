@@ -31,6 +31,7 @@ const getAllController = async (req, res) => {
 
 			return {
 				owner: owner.username,
+				ownerPic: owner.profilephoto,
 				...video,
 			}
 		})
@@ -107,6 +108,7 @@ const uploadController = async (req, res) => {
 
 		const videoData = {
 			owner: owner.username,
+			ownerPic: owner.profilephoto,
 			...savedVideo._doc,
 		}
 
@@ -183,8 +185,10 @@ const recentController = async (req, res) => {
 		}
 
 		const videosData = videos.map((video) => {
+			// console.log('video', { ...video })
 			return {
 				owner: owner.username,
+				ownerPic: owner.profilephoto,
 				...video._doc,
 			}
 		})
