@@ -1,13 +1,41 @@
 import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import { StatusCodes } from 'http-status-codes'
 import { storage } from '../helpers/firebase.helper.js'
+import Editor from '../models/editor.models.js'
+import Owner from '../models/owner.model.js'
 import Video from '../models/video.model.js'
 
 const getAllController = async (req, res) => {
-	let ownerid = '66efdc9aadf813b060a6c470'
+	const { userId, role } = req.params
 	try {
-		const videos = await Video.find({ ownerId: ownerid }).lean()
-		return res.status(StatusCodes.OK).json({ videos })
+		const videos = await Video.find({ ownerId: userId }).lean()
+
+		if (!videos) {
+			return res.status(StatusCodes.NOT_FOUND).json({ message: 'No videos found' })
+		}
+
+		// find owner of videos
+		let owner
+		if (role === 'Owner') {
+			owner = await Owner.findOne({ _id: userId }).lean()
+		} else if (role === 'Editor') {
+			owner = await Editor.findOne({ _id: userId }).lean()
+		}
+
+		if (!owner) {
+			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Owner not found' })
+		}
+
+		const videosData = videos.map((video) => {
+			// console.log('video', { ...video })
+
+			return {
+				owner: owner.username,
+				...video,
+			}
+		})
+
+		return res.status(StatusCodes.OK).json({ videos: videosData })
 	} catch (error) {
 		console.log('Error in getAllController', error)
 		return res
@@ -18,8 +46,12 @@ const getAllController = async (req, res) => {
 
 const uploadController = async (req, res) => {
 	console.log(req.file)
+	console.log('body', req.body)
 	const { file } = req
+	const { userId, role } = req.params
 
+	console.log('file in uploadController: ', file)
+	console.log('userId in uploadController: ', userId)
 	if (!file) {
 		return res.status(StatusCodes.BAD_REQUEST).json({ message: 'No file uploaded' })
 	}
@@ -27,7 +59,7 @@ const uploadController = async (req, res) => {
 	try {
 		const filename = file.originalname || `video-${Date.now()}`
 
-		const findVideo = await Video.findOne({ metaData: { name: filename } })
+		const findVideo = await Video.findOne({ metaData: { name: filename }, ownerId: userId })
 		if (findVideo) {
 			filename = `${filename}-${Date.now()}`
 		}
@@ -37,7 +69,7 @@ const uploadController = async (req, res) => {
 			contentType: file.mimetype,
 			size: file.size,
 		}
-		const storageRef = ref(storage, `videos/${filename}`)
+		const storageRef = ref(storage, `videos/${userId}/${filename}`)
 		const uploadTask = uploadBytesResumable(storageRef, file.buffer, metadata)
 
 		//TODO: Add event listeners to uploadTask
@@ -48,14 +80,37 @@ const uploadController = async (req, res) => {
 		const vidMetaData = uploadTask.snapshot.metadata
 
 		const newVideo = new Video({
-			ownerId: '66efdc9aadf813b060a6c470',
+			ownerId: userId,
 			url: downloadURL,
 			metaData: vidMetaData,
 		})
 
-		let savedVideo = await newVideo.save()
+		const savedVideo = await newVideo.save()
 
-		return res.status(StatusCodes.OK).json({ message: 'File uploaded successfully', url: downloadURL, savedVideo })
+		if (!savedVideo) {
+			return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Failed to save video' })
+		}
+
+		console.log('savedVideo', { ...savedVideo._doc })
+
+		// find owner of videos
+		let owner
+		if (role === 'Owner') {
+			owner = await Owner.findOne({ _id: userId }).lean()
+		} else if (role === 'Editor') {
+			owner = await Editor.findOne({ _id: userId }).lean()
+		}
+
+		if (!owner) {
+			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Owner not found' })
+		}
+
+		const videoData = {
+			owner: owner.username,
+			...savedVideo._doc,
+		}
+
+		return res.status(StatusCodes.OK).json({ message: 'File uploaded successfully', url: downloadURL, videoData })
 	} catch (error) {
 		console.log('Error in uploadController', error)
 		return res
@@ -65,20 +120,19 @@ const uploadController = async (req, res) => {
 }
 
 const deleteController = async (req, res) => {
-	const { id } = req.body
-	console.log('id: ', req.body)
+	const { id, userId } = req.body
+	console.log('/delete: ', req.body)
 	try {
-		const video = await Video.findById(id)
+		const video = await Video.findOne({ _id: id, ownerId: userId }).lean()
 
 		if (!video) {
 			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
 		}
 
-		await video.deleteOne()
-
-		const storageRef = ref(storage, `videos/${video.metaData.name}`)
+		const storageRef = ref(storage, `videos/${userId}/${video.metaData.name}`)
 		await deleteObject(storageRef)
 
+		await Video.findOneAndDelete({ _id: id })
 		return res.status(StatusCodes.OK).json({ message: 'Video deleted successfully' })
 	} catch (error) {
 		console.log('Error in deleteController', error)
@@ -92,7 +146,7 @@ const downloadController = async (req, res) => {
 	const { id } = req.params
 
 	try {
-		const video = await Video.findById(id).lean()
+		const video = await Video.findOne({ _id: id }).lean()
 
 		if (!video) {
 			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
@@ -108,9 +162,34 @@ const downloadController = async (req, res) => {
 }
 
 const recentController = async (req, res) => {
+	const { userId, role } = req.params
 	try {
-		const videos = await Video.find().sort({ createdAt: -1 }).limit(10)
-		res.status(StatusCodes.OK).json({ videos })
+		const videos = await Video.find({ ownerId: userId }).sort({ createdAt: -1 }).limit(10)
+
+		if (!videos) {
+			return res.status(StatusCodes.NOT_FOUND).json({ message: 'No videos found' })
+		}
+
+		// find owner of videos
+		let owner
+		if (role === 'Owner') {
+			owner = await Owner.findOne({ _id: userId }).lean()
+		} else if (role === 'Editor') {
+			owner = await Editor.findOne({ _id: userId }).lean()
+		}
+
+		if (!owner) {
+			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Owner not found' })
+		}
+
+		const videosData = videos.map((video) => {
+			return {
+				owner: owner.username,
+				...video._doc,
+			}
+		})
+
+		res.status(StatusCodes.OK).json({ videos: videosData })
 	} catch (error) {
 		console.log('Error in recentController', error)
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message })
