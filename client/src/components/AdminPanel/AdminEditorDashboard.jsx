@@ -11,6 +11,7 @@ import {
   PlusCircle,
   Search,
   Settings,
+  Video,
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -181,6 +182,12 @@ export function Dashboard() {
                   Dashboard
                 </Button>
               </Link>
+              <Link to="/AdminPanel/videos">
+                <Button variant="ghost" className="w-full justify-start gap-2">
+                  <Video className="h-4 w-4" />
+                  Videos
+                </Button>
+              </Link>
               <Link to="/AdminPanel/requests">
                 <Button variant="ghost" className="w-full justify-start gap-2">
                   <Package2 className="h-4 w-4" />
@@ -216,6 +223,12 @@ export function Dashboard() {
               <Button variant="ghost" className="w-full justify-start gap-2">
                 <Home className="h-4 w-4" />
                 Dashboard
+              </Button>
+            </Link>
+            <Link to="/AdminPanel/videos">
+              <Button variant="ghost" className="w-full justify-start gap-2">
+                <Video className="h-4 w-4" />
+                Videos
               </Button>
             </Link>
             <Link to="/AdminPanel/requests">
