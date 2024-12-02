@@ -14,6 +14,7 @@ import OwnerRouter from './routes/owner.route.js'
 import UserRoute from './routes/UserRoute.js'
 import VideoRouter from './routes/video.route.js'
 import YTRouter from './routes/yt.route.js'
+import requestRoutes from './routes/requestRoutes.js'
 
 dotenv.config()
 
@@ -52,6 +53,7 @@ app.get('/', (req, res) => {
 	res.send('Backend is up!')
 })
 
+app.use('/requests', requestRoutes)
 app.use('/auth0', authCheck, auth0Router)
 app.use('/api/videos', VideoRouter)
 app.use('/api/yt', YTRouter)

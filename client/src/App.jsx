@@ -1,6 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
-import AdminPanel from './AdminPanel/AdminPanel.jsx'
+import AdminPanel from './components/AdminPanel/AdminPanel.jsx'
 import Login from './components/Auth/Login.jsx'
 import LoginEditor from './components/Auth/LoginEditor.jsx'
 import Logout from './components/Auth/Logout.jsx'
@@ -9,7 +9,7 @@ import Profile from './components/OwnerProfile/Profile.jsx'
 import ProfileForm from './components/OwnerProfile/ProfileForm.jsx'
 import RequestApprove from './components/Request&Apporved/raas.jsx'
 import Storage from './components/Storage/Storage.jsx'
-import HiredEditor from './HiredEditor/HiredEditor.jsx'
+import HiredEditor from './components/HiredEditor/HiredEditor.jsx'
 
 function App() {
   const { isAuthenticated } = useAuth0()
