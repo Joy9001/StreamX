@@ -21,7 +21,7 @@ function Navbar({ title }) {
     { title: 'Storage', icon: Video, route: '/storage?login=true' },
     { title: 'Hire Editors', icon: Briefcase, route: '/HireEditor' },
     { title: 'raas', icon: Settings, route: '/raas' },
-    { title: 'Settings', icon: Settings, route: '/settings' },
+    
   ]
 
   return (

@@ -1,0 +1,19 @@
+{
+  "editors": [
+    {
+      "id": 1,
+      "name": "John Smith",
+      "avatar": "https://randomuser.me/api/portraits/men/1.jpg"
+    },
+    {
+      "id": 2,
+      "name": "Emma Wilson",
+      "avatar": "https://randomuser.me/api/portraits/women/2.jpg"
+    },
+    {
+      "id": 3,
+      "name": "Michael Brown",
+      "avatar": "https://randomuser.me/api/portraits/men/3.jpg"
+    }
+  ]
+}
