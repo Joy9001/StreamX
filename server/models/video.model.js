@@ -10,6 +10,7 @@ const videoSchema = new Schema(
 		editorId: {
 			type: Schema.Types.ObjectId,
 			required: false,
+			default: null,
 			ref: 'Editor',
 		},
 		editorAccess: {
