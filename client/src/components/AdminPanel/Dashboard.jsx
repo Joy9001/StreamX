@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import Modal from '../components/modal.jsx'
+import Modal from '../modal.jsx'
 
 import {
   Home,

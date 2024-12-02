@@ -1,0 +1,394 @@
+{
+  "videos": [
+    {
+      "_id": "507f1f77bcf86cd799439111",
+      "ownerId": "507f1f77bcf86cd799439011",
+      "editorId": "507f1f77bcf86cd799439012",
+      "editorAccess": true,
+      "url": "https://www.example.com/video1.mp4",
+      "metaData": {
+        "title": "How to Edit Videos Like a Pro",
+        "description": "Learn professional video editing techniques",
+        "duration": "15:30",
+        "resolution": "1920x1080",
+        "fileSize": "250MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439013",
+      "ytData": {
+        "title": "Video Editing Masterclass",
+        "description": "Professional video editing tutorial",
+        "tags": ["editing", "tutorial", "professional"],
+        "category": "Education",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "Uploaded",
+      "scheduleUpload": "2024-02-15T10:00:00.000Z",
+      "approvalStatus": "Approved"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439222",
+      "ownerId": "507f1f77bcf86cd799439011",
+      "editorId": null,
+      "editorAccess": false,
+      "url": "https://www.example.com/video1b.mp4",
+      "metaData": {
+        "title": "Advanced Color Grading Tutorial",
+        "description": "Master the art of color grading in video editing",
+        "duration": "25:45",
+        "resolution": "2560x1440",
+        "fileSize": "380MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439013",
+      "ytData": {
+        "title": "Professional Color Grading Guide",
+        "description": "Learn advanced color grading techniques",
+        "tags": ["color grading", "tutorial", "professional"],
+        "category": "Education",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "Pending",
+      "scheduleUpload": "2024-02-28T14:00:00.000Z",
+      "approvalStatus": "None"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439333",
+      "ownerId": "507f1f77bcf86cd799439011",
+      "editorId": null,
+      "editorAccess": false,
+      "url": "https://www.example.com/video1c.mp4",
+      "metaData": {
+        "title": "Sound Design Fundamentals",
+        "description": "Essential sound design techniques for video editors",
+        "duration": "18:20",
+        "resolution": "1920x1080",
+        "fileSize": "290MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439013",
+      "ytData": {
+        "title": "Sound Design for Video Editors",
+        "description": "Complete guide to sound design",
+        "tags": ["sound design", "audio editing", "tutorial"],
+        "category": "Education",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "None",
+      "scheduleUpload": null,
+      "approvalStatus": "None"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439444",
+      "ownerId": "507f1f77bcf86cd799439014",
+      "editorId": "507f1f77bcf86cd799439015",
+      "editorAccess": true,
+      "url": "https://www.example.com/video2.mp4",
+      "metaData": {
+        "title": "Travel Vlog - Paris Adventure",
+        "description": "Exploring the beautiful city of Paris",
+        "duration": "22:45",
+        "resolution": "3840x2160",
+        "fileSize": "450MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439016",
+      "ytData": {
+        "title": "Paris Travel Guide 2024",
+        "description": "Complete Paris travel guide with tips and tricks",
+        "tags": ["travel", "paris", "vlog"],
+        "category": "Travel",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "Pending",
+      "scheduleUpload": "2024-02-20T15:30:00.000Z",
+      "approvalStatus": "Pending"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439555",
+      "ownerId": "507f1f77bcf86cd799439014",
+      "editorId": null,
+      "editorAccess": false,
+      "url": "https://www.example.com/video2b.mp4",
+      "metaData": {
+        "title": "London Street Food Tour",
+        "description": "Discovering the best street food spots in London",
+        "duration": "28:15",
+        "resolution": "3840x2160",
+        "fileSize": "520MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439016",
+      "ytData": {
+        "title": "Ultimate London Food Guide",
+        "description": "Best street food locations in London",
+        "tags": ["food", "london", "travel"],
+        "category": "Travel",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "Failed",
+      "scheduleUpload": "2024-02-22T12:00:00.000Z",
+      "approvalStatus": "None"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439666",
+      "ownerId": "507f1f77bcf86cd799439014",
+      "editorId": null,
+      "editorAccess": false,
+      "url": "https://www.example.com/video2c.mp4",
+      "metaData": {
+        "title": "Tokyo Night Life",
+        "description": "Experience the vibrant nightlife of Tokyo",
+        "duration": "32:40",
+        "resolution": "3840x2160",
+        "fileSize": "680MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439016",
+      "ytData": {
+        "title": "Tokyo After Dark",
+        "description": "Complete guide to Tokyo's nightlife",
+        "tags": ["tokyo", "nightlife", "travel"],
+        "category": "Travel",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "None",
+      "scheduleUpload": null,
+      "approvalStatus": "None"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439777",
+      "ownerId": "507f1f77bcf86cd799439017",
+      "editorId": null,
+      "editorAccess": false,
+      "url": "https://www.example.com/video3.mp4",
+      "metaData": {
+        "title": "Gaming Highlights - Fortnite",
+        "description": "Best gaming moments of the week",
+        "duration": "10:15",
+        "resolution": "2560x1440",
+        "fileSize": "300MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439018",
+      "ytData": {
+        "title": "Epic Fortnite Moments",
+        "description": "Weekly compilation of best Fortnite plays",
+        "tags": ["gaming", "fortnite", "highlights"],
+        "category": "Gaming",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "None",
+      "scheduleUpload": null,
+      "approvalStatus": "None"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439888",
+      "ownerId": "507f1f77bcf86cd799439017",
+      "editorId": null,
+      "editorAccess": false,
+      "url": "https://www.example.com/video3b.mp4",
+      "metaData": {
+        "title": "Minecraft Build Challenge",
+        "description": "Epic building competition in Minecraft",
+        "duration": "45:20",
+        "resolution": "2560x1440",
+        "fileSize": "750MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439018",
+      "ytData": {
+        "title": "Ultimate Minecraft Build Battle",
+        "description": "Amazing builds and competition highlights",
+        "tags": ["minecraft", "building", "gaming"],
+        "category": "Gaming",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "Uploading",
+      "scheduleUpload": "2024-02-25T16:00:00.000Z",
+      "approvalStatus": "Pending"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439999",
+      "ownerId": "507f1f77bcf86cd799439017",
+      "editorId": null,
+      "editorAccess": false,
+      "url": "https://www.example.com/video3c.mp4",
+      "metaData": {
+        "title": "Valorant Pro Plays",
+        "description": "Best professional Valorant moments",
+        "duration": "15:45",
+        "resolution": "2560x1440",
+        "fileSize": "420MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439018",
+      "ytData": {
+        "title": "Top Valorant Plays of the Month",
+        "description": "Professional Valorant highlights and analysis",
+        "tags": ["valorant", "esports", "gaming"],
+        "category": "Gaming",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "Uploaded",
+      "scheduleUpload": "2024-02-18T10:00:00.000Z",
+      "approvalStatus": "Approved"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439aaa",
+      "ownerId": "507f1f77bcf86cd799439019",
+      "editorId": "507f1f77bcf86cd799439020",
+      "editorAccess": true,
+      "url": "https://www.example.com/video4.mp4",
+      "metaData": {
+        "title": "Cooking Tutorial - Italian Pasta",
+        "description": "Learn to make authentic Italian pasta",
+        "duration": "18:20",
+        "resolution": "1920x1080",
+        "fileSize": "350MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439021",
+      "ytData": {
+        "title": "Authentic Italian Pasta Recipe",
+        "description": "Step-by-step guide to making Italian pasta",
+        "tags": ["cooking", "italian", "recipe"],
+        "category": "Food",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "Uploading",
+      "scheduleUpload": "2024-02-25T12:00:00.000Z",
+      "approvalStatus": "Approved"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439bbb",
+      "ownerId": "507f1f77bcf86cd799439019",
+      "editorId": null,
+      "editorAccess": false,
+      "url": "https://www.example.com/video4b.mp4",
+      "metaData": {
+        "title": "French Pastry Basics",
+        "description": "Master the art of French pastry making",
+        "duration": "42:15",
+        "resolution": "1920x1080",
+        "fileSize": "820MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439021",
+      "ytData": {
+        "title": "French Pastry Masterclass",
+        "description": "Complete guide to French pastry making",
+        "tags": ["baking", "french", "pastry"],
+        "category": "Food",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "Pending",
+      "scheduleUpload": "2024-03-01T09:00:00.000Z",
+      "approvalStatus": "None"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439ccc",
+      "ownerId": "507f1f77bcf86cd799439019",
+      "editorId": null,
+      "editorAccess": false,
+      "url": "https://www.example.com/video4c.mp4",
+      "metaData": {
+        "title": "Sushi Making at Home",
+        "description": "Learn to make restaurant-quality sushi",
+        "duration": "35:50",
+        "resolution": "1920x1080",
+        "fileSize": "680MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439021",
+      "ytData": {
+        "title": "Professional Sushi Making Guide",
+        "description": "Step-by-step sushi making tutorial",
+        "tags": ["sushi", "japanese", "cooking"],
+        "category": "Food",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "None",
+      "scheduleUpload": null,
+      "approvalStatus": "None"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439ddd",
+      "ownerId": "507f1f77bcf86cd799439022",
+      "editorId": "507f1f77bcf86cd799439023",
+      "editorAccess": true,
+      "url": "https://www.example.com/video5.mp4",
+      "metaData": {
+        "title": "Fitness Workout - Full Body HIIT",
+        "description": "30-minute high-intensity interval training",
+        "duration": "32:10",
+        "resolution": "1920x1080",
+        "fileSize": "400MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439024",
+      "ytData": {
+        "title": "30-Min Full Body HIIT Workout",
+        "description": "Complete home workout routine",
+        "tags": ["fitness", "workout", "hiit"],
+        "category": "Sports",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "Failed",
+      "scheduleUpload": "2024-02-18T08:00:00.000Z",
+      "approvalStatus": "Rejected"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439eee",
+      "ownerId": "507f1f77bcf86cd799439022",
+      "editorId": null,
+      "editorAccess": false,
+      "url": "https://www.example.com/video5b.mp4",
+      "metaData": {
+        "title": "Yoga for Beginners",
+        "description": "Complete yoga guide for beginners",
+        "duration": "55:30",
+        "resolution": "1920x1080",
+        "fileSize": "890MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439024",
+      "ytData": {
+        "title": "Beginner's Guide to Yoga",
+        "description": "Start your yoga journey with this comprehensive guide",
+        "tags": ["yoga", "fitness", "beginners"],
+        "category": "Sports",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "Uploaded",
+      "scheduleUpload": "2024-02-15T07:00:00.000Z",
+      "approvalStatus": "Approved"
+    },
+    {
+      "_id": "507f1f77bcf86cd799439fff",
+      "ownerId": "507f1f77bcf86cd799439022",
+      "editorId": null,
+      "editorAccess": false,
+      "url": "https://www.example.com/video5c.mp4",
+      "metaData": {
+        "title": "Strength Training Basics",
+        "description": "Foundation exercises for strength training",
+        "duration": "48:25",
+        "resolution": "1920x1080",
+        "fileSize": "780MB",
+        "format": "mp4"
+      },
+      "playListId": "507f1f77bcf86cd799439024",
+      "ytData": {
+        "title": "Strength Training for Beginners",
+        "description": "Learn proper form and techniques for strength training",
+        "tags": ["strength", "workout", "fitness"],
+        "category": "Sports",
+        "visibility": "public"
+      },
+      "ytUploadStatus": "Pending",
+      "scheduleUpload": "2024-03-05T08:00:00.000Z",
+      "approvalStatus": "None"
+    }
+  ]
+}
