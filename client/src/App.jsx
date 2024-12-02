@@ -5,8 +5,8 @@ import Login from './components/Auth/Login.jsx'
 import LoginEditor from './components/Auth/LoginEditor.jsx'
 import Logout from './components/Auth/Logout.jsx'
 import SignUp from './components/Auth/SignUp.jsx'
-import Profile from './components/Profile.jsx'
-import ProfileForm from './components/ProfileForm.jsx'
+import Profile from './components/OwnerProfile/Profile.jsx'
+import ProfileForm from './components/OwnerProfile/ProfileForm.jsx'
 import Request_Approve from './components/Request&Apporved/main.jsx'
 import Storage from './components/Storage/Storage.jsx'
 import HiredEditor from './HiredEditor/HiredEditor.jsx'
@@ -57,10 +57,7 @@ function App() {
       path: '/profile/owner',
       element: <Profile />,
     },
-    {
-      path: '/settings',
-      element: <ProfileForm />,
-    },
+   
     {
       path: '/HireEditor',
       element: <HiredEditor />,

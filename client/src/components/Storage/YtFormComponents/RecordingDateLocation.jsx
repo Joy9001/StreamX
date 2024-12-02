@@ -3,13 +3,16 @@ import {
   recordingDateState,
 } from '@/states/YtFormStates/recordingState'
 import PropTypes from 'prop-types'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
 import { useRecoilState } from 'recoil'
 
 const RecordingDateLocation = () => {
   const [recordingDate, setRecordingDate] = useRecoilState(recordingDateState)
   const [location, setLocation] = useRecoilState(locationState)
+
+  const handleDateChange = (e) => {
+    const date = new Date(e.target.value)
+    setRecordingDate(date)
+  }
 
   return (
     <div className='mt-6'>
@@ -26,12 +29,12 @@ const RecordingDateLocation = () => {
           <label htmlFor='recordingDate' className='mb-1 block font-medium'>
             Date
           </label>
-          <DatePicker
-            selected={recordingDate}
-            onChange={(date) => setRecordingDate(date)}
-            dateFormat='yyyy/MM/dd'
+          <input
+            type='date'
+            id='recordingDate'
+            value={recordingDate ? recordingDate.toISOString().split('T')[0] : ''}
+            onChange={handleDateChange}
             className='w-full rounded-md border-2 border-solid border-black p-2'
-            placeholderText='Select a date'
           />
         </div>
 
@@ -55,8 +58,8 @@ const RecordingDateLocation = () => {
 }
 
 RecordingDateLocation.propTypes = {
-  recordingDate: PropTypes.instanceOf(Date), // The selected recording date
-  location: PropTypes.string, // The recording location
+  recordingDate: PropTypes.instanceOf(Date),
+  location: PropTypes.string,
 }
 
 export default RecordingDateLocation

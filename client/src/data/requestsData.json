@@ -1,0 +1,8 @@
+{
+  "requests": {
+    "totalRequests": 25,
+    "approvedRequests": 15,
+    "rejectedRequests": 5,
+    "pendingRequests": 5
+  }
+}
