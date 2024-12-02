@@ -15,6 +15,7 @@ import OwnerRouter from './routes/owner.route.js'
 import UserRoute from './routes/UserRoute.js'
 import VideoRouter from './routes/video.route.js'
 import YTRouter from './routes/yt.route.js'
+import requestRoutes from './routes/requestRoutes.js'
 import { passportEditorStrategy, passportOwnerStrategy } from './strategy/google.strategy.js'
 dotenv.config()
 passportEditorStrategy()
@@ -53,11 +54,11 @@ app.use(sessionMiddleware)
 app.use(passport.initialize())
 app.use(passport.session())
 // require("./strategy/jwtpassport.js");
-
 app.get('/', (req, res) => {
 	res.send('Backend is up!')
 })
 
+app.use('/requests', requestRoutes)
 app.use('/api/videos', VideoRouter)
 app.use('/api/yt', YTRouter)
 app.use('/auth', authRoute)

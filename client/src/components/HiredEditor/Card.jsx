@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import axios from 'axios'
 import locationIcon from '../../assets/location.svg'
 import languageIcon from '../../assets/language.svg'
 import starIcon from '../../assets/star.svg'
@@ -444,15 +445,40 @@ function Card({ data }) {
               </button>
               <button
                 type="submit"
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.preventDefault();
                   if (!selectedVideo) {
                     alert('Please select a video to proceed');
                     return;
                   }
-                  // Handle form submission here with selectedVideo
-                  console.log('Selected Video:', selectedVideo);
-                  setIsModelOpen(false);
+
+                  try {
+                    const requestData = {
+                      editor_id: data._id, // Editor's ID from the card data
+                      video_id: selectedVideo._id,
+                      owner_id: selectedVideo.ownerId,
+                      description: description,
+                      price: showCustomPrice ? Number(customPrice) : Number(plans[selectedPlan].price.replace('₹', '')),
+                      status: 'pending'
+                    };
+
+                    console.log('Sending request with data:', requestData); // Add logging
+                    const response = await axios.post('http://localhost:3000/requests/create', requestData);
+                    
+                    if (response.status === 201 || response.status === 200) {
+                      alert('Request sent successfully!');
+                      setIsModelOpen(false);
+                      // Reset form
+                      setSelectedVideo(null);
+                      setDescription('');
+                      setCustomPrice('');
+                      setShowCustomPrice(false);
+                    }
+                  } catch (error) {
+                    console.error('Error sending request:', error);
+                    console.error('Request data was:', requestData); // Add error logging
+                    alert('Failed to send request. Please try again.');
+                  }
                 }}
                 className="rounded-lg bg-blue-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
