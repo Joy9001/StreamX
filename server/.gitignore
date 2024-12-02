@@ -1,3 +1,4 @@
+backup.txt
 # Logs
 logs
 *.log
@@ -169,3 +170,5 @@ node_modules/
 /tailwindcss
 .prettierrc
 IMP.md
+.secrets/
+package-lock.json

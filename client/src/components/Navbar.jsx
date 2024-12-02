@@ -1,29 +1,34 @@
+import axios from 'axios'
 import {
-  BarChart2,
+  Briefcase,
   ChevronLeft,
   HelpCircle,
-  LayoutDashboard,
   LogOut,
   MoreVertical,
   Settings,
   User,
   Video,
 } from 'lucide-react'
+import PropTypes from 'prop-types'
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
 import { navbarOpenState } from '../states/navbarState.js'
 
-function Navbar() {
+function Navbar({ title }) {
   const [open, setOpen] = useRecoilState(navbarOpenState)
   const [showPopup, setShowPopup] = useState(false)
   const popupRef = useRef(null)
+  const navigate = useNavigate()
 
   const Menus = [
-    { title: 'Dashboard', icon: LayoutDashboard },
-    { title: 'Profile', icon: User },
-    { title: 'Analytics', icon: BarChart2 },
-    { title: 'Videos', icon: Video },
-    { title: 'Settings', icon: Settings },
+    // { title: 'Dashboard', icon: LayoutDashboard },
+    { title: 'Profile', icon: User, route: '/profile/owner' },
+    // { title: 'Analytics', icon: BarChart2 },
+    { title: 'Storage', icon: Video, route: '/storage?login=true' },
+    { title: 'Hire Editors', icon: Briefcase, route: '/HireEditor' },
+    { title: 'raas', icon: Settings, route: '/raas' },
+    
   ]
 
   useEffect(() => {
@@ -38,6 +43,19 @@ function Navbar() {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+  const handleLogout = async () => {
+    // Clear cookies
+    document.cookie =
+      'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; samesite=strict;'
+    axios
+      .get('http://localhost:3000/auth/logout')
+      .then(() => {
+        navigate('/') // Redirect to login page
+      })
+      .catch((error) => {
+        console.error('Logout failed:', error)
+      })
+  }
 
   return (
     <>
@@ -58,7 +76,7 @@ function Navbar() {
           {/* Logo and title */}
           <div className={`flex items-center gap-x-4 ${open && 'mr-16'}`}>
             <img
-              src='./src/assets/logoX.png'
+              src='http://localhost:5173/src/assets/logoX.png'
               alt='Logo'
               className={`w-14 cursor-pointer rounded-full bg-black duration-500`}
             />
@@ -74,7 +92,8 @@ function Navbar() {
             {Menus.map((menu, index) => (
               <li
                 key={index}
-                className={`mt-2 flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm ease-in hover:bg-secondary hover:duration-300`}>
+                className={`mt-2 flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm ease-in hover:bg-secondary hover:duration-300 ${title == menu.title ? 'bg-secondary' : ''}`}
+                onClick={() => navigate(`${menu.route}`)}>
                 <menu.icon className='h-5 w-5' />
                 <span
                   className={`${!open && 'hidden'} origin-left duration-200`}>
@@ -120,7 +139,9 @@ function Navbar() {
                         <HelpCircle className='mr-2 h-4 w-4' />
                         Support
                       </li>
-                      <li className='flex cursor-pointer items-center px-4 py-2 text-red-500 hover:bg-accent'>
+                      <li
+                        onClick={handleLogout}
+                        className='flex cursor-pointer items-center px-4 py-2 text-red-500 hover:bg-accent'>
                         <LogOut className='mr-2 h-4 w-4' />
                         Log out
                       </li>
@@ -136,4 +157,7 @@ function Navbar() {
   )
 }
 
+Navbar.propTypes = {
+  title: PropTypes.string,
+}
 export default Navbar

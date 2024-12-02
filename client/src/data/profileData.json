@@ -1,0 +1,147 @@
+{
+  "profiles": [
+    {
+      "name": "John Doe",
+      "profilePicture": "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
+      "ytChannelName": "TechWithJohn",
+      "bio": "Creative content creator passionate about technology and education. Sharing knowledge through engaging tutorials and tech reviews.",
+      "email": "john.doe@example.com",
+      "phone": "(097) 234-5678",
+      "mobile": "(098) 765-4321",
+      "address": "Bay Area, San Francisco, CA",
+      "website": "https://techwith.john.dev",
+      "github": "johndoe",
+      "twitter": "@TechWithJohn",
+      "instagram": "techwjohn",
+      "facebook": "TechWithJohn",
+      "membership": "Gold",
+      "uploadedVideos": [
+        {
+          "title": "React Hooks Deep Dive",
+          "uploadTime": "2024-01-15T14:30:00Z",
+          "thumbnail": "https://example.com/thumbnail1.jpg",
+          "ytUploadStatus": "Uploaded",
+          "fileSize": "256MB"
+        },
+        {
+          "title": "Building a Full-Stack App",
+          "uploadTime": "2024-01-10T18:45:00Z",
+          "thumbnail": "https://example.com/thumbnail2.jpg",
+          "ytUploadStatus": "Uploading",
+          "fileSize": "512MB"
+        },
+        {
+          "title": "TypeScript Tips and Tricks",
+          "uploadTime": "2024-01-05T09:15:00Z",
+          "thumbnail": "https://example.com/thumbnail3.jpg",
+          "ytUploadStatus": "Pending",
+          "fileSize": "128MB"
+        },
+        {
+          "title": "Web Development Best Practices",
+          "uploadTime": "2024-01-01T11:20:00Z",
+          "thumbnail": "https://example.com/thumbnail4.jpg",
+          "ytUploadStatus": "Failed",
+          "fileSize": "384MB"
+        }
+      ]
+    },
+    {
+      "name": "Sarah Wilson",
+      "profilePicture": "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+      "ytChannelName": "SarahCreates",
+      "bio": "Digital artist and motion designer. Creating beautiful animations and sharing creative process videos with my amazing community.",
+      "email": "sarah.wilson@example.com",
+      "phone": "(097) 876-5432",
+      "mobile": "(098) 234-5678",
+      "address": "Brooklyn, New York, NY",
+      "website": "https://sarah.creates.art",
+      "github": "sarahcreates",
+      "twitter": "@SarahCreates",
+      "instagram": "sarahcreatesart",
+      "facebook": "SarahCreatesArt",
+      "membership": "Silver",
+      "uploadedVideos": [
+        {
+          "title": "Digital Art Fundamentals",
+          "uploadTime": "2024-01-14T16:20:00Z",
+          "thumbnail": "https://example.com/thumbnail5.jpg",
+          "ytUploadStatus": "Uploaded",
+          "fileSize": "720MB"
+        },
+        {
+          "title": "Animation Workflow Tutorial",
+          "uploadTime": "2024-01-09T13:40:00Z",
+          "thumbnail": "https://example.com/thumbnail6.jpg",
+          "ytUploadStatus": "Uploading",
+          "fileSize": "1.2GB"
+        },
+        {
+          "title": "Character Design Workshop",
+          "uploadTime": "2024-01-04T15:30:00Z",
+          "thumbnail": "https://example.com/thumbnail7.jpg",
+          "ytUploadStatus": "Uploaded",
+          "fileSize": "450MB"
+        },
+        {
+          "title": "Motion Graphics Basics",
+          "uploadTime": "2023-12-30T10:15:00Z",
+          "thumbnail": "https://example.com/thumbnail8.jpg",
+          "ytUploadStatus": "Uploaded",
+          "fileSize": "640MB"
+        }
+      ]
+    },
+    {
+      "name": "Alex Chen",
+      "profilePicture": "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
+      "ytChannelName": "GamersHub",
+      "bio": "Professional gamer and strategy game enthusiast. Streaming daily and creating in-depth game analysis videos.",
+      "email": "alex.chen@example.com",
+      "phone": "(097) 345-6789",
+      "mobile": "(098) 987-6543",
+      "address": "Seattle, Washington, WA",
+      "website": "https://gamers.hub",
+      "github": "alexgaming",
+      "twitter": "@GamersHubAlex",
+      "instagram": "gamershub",
+      "facebook": "GamersHubOfficial",
+      "membership": "Bronze",
+      "uploadedVideos": []
+    },
+    {
+      "name": "Maria Garcia",
+      "profilePicture": "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
+      "ytChannelName": "CookingWithMaria",
+      "bio": "Culinary expert sharing traditional and modern recipes. Making cooking accessible and fun for everyone.",
+      "email": "maria.garcia@example.com",
+      "phone": "(097) 456-7890",
+      "mobile": "(098) 345-6789",
+      "address": "Miami, Florida, FL",
+      "website": "https://cooking.with.maria",
+      "github": "mariakitchen",
+      "twitter": "@CookWithMaria",
+      "instagram": "cookingwithmaria",
+      "facebook": "CookingWithMaria",
+      "membership": "Free",
+      "uploadedVideos": []
+    },
+    {
+      "name": "David Kim",
+      "profilePicture": "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
+      "ytChannelName": "FitnessWithDave",
+      "bio": "Certified personal trainer helping you achieve your fitness goals. Specializing in home workouts and nutrition advice.",
+      "email": "david.kim@example.com",
+      "phone": "(097) 567-8901",
+      "mobile": "(098) 456-7890",
+      "address": "Los Angeles, California, CA",
+      "website": "https://fitness.with.dave",
+      "github": "fitnessdave",
+      "twitter": "@FitnessDave",
+      "instagram": "fitnesswithdave",
+      "facebook": "FitnessWithDave",
+      "membership": "Gold",
+      "uploadedVideos": []
+    }
+  ]
+}

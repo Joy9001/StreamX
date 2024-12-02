@@ -1,41 +1,75 @@
-//import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-//import Profile from "./components/Profile.jsx"
-//import Header from './components/Header.jsx'
-// import Home from "./components/Home.jsx";
-// import Login from "./components/Login.jsx";
-// import SignUp from "./components/SignUp.jsx";
-//import Navbar from './components/Navbar.jsx'
-//import Profile from './components/Profile.jsx'
-//import Header from './components/Header.jsx'
-//import UserProfile from './components/UserProfile.jsx'
-//import HiredEditors from './components/HiredEditors.jsx'
-// import Radial from './components/Radial.jsx'
-//import RecentCard from './components/RecentCard.jsx'
-import ProfileForm from './components/ProfileForm'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { useRecoilValue } from 'recoil'
+import AdminPanel from './AdminPanel/AdminPanel.jsx'
+import Login from './components/Auth/Login.jsx'
+import LoginEditor from './components/Auth/LoginEditor.jsx'
+import Logout from './components/Auth/Logout.jsx'
+import SignUp from './components/Auth/SignUp.jsx'
+import Profile from './components/OwnerProfile/Profile.jsx'
+import ProfileForm from './components/OwnerProfile/ProfileForm.jsx'
+import Request_Approve from './components/Request&Apporved/main.jsx'
+import Storage from './components/Storage/Storage.jsx'
+import HiredEditor from './HiredEditor/HiredEditor.jsx'
+import { loginState, userTypeState } from './states/loginState.js'
 
 function App() {
-  //const router = createBrowserRouter([
-  // {
-  //   path: "/",
-  //   element: <Home />,
-  // },
-  // {
-  //   path: "/login",
-  //   element: <Login />,
-  // },
-  // {
-  //   path: "/signup",
-  //   element: <SignUp />,
-  // },
-
-  //{
-  //path: "/Profile",
-  //element: <Profile />,
-  //}
-  //])
+  const isLoggedIn = useRecoilValue(loginState)
+  const userType = useRecoilValue(userTypeState)
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: isLoggedIn ? (
+        userType == 'owner' ? (
+          <Storage />
+        ) : (
+          <LoginEditor />
+        )
+      ) : (
+        <Login />
+      ),
+    },
+    {
+      path: '/login/owner',
+      element: isLoggedIn ? <Storage /> : <Login />,
+    },
+    {
+      path: '/raas',
+      element: <Request_Approve />,
+    },
+    {
+      path: '/signup',
+      element: isLoggedIn ? <Storage /> : <SignUp />,
+    },
+    {
+      path: '/login/editor',
+      element: isLoggedIn ? <Storage /> : <LoginEditor />,
+    },
+    {
+      path: '/logout',
+      // element: isLoggedIn ? <Logout /> : <Login />,
+      element: <Logout />,
+    },
+    {
+      path: '/storage',
+      element: <Storage />,
+    },
+    {
+      path: '/profile/owner',
+      element: <Profile />,
+    },
+   
+    {
+      path: '/HireEditor',
+      element: <HiredEditor />,
+    },
+    {
+      path: '/AdminPanel',
+      element: <AdminPanel />,
+    },
+  ])
   return (
     <>
-      <ProfileForm />
+      <RouterProvider router={router} />
     </>
   )
 }
