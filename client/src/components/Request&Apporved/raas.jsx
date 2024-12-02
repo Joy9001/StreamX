@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import Navbar from '../NavBar/Navbar.jsx'
-import ContentTable from './ContentTable.jsx'
+import ContentTable from './RAContentTable.jsx'
 import RaasNav from './raasNav.jsx'
 
 const RequestApprove = () => {

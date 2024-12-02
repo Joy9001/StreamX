@@ -13,6 +13,7 @@ import YtUploadedBtn from './YtStatusBtnComponents/YtUploadedBtn'
 import YtUploadingBtn from './YtStatusBtnComponents/YtUploadingBtn'
 
 function ContentTableRow({ content }) {
+  console.log('content in ContentTableRow', content)
   const [ytBtn, setYtBtn] = useState('')
   const dispatch = useDispatch()
 

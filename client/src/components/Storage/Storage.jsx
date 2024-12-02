@@ -11,12 +11,13 @@ import StorageNav from './StorageNav.jsx'
 import VideoDrawer from './VideoDrawer.jsx'
 
 function Storage() {
-  const drawer = useSelector((state) => state.ui.drawer)
+  const drawer = useSelector((state) => state.ui.drawerOpen)
   const navOpen = useSelector((state) => state.ui.navbarOpen)
   const fileInputRef = useRef(null)
   const [uploading, setUploading] = useState(false)
   const recentVideos = useSelector((state) => state.video.recentVideos)
   const allVideos = useSelector((state) => state.video.allVideos)
+  const userData = useSelector((state) => state.user.userData)
   const { getAccessTokenSilently } = useAuth0()
   const [accessToken, setAccessToken] = useState(null)
 
@@ -45,10 +46,11 @@ function Storage() {
     if (file) {
       const formData = new FormData()
       formData.append('file', file)
-
+      console.log('formData', formData)
+      console.log('accessToken in handleFileUpload', accessToken)
       try {
         const res = await axios.post(
-          `${import.meta.env.VITE_BACKEND_URL}/api/videos/upload`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/upload/${userData.user_metadata.role}/${userData._id}`,
           formData,
           {
             headers: {
@@ -59,16 +61,17 @@ function Storage() {
           }
         )
 
-        console.log(res)
-        setUploading(false)
-        dispatch(setRecentVideos([res.data.savedVideo, ...recentVideos]))
-        dispatch(setAllVideos([res.data.savedVideo, ...allVideos]))
+        console.log('res.data', res.data)
+
+        dispatch(setRecentVideos([res.data.videoData, ...recentVideos]))
+        dispatch(setAllVideos([res.data.videoData, ...allVideos]))
         alert(res.data.message)
       } catch (error) {
         console.error('Error uploading file:', error)
         alert('File upload failed!')
       } finally {
         e.target.value = ''
+        setUploading(false)
       }
     }
   }
@@ -78,7 +81,7 @@ function Storage() {
     async function fetchRecentVideos() {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/videos/recent`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/recent/${userData.user_metadata.role}/${userData._id}`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -88,14 +91,14 @@ function Storage() {
           }
         )
         console.log(res.data)
-        setRecentVideos(res.data.videos)
+        dispatch(setRecentVideos(res.data.videos))
       } catch (error) {
         console.error('Error fetching recent videos:', error)
       }
     }
 
-    fetchRecentVideos()
-  }, [setRecentVideos, accessToken])
+    if (JSON.stringify(userData) !== '{}') fetchRecentVideos()
+  }, [dispatch, accessToken, userData])
 
   return (
     <div className='storage-main flex h-screen'>
