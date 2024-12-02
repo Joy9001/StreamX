@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import Modal from '../modal.jsx'
+import EditorModal from './EditorModal'
 
 import {
   Home,
@@ -338,7 +338,7 @@ export function Dashboard() {
 
       {/* Modal for Add/Edit Editor */}
       {isModalOpen && (
-        <Modal
+        <EditorModal
           isOpen={isModalOpen}
           onClose={handleModalClose}
           onSubmit={handleFormSubmit}

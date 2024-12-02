@@ -83,3 +83,53 @@ export const getOwnerProfile = async (req, res) => {
 		res.status(500).json({ message: 'Error fetching profile', error })
 	}
 }
+
+export const getOwnerByEmail = async (req, res) => {
+  try {
+    const { email } = req.params
+    const owner = await Owner.findOne({ email })
+
+    if (!owner) {
+      return res.status(404).json({ message: 'Owner not found' })
+    }
+
+    // Convert storage from KB to GB for frontend
+    const ownerData = owner.toObject()
+    ownerData.storageLimit = ownerData.storageLimit / 1024 // Convert KB to GB
+
+    res.status(200).json(ownerData)
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching owner', error: error.message })
+  }
+}
+
+export const updateOwner = async (req, res) => {
+  try {
+    const { email } = req.params
+    const updateData = req.body
+
+    // Convert storage limit to KB if provided
+    if (updateData.storageLimit) {
+      updateData.storageLimit = parseInt(updateData.storageLimit) * 1024 // Convert GB to KB
+    }
+
+    // Remove password field if it's empty
+    if (!updateData.password) {
+      delete updateData.password
+    }
+
+    const owner = await Owner.findOneAndUpdate(
+      { email },
+      { $set: updateData },
+      { new: true, runValidators: true }
+    )
+
+    if (!owner) {
+      return res.status(404).json({ message: 'Owner not found' })
+    }
+
+    res.status(200).json(owner)
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating owner', error: error.message })
+  }
+}

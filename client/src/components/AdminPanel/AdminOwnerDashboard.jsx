@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import Modal from '../modal.jsx'
+import OwnerModal from './OwnerModal'
 
 import {
   Home,
@@ -78,7 +78,9 @@ export function Dashboard() {
       const response = await axios.get(
         `http://localhost:3000/api/ownerProfile/${owner.email}`
       )
-      setCurrentOwner(response.data)
+      // Convert storage limit from KB to GB for the form
+      const ownerData = response.data
+      setCurrentOwner(ownerData)
       setIsCreating(false)
       setIsModalOpen(true)
     } catch (err) {
@@ -112,7 +114,7 @@ export function Dashboard() {
       }
     } else {
       try {
-        const response = await axios.put(
+        const response = await axios.patch(
           `http://localhost:3000/api/ownerProfile/${currentOwner.email}`,
           newOwnerData
         )
@@ -327,11 +329,11 @@ export function Dashboard() {
       </div>
 
       {isModalOpen && (
-        <Modal
+        <OwnerModal
           isOpen={isModalOpen}
           onClose={handleModalClose}
           onSubmit={handleFormSubmit}
-          editor={currentOwner}
+          owner={currentOwner}
           isCreating={isCreating}
         />
       )}
