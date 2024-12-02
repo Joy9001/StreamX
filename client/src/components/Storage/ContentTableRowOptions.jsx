@@ -1,18 +1,36 @@
 import { allVidState, recentVidState } from '@/states/videoState'
+import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
 import PropTypes from 'prop-types'
+import { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 
 function ContenetTableRowOptions({ editor, videoId }) {
   const setRecentVideos = useRecoilState(recentVidState)[1]
   const setAllVideos = useRecoilState(allVidState)[1]
+  const [accessToken, setAccessToken] = useState(null)
+  const { getAccessTokenSilently } = useAuth0()
+
+  useEffect(() => {
+    async function fetchAccessToken() {
+      try {
+        const token = await getAccessTokenSilently()
+        setAccessToken(token)
+      } catch (error) {
+        console.error('Error fetching access token:', error)
+      }
+    }
+    fetchAccessToken()
+  }, [getAccessTokenSilently])
+
   async function handleDelete() {
     try {
       const res = await axios.delete(
-        'http://localhost:3000/api/videos/delete',
+        `${import.meta.env.VITE_BACKEND_URL}/api/videos/delete`,
         {
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
           },
           withCredentials: true,
           data: {

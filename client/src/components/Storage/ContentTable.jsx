@@ -1,19 +1,41 @@
 import { allVidState } from '@/states/videoState.js'
+import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import ContentTableRow from './ContenetTableRow'
 import { YTVideoUploadForm } from './YTVideoUploadForm'
 
 function ContentTable() {
   const [allVideos, setAllVideos] = useRecoilState(allVidState)
+  const { getAccessTokenSilently } = useAuth0()
+  const [accessToken, setAccessToken] = useState(null)
+
+  useEffect(() => {
+    async function fetchAccessToken() {
+      try {
+        const token = await getAccessTokenSilently()
+        setAccessToken(token)
+      } catch (error) {
+        console.error('Error fetching access token:', error)
+      }
+    }
+    fetchAccessToken()
+  }, [getAccessTokenSilently])
 
   useEffect(() => {
     async function fetchAllVideos() {
       try {
-        const res = await axios.get('http://localhost:3000/api/videos/all', {
-          withCredentials: true,
-        })
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/all`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+          }
+        )
         console.log('all', res.data)
         setAllVideos(res.data.videos)
       } catch (error) {
@@ -22,7 +44,7 @@ function ContentTable() {
     }
 
     fetchAllVideos()
-  }, [setAllVideos])
+  }, [setAllVideos, accessToken])
 
   return (
     <>
