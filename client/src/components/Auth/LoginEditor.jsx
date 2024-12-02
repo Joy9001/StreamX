@@ -1,15 +1,15 @@
 import axios from 'axios'
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { useRecoilState } from 'recoil'
-import { userTypeState } from '../../states/loginState.js'
+// import { useRecoilState } from 'recoil'
+// import { userTypeState } from '../../states/loginState.js'
 function LoginEditor() {
   // State to manage input values
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
-  const setUserType = useRecoilState(userTypeState)[1]
-  setUserType('editor')
+  // const setUserType = useRecoilState(userTypeState)[1]
+  // setUserType('editor')
 
   // Handler for Google login
   const handleGoogleLogin = () => {

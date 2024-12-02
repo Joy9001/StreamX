@@ -10,11 +10,9 @@ const ownerSchema = new mongoose.Schema({
 		required: true,
 		unique: true,
 	},
-
 	password: {
 		type: String,
 	},
-
 	YTchannelname: {
 		type: String,
 	},
@@ -24,13 +22,8 @@ const ownerSchema = new mongoose.Schema({
 	},
 	hiredEditors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Editor' }],
 	videoIds: [{ type: String }],
-
 	ytChannelLink: {
 		type: String,
-	},
-	requestCount: {
-		type: Number,
-		default: 0,
 	},
 	storageLimit: {
 		type: Number,
@@ -40,10 +33,11 @@ const ownerSchema = new mongoose.Schema({
 		type: Number,
 		default: 0,
 	},
-	googleId: {
-		type: String,
+	providerSub: {
+		type: Array,
+		required: true,
 	},
 })
 
 const Owner = mongoose.model('Owner', ownerSchema)
-export { Owner }
+export default Owner

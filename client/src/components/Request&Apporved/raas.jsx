@@ -1,11 +1,11 @@
 import { useRecoilValue } from 'recoil'
 import { drawerState } from '../../states/drawerState.js'
 import { navbarOpenState } from '../../states/navbarState.js'
-import Navbar from '../Navbar'
+import Navbar from '../NavBar/Navbar.jsx'
 import ContentTable from './ContentTable.jsx'
 import RaasNav from './raasNav.jsx'
 
-const main = () => {
+const RequestApprove = () => {
   const navOpen = useRecoilValue(navbarOpenState)
   const drawer = useRecoilValue(drawerState)
   return (
@@ -45,4 +45,4 @@ const main = () => {
   )
 }
 
-export default main
+export default RequestApprove

@@ -6,7 +6,7 @@ import { useRecoilState, useRecoilValue } from 'recoil'
 import { drawerState } from '../../states/drawerState.js'
 import { navbarOpenState } from '../../states/navbarState.js'
 import { allVidState, recentVidState } from '../../states/videoState.js'
-import Navbar from '../Navbar.jsx'
+import Navbar from '../NavBar/Navbar.jsx'
 import ContentTable from './ContentTable.jsx'
 import RecentCard from './RecentCard.jsx'
 import StorageNav from './StorageNav.jsx'
@@ -19,21 +19,6 @@ function Storage() {
   const [uploading, setUploading] = useState(false)
   const [recentVideos, setRecentVideos] = useRecoilState(recentVidState)
   const setAllVideos = useRecoilState(allVidState)[1]
-  // const navigate = useNavigate()
-  // const setLoginState = useRecoilState(loginState)[1]
-
-  // const [searchParams] = useSearchParams()
-  // const login = searchParams.get('login')
-
-  // useEffect(() => {
-  //   if (login !== 'true') {
-  //     setLoginState(false)
-  //     navigate('/')
-  //   } else {
-  //     console.log('User logged in')
-  //     setLoginState(true)
-  //   }
-  // }, [login, navigate, setLoginState])
 
   function handleNewBtnClick() {
     fileInputRef.current.click()

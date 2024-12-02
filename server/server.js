@@ -5,20 +5,18 @@ import dotenv from 'dotenv'
 import express from 'express'
 import session from 'express-session'
 import morgan from 'morgan'
-import passport from 'passport'
 import connectMongo from './db/connectMongo.db.js'
-import authRoute from './routes/auth.route.js'
+import { authCheck } from './middlewares/auth0.middleware.js'
+import auth0Router from './routes/auth0.router.js'
 import editor_gig_route from './routes/editor_gig_router.js'
 import editorProfileRoute from './routes/editorProfileRoute.js'
-import jwtRoute from './routes/jwt.route.js'
 import OwnerRouter from './routes/owner.route.js'
 import UserRoute from './routes/UserRoute.js'
 import VideoRouter from './routes/video.route.js'
 import YTRouter from './routes/yt.route.js'
-import { passportEditorStrategy, passportOwnerStrategy } from './strategy/google.strategy.js'
+
 dotenv.config()
-passportEditorStrategy()
-passportOwnerStrategy()
+
 const PORT = process.env.PORT || 3000
 
 const app = express()
@@ -50,18 +48,13 @@ const sessionMiddleware = session({
 })
 app.use(sessionMiddleware)
 
-app.use(passport.initialize())
-app.use(passport.session())
-// require("./strategy/jwtpassport.js");
-
 app.get('/', (req, res) => {
 	res.send('Backend is up!')
 })
 
+app.use('/auth0', authCheck, auth0Router)
 app.use('/api/videos', VideoRouter)
 app.use('/api/yt', YTRouter)
-app.use('/auth', authRoute)
-app.use('/jwt', jwtRoute)
 app.use('/api', OwnerRouter)
 app.use('/editor_gig', editor_gig_route)
 app.use('/editorProfile', editorProfileRoute)
