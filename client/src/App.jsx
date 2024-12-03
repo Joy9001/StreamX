@@ -2,12 +2,12 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import AdminPanel from './components/AdminPanel/AdminPanel.jsx'
 import Login from './components/Auth/Login.jsx'
+import EditorUi from './components/EditorProfile/EditorUi.jsx'
+import GigProfile from './components/GigProfile/GigProfile.jsx'
 import HiredEditor from './components/HiredEditor/HiredEditor.jsx'
 import Profile from './components/OwnerProfile/Profile.jsx'
 import RequestApprove from './components/Request&Apporved/raas.jsx'
 import Storage from './components/Storage/Storage.jsx'
-import GigProfile from './components/GigProfile/GigProfile.jsx'
-import EditorUi from './components/EditorProfile/EditorUi.jsx'
 
 function App() {
   const { isAuthenticated } = useAuth0()
@@ -35,11 +35,11 @@ function App() {
     },
     {
       path: '/storage',
-      element: isLoggedIn ? <Storage /> : <Login />,
+      element: <Storage />,
     },
     {
       path: '/profile/owner',
-      element: isLoggedIn ? <Profile /> : <Login />,
+      element: <Profile />,
     },
     {
       path: '/profile/editor',
@@ -51,7 +51,7 @@ function App() {
     },
     {
       path: '/HireEditor',
-      element: isLoggedIn ? <HiredEditor /> : <Login />,
+      element: <HiredEditor />,
     },
     {
       path: '/AdminPanel/*',
