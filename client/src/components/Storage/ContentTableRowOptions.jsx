@@ -6,12 +6,15 @@ import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-function ContentTableRowOptions({ editor, videoId }) {
+function ContentTableRowOptions({ video }) {
   const dispatch = useDispatch()
   const recentVideos = useSelector((state) => state.video.recentVideos)
-  const allVideos = useSelector((state) => state.video.allVideos)
   const userData = useSelector((state) => state.user.userData)
+  const allVideos = useSelector((state) => state.video.allVideos)
   const [accessToken, setAccessToken] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [hiredEditors, setHiredEditors] = useState([])
+  const [hiredByOwners, setHiredByOwners] = useState([])
   const { getAccessTokenSilently } = useAuth0()
 
   useEffect(() => {
@@ -37,22 +40,121 @@ function ContentTableRowOptions({ editor, videoId }) {
           },
           withCredentials: true,
           data: {
-            id: videoId,
+            id: video._id,
             userId: userData._id,
           },
         }
       )
       console.log(res)
       dispatch(
-        setRecentVideos(recentVideos.filter((video) => video._id !== videoId))
+        setRecentVideos(recentVideos.filter((video) => video._id !== video._id))
       )
-      dispatch(setAllVideos(allVideos.filter((video) => video._id !== videoId)))
+      dispatch(
+        setAllVideos(allVideos.filter((video) => video._id !== video._id))
+      )
       alert(res.data.message)
     } catch (error) {
       console.error('Error deleting video:', error)
       alert('Failed to delete video!')
     } finally {
       dispatch(setDrawerOpen(false))
+    }
+  }
+
+  async function handleAssignEditor() {
+    console.log('Assigning editor...')
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/hired-editors/${userData._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      console.log('Fetched hired editors:', response)
+      setHiredEditors(response.data)
+      setIsModalOpen(true)
+    } catch (error) {
+      console.error('Error fetching hired editors:', error)
+    }
+  }
+
+  async function handleRequestOwner() {
+    console.log('Getting hired-by owners...')
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/editorProfile/hiredby/${userData._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      console.log('Fetched hired-by owners:', response)
+      setHiredByOwners(response.data)
+      setIsModalOpen(true)
+    } catch (error) {
+      console.error('Error fetching hired-by owners:', error)
+    }
+  }
+
+  // async function handleRevokeOwner() {}
+
+  // async function handleRevokeEditor() {}
+
+  async function handleCreateRequest(user) {
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/requests/create`,
+        {
+          to_id: user._id,
+          video_id: video._id,
+          from_id: userData._id,
+          description: `Request to edit video: ${video.metaData.name}`,
+          price: 0,
+          status: 'pending',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      console.log('Request created successfully')
+      setIsModalOpen(false)
+    } catch (error) {
+      console.error('Error creating request:', error)
+    }
+  }
+
+  let option1
+  if (userData.user_metadata.role === 'Owner') {
+    if (video?.editor) {
+      option1 = ''
+    } else {
+      option1 = 'Assign Editor'
+    }
+  } else {
+    if (video?.owner) {
+      option1 = ''
+    } else {
+      option1 = 'Request Owner'
+    }
+  }
+
+  let option1func
+  if (userData.user_metadata.role === 'Owner') {
+    if (video?.editor) {
+      option1func = null
+    } else {
+      option1func = handleAssignEditor
+    }
+  } else {
+    if (video?.owner) {
+      option1func = null
+    } else {
+      option1func = handleRequestOwner
     }
   }
 
@@ -82,22 +184,103 @@ function ContentTableRowOptions({ editor, videoId }) {
         <ul
           tabIndex={0}
           className='menu dropdown-content z-[1] w-52 rounded-box bg-base-100 p-2 font-semibold shadow'>
-          <li className=''>
-            <a>{editor ? 'Revoke Editor' : 'Assign Editor'}</a>
-          </li>
+          {option1func && (
+            <li onClick={option1func}>
+              <a>{option1}</a>
+            </li>
+          )}
           <hr className='my-1 border-neutral-200' />
           <li className='*:text-red-500' onClick={handleDelete}>
             <a>Delete</a>
           </li>
         </ul>
       </div>
+      {/* Hired Editors Modal */}
+      <dialog
+        id='hired_editors_modal'
+        className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
+        <div className='modal-box'>
+          <h3 className='mb-4 text-lg font-bold'>
+            {userData.user_metadata.role === 'Owner'
+              ? 'Assign Editor'
+              : 'View Hired By Owners'}
+          </h3>
+          <div className='overflow-x-auto'>
+            {userData.user_metadata.role === 'Owner' ? (
+              hiredEditors.length > 0 ? (
+                <table className='table'>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {hiredEditors.map((editor) => (
+                      <tr key={editor._id}>
+                        <td>{editor.name}</td>
+                        <td>{editor.email}</td>
+                        <td>
+                          <button
+                            className='btn btn-primary btn-sm'
+                            onClick={() => handleCreateRequest(editor)}>
+                            Assign
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className='py-4 text-center'>No hired editors found</p>
+              )
+            ) : hiredByOwners.length > 0 ? (
+              <table className='table'>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {hiredByOwners.map((owner) => (
+                    <tr key={owner._id}>
+                      <td>{owner.name}</td>
+                      <td>{owner.email}</td>
+                      <td>
+                        <button
+                          className='btn btn-primary btn-sm'
+                          onClick={() => handleCreateRequest(owner)}>
+                          Assign
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className='py-4 text-center'>No owners found</p>
+            )}
+          </div>
+          <div className='modal-action'>
+            <button className='btn' onClick={() => setIsModalOpen(false)}>
+              Close
+            </button>
+          </div>
+        </div>
+        <form method='dialog' className='modal-backdrop'>
+          <button onClick={() => setIsModalOpen(false)}>close</button>
+        </form>
+      </dialog>
     </>
   )
 }
 
 ContentTableRowOptions.propTypes = {
   editor: PropTypes.string,
-  videoId: PropTypes.string,
+  video: PropTypes.object.isRequired,
 }
 
 export default ContentTableRowOptions

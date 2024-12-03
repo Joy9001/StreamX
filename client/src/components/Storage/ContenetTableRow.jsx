@@ -133,10 +133,7 @@ function ContentTableRow({ content }) {
           <span className='text-sm'>{content.approvalStatus}</span>
         </td>
         <td className='w-40'>
-          <ContenetTableRowOptions
-            editor={content.editor}
-            videoId={content._id}
-          />
+          <ContenetTableRowOptions video={content} />
         </td>
       </tr>
     </>
