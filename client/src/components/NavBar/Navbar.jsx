@@ -14,10 +14,8 @@ function Navbar({ title }) {
   console.log('user in navbar', user)
 
   const Menus = [
-    // { title: 'Dashboard', icon: LayoutDashboard },
     { title: 'Profile', icon: User, route: '/profile/owner' },
-    // { title: 'Analytics', icon: BarChart2 },
-    { title: 'Storage', icon: Video, route: '/storage?login=true' },
+    { title: 'Storage', icon: Video, route: '/storage' },
     { title: 'Hire Editors', icon: Briefcase, route: '/HireEditor' },
     { title: 'raas', icon: Settings, route: '/raas' },
   ]
