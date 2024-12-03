@@ -54,7 +54,7 @@ function App() {
       element: <HiredEditor />,
     },
     {
-      path: '/AdminPanel',
+      path: '/AdminPanel/*',
       element: <AdminPanel />,
     },
   ])

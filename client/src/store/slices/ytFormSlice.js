@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
   visibility: 'public',
   audience: 'notMadeForKids',
-  license: 'standard',
+  license: 'youtube',
   allowEmbedding: false,
   tags: [],
   recordingDate: null,
@@ -39,6 +39,16 @@ export const ytFormSlice = createSlice({
     setSelectedCategory: (state, action) => {
       state.selectedCategory = action.payload
     },
+    resetYtForm: (state) => {
+      state.visibility = 'public'
+      state.audience = 'notMadeForKids'
+      state.license = 'youtube'
+      state.allowEmbedding = false
+      state.tags = []
+      state.recordingDate = null
+      state.location = ''
+      state.selectedCategory = null
+    },
   },
 })
 
@@ -51,6 +61,7 @@ export const {
   setRecordingDate,
   setLocation,
   setSelectedCategory,
+  resetYtForm,
 } = ytFormSlice.actions
 
 export default ytFormSlice.reducer

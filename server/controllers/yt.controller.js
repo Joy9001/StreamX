@@ -3,46 +3,111 @@ import { google } from 'googleapis'
 import { StatusCodes } from 'http-status-codes'
 import { Readable } from 'stream'
 import { storage } from '../helpers/firebase.helper.js'
-import { OAuth2Client } from '../helpers/yt.helper.js'
+import { OAuth2Client, getChanelIds } from '../helpers/yt.helper.js'
+import Admin from '../models/admin.model.js'
+import Owner from '../models/owner.model.js'
 import Video from '../models/video.model.js'
 
 const uploadController = async (req, res) => {
 	try {
 		// Your code here
-		const { title, description, tags, categoryId, videoId } = req.body
+		const { role, userId } = req.params
+		const {
+			id,
+			title,
+			description,
+			visibility,
+			audience,
+			license,
+			allowEmbedding,
+			tags,
+			recordingDate,
+			location,
+			selectedCategory,
+			gAccessToken,
+			gRefreshToken,
+		} = req.body
 
-		let findVideo = await Video.findOne({ _id: videoId })
+		console.log('req.body in yt uploadController', req.body)
+
+		let user
+		if (role === 'Owner') {
+			const owner = await Owner.findOne({ _id: userId })
+			if (!owner) {
+				return res.status(StatusCodes.NOT_FOUND).json({ error: 'Owner not found' })
+			}
+			user = owner
+		} else if (role === 'Admin') {
+			const admin = await Admin.findOne({ _id: userId })
+			if (!admin) {
+				return res.status(StatusCodes.NOT_FOUND).json({ error: 'Admin not found' })
+			}
+			user = admin
+		} else {
+			return res.status(StatusCodes.NOT_FOUND).json({ error: 'User not found' })
+		}
+
+		let findVideo = await Video.findOne({ _id: id })
 
 		if (!findVideo) {
 			return res.status(StatusCodes.NOT_FOUND).json({ error: 'Video not found' })
 		}
 
-		const youtube = google.youtube({
-			version: 'v3',
-			auth: OAuth2Client,
-		})
+		if (findVideo.ytUploadStatus === 'Uploaded') {
+			return res.status(StatusCodes.OK).json({ message: 'Video already uploaded to YouTube' })
+		}
 
 		const videoRef = ref(storage, findVideo.metaData.fullPath)
 
 		const videoBytes = await getBytes(videoRef)
 
 		const videoStream = new Readable()
-		videoStream.push(videoBytes)
+		videoStream.push(Buffer.from(videoBytes))
 		videoStream.push(null)
 
-		console.log('videoStream', videoStream)
+		// console.log('videoStream', videoStream)
+
+		OAuth2Client.setCredentials({
+			access_token: gAccessToken,
+			refresh_token: gRefreshToken,
+		})
+
+		const youtube = google.youtube({
+			version: 'v3',
+			auth: OAuth2Client,
+		})
+
+		let channelId
+		if (user.ytChannelId === '') {
+			channelId = await getChanelIds(OAuth2Client)
+		} else {
+			channelId = user.ytChannelId
+		}
+
+		console.log('channelId in yt uploadController', channelId)
 
 		const response = await youtube.videos.insert({
-			part: 'snippet,status',
+			part: 'snippet,status,recordingDetails',
 			requestBody: {
 				snippet: {
-					categoryId,
-					description,
+					channelId,
 					title,
+					description,
 					tags,
+					categoryId: selectedCategory,
+					defaultLanguage: 'en',
+					defaultAudioLanguage: 'en',
+					defaultAudioLanguageCode: 'en-GB',
 				},
 				status: {
-					privacyStatus: 'private',
+					privacyStatus: visibility,
+					license: license,
+					embeddable: allowEmbedding,
+					madeForKids: audience === 'notMadeForKids' ? false : true,
+					selfDeclaredMadeForKids: audience === 'notMadeForKids' ? false : true,
+				},
+				recordingDetails: {
+					recordingDate,
 				},
 			},
 			media: {
@@ -64,4 +129,4 @@ const uploadController = async (req, res) => {
 	}
 }
 
-export { uploadController }
+export { getChanelIds, uploadController }

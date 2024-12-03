@@ -9,11 +9,14 @@ const Auth0ProviderWrapper = ({ children }) => {
     <Auth0Provider
       domain={domain}
       clientId={clientId}
+      cacheLocation='localstorage'
+      useRefreshTokens={true}
+      useRefreshTokensFallback={true}
       authorizationParams={{
         redirect_uri: window.location.origin,
         audience: `https://${import.meta.env.VITE_AUTH0_DOMAIN}/api/v2/`,
         scope:
-          'read:users read:user_idp_tokens read:current_user read:current_user_metadata update:current_user_metadata profile email ',
+          'read:users read:user_idp_tokens read:current_user read:current_user_metadata update:current_user_metadata openid profile email offline_access',
       }}>
       <AuthenticationWrapper>{children}</AuthenticationWrapper>
     </Auth0Provider>

@@ -15,9 +15,7 @@ function ContentTable() {
   useEffect(() => {
     async function fetchAccessToken() {
       try {
-        const token = await getAccessTokenSilently({
-          cacheMode: 'on',
-        })
+        const token = await getAccessTokenSilently()
         setAccessToken(token)
       } catch (error) {
         console.error('Error fetching access token:', error)

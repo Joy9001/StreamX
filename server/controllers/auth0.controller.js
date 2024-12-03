@@ -1,13 +1,12 @@
-import { auth0ManagementClient } from '../helpers/auth0.helper.js'
+import { findUserByEmail } from '../helpers/auth0.helper.js'
+import Admin from '../models/admin.model.js'
 import Editor from '../models/editor.models.js'
 import Owner from '../models/owner.model.js'
 
 export const auth0CreateController = async (req, res) => {
 	try {
-		const { email } = req.body
-		const user = await auth0ManagementClient.usersByEmail
-			.getByEmail({ email, include_fields: true })
-			.then((res) => res.data[0])
+		const { email, userId } = req.body
+		const user = await findUserByEmail(email)
 
 		console.log('/auth0/create', user)
 
@@ -67,6 +66,34 @@ export const auth0CreateController = async (req, res) => {
 			await editor.save()
 			console.log('Editor created successfully')
 			return res.status(200).json({ message: 'Editor created successfully', user: { ...user, _id: editor._id } })
+		} else if (user.user_metadata.role === 'Admin') {
+			const findAdmin = await Admin.findOne({ email: user.email })
+			const providerSub = user.identities.map((identity) => `${identity.provider}|${identity.user_id}`)
+			if (findAdmin) {
+				let message = 'Admin already exists'
+				if (findAdmin.providerSub !== providerSub) {
+					await Admin.findOneAndUpdate({ email: user.email }, { providerSub: providerSub })
+					message = 'Admin Updated'
+				}
+				console.log(message)
+
+				return res.status(200).json({
+					message,
+					user: {
+						...user,
+						_id: findAdmin._id,
+					},
+				})
+			}
+			const admin = new Admin({
+				username: user.nickname,
+				email: user.email,
+				profilephoto: user.picture,
+				providerSub: providerSub,
+			})
+			await admin.save()
+			console.log('Admin created successfully')
+			return res.status(200).json({ message: 'Admin created successfully', user: { ...user, _id: admin._id } })
 		} else {
 			console.log('User role undefined')
 		}
