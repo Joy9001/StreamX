@@ -1,16 +1,16 @@
-import EditorProfile from '../models/EditorProfile.js'
+import Editor from '../models/editor.models.js'
 
 export const createEditorProfile = async (req, res) => {
 	const { name, email, phone, location, image, software, specializations } = req.body
 
 	try {
-		const existingEditor = await EditorProfile.findOne({ email })
+		const existingEditor = await Editor.findOne({ email })
 		console.log('existingEditor:', existingEditor)
 		if (existingEditor) {
 			return res.status(400).json({ message: 'Editor with this email already exists.' })
 		}
 
-		const newEditor = new EditorProfile({
+		const newEditor = new Editor({
 			name,
 			email,
 			phone,

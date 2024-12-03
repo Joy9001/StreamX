@@ -5,21 +5,19 @@ import dotenv from 'dotenv'
 import express from 'express'
 import session from 'express-session'
 import morgan from 'morgan'
-import passport from 'passport'
 import connectMongo from './db/connectMongo.db.js'
-import isAuthenticated from './middlewares/auth.middleware.js'
-import authRoute from './routes/auth.route.js'
+import { authCheck } from './middlewares/auth0.middleware.js'
+import auth0Router from './routes/auth0.router.js'
 import editor_gig_route from './routes/editor_gig_router.js'
 import editorProfileRoute from './routes/editorProfileRoute.js'
-import jwtRoute from './routes/jwt.route.js'
 import OwnerRouter from './routes/owner.route.js'
+import requestRoutes from './routes/requestRoutes.js'
 import UserRoute from './routes/UserRoute.js'
 import VideoRouter from './routes/video.route.js'
 import YTRouter from './routes/yt.route.js'
-import { passportEditorStrategy, passportOwnerStrategy } from './strategy/google.strategy.js'
+
 dotenv.config()
-passportEditorStrategy()
-passportOwnerStrategy()
+
 const PORT = process.env.PORT || 3000
 
 const app = express()
@@ -29,7 +27,7 @@ app.use(cookieParser())
 app.use(
 	cors({
 		origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
-		methods: ['GET', 'POST', 'PUT', 'DELETE'],
+		methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
 		credentials: true,
 	})
 )
@@ -51,18 +49,14 @@ const sessionMiddleware = session({
 })
 app.use(sessionMiddleware)
 
-app.use(passport.initialize())
-app.use(passport.session())
-// require("./strategy/jwtpassport.js");
-
-app.get('/', isAuthenticated, (req, res) => {
+app.get('/', (req, res) => {
 	res.send('Backend is up!')
 })
 
-app.use('/api/videos', isAuthenticated, VideoRouter)
-app.use('/api/yt', isAuthenticated, YTRouter)
-app.use('/auth', authRoute)
-app.use('/jwt', jwtRoute)
+app.use('/requests', requestRoutes)
+app.use('/auth0', authCheck, auth0Router)
+app.use('/api/videos', authCheck, VideoRouter)
+app.use('/api/yt', YTRouter)
 app.use('/api', OwnerRouter)
 app.use('/editor_gig', editor_gig_route)
 app.use('/editorProfile', editorProfileRoute)

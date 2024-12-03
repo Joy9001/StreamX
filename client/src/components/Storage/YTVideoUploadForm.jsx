@@ -1,7 +1,10 @@
-import { ytVideoUploadState } from '@/states/videoState'
+import { setAllVideos } from '@/store/slices/videoSlice'
+import { resetYtForm } from '@/store/slices/ytFormSlice'
+import { useAuth0 } from '@auth0/auth0-react'
+import axios from 'axios'
 import { useEffect, useState } from 'react'
 import ReactPlayer from 'react-player'
-import { useRecoilValue } from 'recoil'
+import { useDispatch, useSelector } from 'react-redux'
 import AudienceRadioButtons from './YtFormComponents/AudienceRadioButtons'
 import CategoryDropdown from './YtFormComponents/CategoryDropdown'
 import LicenseOptions from './YtFormComponents/LicenseOptions'
@@ -11,13 +14,32 @@ import UploadFooter from './YtFormComponents/UploadFooter'
 import VisibilityOptions from './YtFormComponents/VisibilityOptions'
 
 export const YTVideoUploadForm = () => {
-  const ytVideoUpload = useRecoilValue(ytVideoUploadState)
+  const allVideos = useSelector((state) => state.video.allVideos)
+  const ytVideoUpload = useSelector((state) => state.video.ytVideoUpload)
+  const userData = useSelector((state) => state.user.userData)
+  const ytForm = useSelector((state) => state.ytForm)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [errors, setErrors] = useState({ title: false, description: false })
   const [light, setLight] = useState(
     'https://via.placeholder.com/150x150.png?text=&bg=ffffff&shadow=true'
   )
+  const { getAccessTokenSilently } = useAuth0()
+  const [accessToken, setAccessToken] = useState(null)
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    async function fetchAccessToken() {
+      try {
+        const token = await getAccessTokenSilently()
+        setAccessToken(token)
+      } catch (error) {
+        console.error('Error fetching access token:', error)
+      }
+    }
+    if (!accessToken) fetchAccessToken()
+  }, [getAccessTokenSilently, accessToken])
 
   useEffect(() => {
     if (ytVideoUpload) {
@@ -25,34 +47,95 @@ export const YTVideoUploadForm = () => {
     }
   }, [ytVideoUpload])
 
-  const handleSubmit = () => {
-    let validationErrors = { title: false, description: false }
+  const resetForm = () => {
+    setTitle('')
+    setDescription('')
+    setErrors({ title: false, description: false })
+    dispatch(resetYtForm())
 
-    // Check if title is empty
+    // Find and click the modal close button
+    const modal = document.getElementById('my_modal_3')
+    if (modal) {
+      modal.close()
+    }
+  }
+
+  const updateVideos = () => {
+    dispatch(
+      setAllVideos(
+        allVideos.map((video) => {
+          if (video._id === ytVideoUpload._id) {
+            video.ytUploadStatus = 'Uploaded'
+          }
+          return video
+        })
+      )
+    )
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    let validationErrors = { title: false, description: false }
     if (title.trim() === '') {
       validationErrors.title = true
     }
-
-    // Check if description is empty (you can make this optional if needed)
     if (description.trim() === '') {
       validationErrors.description = true
     }
-
     setErrors(validationErrors)
 
-    // Proceed only if no errors
     if (!validationErrors.title && !validationErrors.description) {
       // Perform form submission logic here
-      console.log('Form submitted successfully!')
+
+      let reqBody = {
+        id: ytVideoUpload._id,
+        title,
+        description,
+      }
+
+      for (const [key, value] of Object.entries(ytForm)) {
+        reqBody[key] = value
+      }
+
+      console.log('identities', userData.identities)
+
+      const googleIdentity = userData.identities.find(
+        (identity) => identity.provider === 'google-oauth2'
+      )
+      reqBody['gAccessToken'] = googleIdentity.access_token
+      reqBody['gRefreshToken'] = googleIdentity.refresh_token
+      console.log('Form Data', reqBody)
+
+      const postUrl = `${import.meta.env.VITE_BACKEND_URL}/api/yt/upload/${userData.user_metadata.role}/${userData._id}`
+      console.log('postUrl', postUrl)
+
+      axios
+        .post(postUrl, reqBody, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+        .then((response) => {
+          console.log('Form submitted successfully!', response.data)
+          resetForm()
+          updateVideos()
+        })
+        .catch((error) => {
+          console.error('Error submitting form:', error)
+        })
     }
   }
 
   return (
     <>
-      <div id='webcrumbs' className='p-4'>
-        <div className='mx-auto w-full rounded-lg p-6'>
+      <div id='webcrumbs' className=''>
+        <div className='mx-auto w-full rounded-lg p-3'>
           <header className='mb-6 flex items-center justify-between p-2'>
-            <h1 className='text-2xl font-semibold'>{title}</h1>
+            <h1 className='text-2xl font-semibold'>
+              <span className='font-medium'>Upload Video to YouTube - </span>
+              {title}
+            </h1>
           </header>
 
           {/* Main section with Title, Description, and Video Preview */}

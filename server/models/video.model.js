@@ -10,6 +10,7 @@ const videoSchema = new Schema(
 		editorId: {
 			type: Schema.Types.ObjectId,
 			required: false,
+			default: null,
 			ref: 'Editor',
 		},
 		editorAccess: {
@@ -30,8 +31,14 @@ const videoSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			required: false,
 		},
+		ytFormData: {
+			type: Object,
+			default: {},
+			required: false,
+		},
 		ytData: {
 			type: Object,
+			default: {},
 			required: false,
 		},
 		ytUploadStatus: {

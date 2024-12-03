@@ -1,15 +1,25 @@
-import {
-  locationState,
-  recordingDateState,
-} from '@/states/YtFormStates/recordingState'
+import { setLocation, setRecordingDate } from '@/store/slices/ytFormSlice'
 import PropTypes from 'prop-types'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
-import { useRecoilState } from 'recoil'
+import { useDispatch, useSelector } from 'react-redux'
+
+const getDate = (date) => {
+  if (!date) return
+  // format date to YYYY-MM-DD with padding
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${date.getFullYear()}-${month}-${day}`
+}
 
 const RecordingDateLocation = () => {
-  const [recordingDate, setRecordingDate] = useRecoilState(recordingDateState)
-  const [location, setLocation] = useRecoilState(locationState)
+  const dispatch = useDispatch()
+  const recordingDate = useSelector((state) => state.ytForm.recordingDate)
+  const location = useSelector((state) => state.ytForm.location)
+
+  const handleDateChange = (e) => {
+    const date = new Date(e.target.value)
+    console.log(date)
+    dispatch(setRecordingDate(getDate(date)))
+  }
 
   return (
     <div className='mt-6'>
@@ -26,12 +36,12 @@ const RecordingDateLocation = () => {
           <label htmlFor='recordingDate' className='mb-1 block font-medium'>
             Date
           </label>
-          <DatePicker
-            selected={recordingDate}
-            onChange={(date) => setRecordingDate(date)}
-            dateFormat='yyyy/MM/dd'
+          <input
+            type='date'
+            id='recordingDate'
+            value={recordingDate ? getDate(new Date(recordingDate)) : ''}
+            onChange={handleDateChange}
             className='w-full rounded-md border-2 border-solid border-black p-2'
-            placeholderText='Select a date'
           />
         </div>
 
@@ -43,7 +53,7 @@ const RecordingDateLocation = () => {
             id='location'
             type='text'
             value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            onChange={(e) => dispatch(setLocation(e.target.value))}
             className='w-full rounded-md border-2 border-solid border-black p-2'
             placeholder='Enter location'
             aria-required='true'
@@ -55,8 +65,8 @@ const RecordingDateLocation = () => {
 }
 
 RecordingDateLocation.propTypes = {
-  recordingDate: PropTypes.instanceOf(Date), // The selected recording date
-  location: PropTypes.string, // The recording location
+  recordingDate: PropTypes.instanceOf(Date),
+  location: PropTypes.string,
 }
 
 export default RecordingDateLocation

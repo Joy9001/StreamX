@@ -1,8 +1,7 @@
 import { Router } from 'express'
 import { uploadController } from '../controllers/yt.controller.js'
-import isAuthenticated from '../middlewares/auth.middleware.js'
 const router = Router()
 
-router.post('/upload', isAuthenticated, uploadController)
+router.post('/upload/:role/:userId', uploadController)
 
 export default router

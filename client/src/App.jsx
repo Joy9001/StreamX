@@ -1,53 +1,37 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { useRecoilValue } from 'recoil'
-import AdminPanel from './AdminPanel/AdminPanel.jsx'
+import { useAuth0 } from '@auth0/auth0-react'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
+import AdminPanel from './components/AdminPanel/AdminPanel.jsx'
 import Login from './components/Auth/Login.jsx'
-import LoginEditor from './components/Auth/LoginEditor.jsx'
-import SignUp from './components/Auth/SignUp.jsx'
-import Profile from './components/Profile.jsx'
-import ProfileForm from './components/ProfileForm.jsx'
-import Request_Approve from './components/Request&Apporved/main.jsx'
+import HiredEditor from './components/HiredEditor/HiredEditor.jsx'
+import Profile from './components/OwnerProfile/Profile.jsx'
+import RequestApprove from './components/Request&Apporved/raas.jsx'
 import Storage from './components/Storage/Storage.jsx'
-import HiredEditor from './HiredEditor/HiredEditor.jsx'
-import { loginState } from './states/loginState.js'
-import { userTypeState } from './states/userTypeState.js'
-import Land from './components/Landing/LandingPage.jsx'
+import GigProfile from './components/GigProfile/GigProfile.jsx'
+import EditorUi from './components/EditorProfile/EditorUi.jsx'
 
 function App() {
-  const isLoggedIn = useRecoilValue(loginState)
-  const userType = useRecoilValue(userTypeState)
+  const { isAuthenticated } = useAuth0()
+
   const router = createBrowserRouter([
     {
       path: '/',
-      element: isLoggedIn ? (
-        userType == 'owner' ? (
-          <Storage />
-        ) : (
-          <LoginEditor />
-        )
-      ) : (
-        <Login />
-      ),
-    },
-    {
-      path: '/landing',
-      element: <Land />,
+      element: isAuthenticated ? <Navigate to='/storage' replace /> : <Login />,
     },
     {
       path: '/login/owner',
-      element: isLoggedIn ? <Storage /> : <Login />,
+      element: isAuthenticated ? <Storage /> : <Login />,
     },
     {
       path: '/raas',
-      element: <Request_Approve />,
+      element: <RequestApprove />,
     },
     {
       path: '/signup',
-      element: isLoggedIn ? <Storage /> : <SignUp />,
+      element: isAuthenticated ? <Storage /> : <Login />,
     },
     {
       path: '/login/editor',
-      element: isLoggedIn ? <Storage /> : <LoginEditor />,
+      element: isAuthenticated ? <Storage /> : <Login />,
     },
     {
       path: '/storage',
@@ -58,16 +42,20 @@ function App() {
       element: isLoggedIn ? <Profile /> : <Login />,
     },
     {
-      path: '/settings',
-      element: isLoggedIn ? <ProfileForm /> : <Login />,
+      path: '/profile/editor',
+      element: <EditorUi />,
+    },
+    {
+      path: '/gig-profile',
+      element: <GigProfile />,
     },
     {
       path: '/HireEditor',
       element: isLoggedIn ? <HiredEditor /> : <Login />,
     },
     {
-      path: '/AdminPanel',
-      element: isLoggedIn ? <AdminPanel /> : <Login />,
+      path: '/AdminPanel/*',
+      element: <AdminPanel />,
     },
   ])
   return (

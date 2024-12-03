@@ -1,12 +1,13 @@
-import { audienceState } from '@/states/YtFormStates/audienceState.js'
+import { useDispatch, useSelector } from 'react-redux'
+import { setAudience } from '@/store/slices/ytFormSlice'
 import PropTypes from 'prop-types'
-import { useRecoilState } from 'recoil'
 
 const AudienceRadioButtons = () => {
-  const [audience, setAudience] = useRecoilState(audienceState)
+  const audience = useSelector((state) => state.ytForm.audience)
+  const dispatch = useDispatch()
 
   const handleAudienceChange = (e) => {
-    setAudience(e.target.value)
+    dispatch(setAudience(e.target.value))
   }
 
   return (
@@ -85,7 +86,7 @@ const AudienceRadioButtons = () => {
 }
 
 AudienceRadioButtons.propTypes = {
-  audienceState: PropTypes.string, // The selected audience option
+  audience: PropTypes.string, // The selected audience option
 }
 
 export default AudienceRadioButtons

@@ -1,13 +1,27 @@
 import express from 'express'
-import { getOwnerProfile } from '../controllers/owner.controller.js'
+import { 
+  getOwnerProfile, 
+  getAllOwners, 
+  createOwner, 
+  deleteOwner, 
+  updateOwner,
+  getOwnerByEmail 
+} from '../controllers/owner.controller.js'
 import { createOwnerProfile, updateOwnerProfile } from '../controllers/profileSetting.controller.js'
-import isAuthenticated from '../middlewares/auth.middleware.js'
-import { upload } from '../middlewares/multer.middleware.js' // Multer middleware
+import { upload } from '../middlewares/multer.middleware.js'
 
 const router = express.Router()
 
-router.get('/owner/profile/:id', isAuthenticated, getOwnerProfile)
-router.post('/owner/profile/setup/:id', isAuthenticated, upload.single('file'), createOwnerProfile)
-router.put('/owner/profile/settings/:id', isAuthenticated, upload.single('file'), updateOwnerProfile)
+// Admin dashboard routes
+router.get('/ownerProfile', getAllOwners)
+router.get('/ownerProfile/:email', getOwnerByEmail)  
+router.post('/ownerProfile', createOwner)
+router.patch('/ownerProfile/:email', updateOwner)
+router.delete('/ownerProfile/:email', deleteOwner)
+
+// Original routes
+router.get('/owner/profile/:id', getOwnerProfile)
+router.post('/owner/profile/setup/:id', upload.single('file'), createOwnerProfile)
+router.put('/owner/profile/settings/:id', upload.single('file'), updateOwnerProfile)
 
 export default router

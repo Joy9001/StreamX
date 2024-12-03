@@ -1,32 +1,58 @@
-import { allVidState, recentVidState } from '@/states/videoState'
+import { setDrawerOpen } from '@/store/slices/uiSlice'
+import { setAllVideos, setRecentVideos } from '@/store/slices/videoSlice'
+import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
 import PropTypes from 'prop-types'
-import { useRecoilState } from 'recoil'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-function ContenetTableRowOptions({ editor, videoId }) {
-  const setRecentVideos = useRecoilState(recentVidState)[1]
-  const setAllVideos = useRecoilState(allVidState)[1]
+function ContentTableRowOptions({ editor, videoId }) {
+  const dispatch = useDispatch()
+  const recentVideos = useSelector((state) => state.video.recentVideos)
+  const allVideos = useSelector((state) => state.video.allVideos)
+  const userData = useSelector((state) => state.user.userData)
+  const [accessToken, setAccessToken] = useState(null)
+  const { getAccessTokenSilently } = useAuth0()
+
+  useEffect(() => {
+    async function fetchAccessToken() {
+      try {
+        const token = await getAccessTokenSilently()
+        setAccessToken(token)
+      } catch (error) {
+        console.error('Error fetching access token:', error)
+      }
+    }
+    fetchAccessToken()
+  }, [getAccessTokenSilently])
+
   async function handleDelete() {
     try {
       const res = await axios.delete(
-        'http://localhost:3000/api/videos/delete',
+        `${import.meta.env.VITE_BACKEND_URL}/api/videos/delete`,
         {
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
           },
           withCredentials: true,
           data: {
             id: videoId,
+            userId: userData._id,
           },
         }
       )
       console.log(res)
-      setRecentVideos((prev) => prev.filter((video) => video._id !== videoId))
-      setAllVideos((prev) => prev.filter((video) => video._id !== videoId))
+      dispatch(
+        setRecentVideos(recentVideos.filter((video) => video._id !== videoId))
+      )
+      dispatch(setAllVideos(allVideos.filter((video) => video._id !== videoId)))
       alert(res.data.message)
     } catch (error) {
       console.error('Error deleting video:', error)
       alert('Failed to delete video!')
+    } finally {
+      dispatch(setDrawerOpen(false))
     }
   }
 
@@ -69,9 +95,9 @@ function ContenetTableRowOptions({ editor, videoId }) {
   )
 }
 
-ContenetTableRowOptions.propTypes = {
+ContentTableRowOptions.propTypes = {
   editor: PropTypes.string,
   videoId: PropTypes.string,
 }
 
-export default ContenetTableRowOptions
+export default ContentTableRowOptions

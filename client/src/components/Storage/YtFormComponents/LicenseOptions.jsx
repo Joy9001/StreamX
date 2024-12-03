@@ -1,14 +1,11 @@
-import {
-  allowEmbeddingState,
-  licenseState,
-} from '@/states/YtFormStates/licenseState'
+import { setAllowEmbedding, setLicense } from '@/store/slices/ytFormSlice'
 import PropTypes from 'prop-types'
-import { useRecoilState } from 'recoil'
+import { useDispatch, useSelector } from 'react-redux'
 
 const LicenseOptions = () => {
-  const [license, setLicense] = useRecoilState(licenseState)
-  const [allowEmbedding, setAllowEmbedding] =
-    useRecoilState(allowEmbeddingState)
+  const dispatch = useDispatch()
+  const license = useSelector((state) => state.ytForm.license)
+  const allowEmbedding = useSelector((state) => state.ytForm.allowEmbedding)
 
   return (
     <div className='mt-6'>
@@ -25,17 +22,17 @@ const LicenseOptions = () => {
       </p>
       <select
         value={license}
-        onChange={(e) => setLicense(e.target.value)}
+        onChange={(e) => dispatch(setLicense(e.target.value))}
         className='w-full rounded-md border-2 border-solid border-black p-2'>
-        <option value='standard'>Standard YouTube License</option>
-        <option value='creative_commons'>Creative Commons - Attribution</option>
+        <option value='youtube'>Standard YouTube License</option>
+        <option value='creativeCommon'>Creative Commons - Attribution</option>
       </select>
 
       <div className='mt-4 flex items-center'>
         <input
           type='checkbox'
           checked={allowEmbedding}
-          onChange={(e) => setAllowEmbedding(e.target.checked)}
+          onChange={(e) => dispatch(setAllowEmbedding(e.target.checked))}
           className='checkbox checkbox-sm mr-2'
         />
         <label className='flex space-x-2'>

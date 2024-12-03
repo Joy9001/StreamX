@@ -1,10 +1,10 @@
 import userCircle from '@/assets/user-circle.svg'
-import { drawerContentState, drawerState } from '@/states/drawerState.js'
-import { ytVideoUploadState } from '@/states/videoState'
+import { setDrawerContent, setDrawerOpen } from '@/store/slices/uiSlice'
+import { setYtVideoUpload } from '@/store/slices/videoSlice'
 import { filesize } from 'filesize'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
-import { useRecoilState } from 'recoil'
+import { useDispatch } from 'react-redux'
 import ContenetTableRowOptions from './ContentTableRowOptions'
 import YtUPendingBtn from './YtStatusBtnComponents/YtPendingBtn'
 import YtRetryBtn from './YtStatusBtnComponents/YtRetryBtn'
@@ -13,10 +13,9 @@ import YtUploadedBtn from './YtStatusBtnComponents/YtUploadedBtn'
 import YtUploadingBtn from './YtStatusBtnComponents/YtUploadingBtn'
 
 function ContentTableRow({ content }) {
+  console.log('content in ContentTableRow', content)
   const [ytBtn, setYtBtn] = useState('')
-  const setDrawerState = useRecoilState(drawerState)[1]
-  const setDrawerContentState = useRecoilState(drawerContentState)[1]
-  const setYtVideoUpload = useRecoilState(ytVideoUploadState)[1]
+  const dispatch = useDispatch()
 
   useEffect(() => {
     switch (content.ytUploadStatus) {
@@ -39,21 +38,13 @@ function ContentTableRow({ content }) {
   }, [content.ytUploadStatus])
 
   function handleRowClick() {
-    setDrawerState(true)
-    setDrawerContentState(content)
+    dispatch(setDrawerOpen(true))
+    dispatch(setDrawerContent(content))
   }
 
   function handleYtUpload() {
     document.getElementById('my_modal_3').showModal()
-    setYtVideoUpload(content)
-    // axios
-    //   .post('/api/yt/upload', { videoId: content._id })
-    //   .then((res) => {
-    //     console.log(res.data)
-    //   })
-    //   .catch((err) => {
-    //     console.log(err)
-    //   })
+    dispatch(setYtVideoUpload(content))
     console.log('uploading to youtube')
   }
 
@@ -133,7 +124,9 @@ function ContentTableRow({ content }) {
         <td onClick={handleRowClick}>
           <span className='text-sm'>{filesize(content.metaData.size)}</span>
         </td>
-        <td className='w-40' onClick={handleYtUpload}>
+        <td
+          className='w-40'
+          onClick={content.ytUploadStatus === 'None' ? handleYtUpload : null}>
           {ytBtn}
         </td>
         <td className='w-40'>

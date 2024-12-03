@@ -1,28 +1,55 @@
-import { allVidState } from '@/states/videoState.js'
+import { setAllVideos } from '@/store/slices/videoSlice'
+import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
-import { useEffect } from 'react'
-import { useRecoilState } from 'recoil'
-import ContentTableRow from './ContenetTableRow'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import ContentTableRow from './ContenetTableRow.jsx'
 import { YTVideoUploadForm } from './YTVideoUploadForm'
-
 function ContentTable() {
-  const [allVideos, setAllVideos] = useRecoilState(allVidState)
+  const allVideos = useSelector((state) => state.video.allVideos)
+  const dispatch = useDispatch()
+  const userData = useSelector((state) => state.user.userData)
+  const { getAccessTokenSilently } = useAuth0()
+  const [accessToken, setAccessToken] = useState(null)
+
+  useEffect(() => {
+    async function fetchAccessToken() {
+      try {
+        const token = await getAccessTokenSilently()
+        setAccessToken(token)
+      } catch (error) {
+        console.error('Error fetching access token:', error)
+      }
+    }
+    fetchAccessToken()
+  }, [getAccessTokenSilently])
 
   useEffect(() => {
     async function fetchAllVideos() {
       try {
-        const res = await axios.get('http://localhost:3000/api/videos/all', {
-          withCredentials: true,
-        })
-        console.log('all', res.data)
-        setAllVideos(res.data.videos)
+        console.log('userData...', userData)
+        console.log('Fetching all videos...', userData._id)
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/all/${userData.user_metadata.role}/${userData._id}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+          }
+        )
+        console.log('all videos', res.data)
+        dispatch(setAllVideos(res.data.videos))
       } catch (error) {
         console.error('Error fetching all videos:', error)
+      } finally {
+        console.log('all videos fetched')
       }
     }
 
-    fetchAllVideos()
-  }, [setAllVideos])
+    if (JSON.stringify(userData) !== '{}') fetchAllVideos()
+  }, [dispatch, accessToken, userData])
 
   return (
     <>
@@ -55,8 +82,6 @@ function ContentTable() {
                 ✕
               </button>
             </form>
-            {/* <h3 className='text-lg font-bold'>Hello!</h3>
-            <p className='py-4'>Press ESC key or click on ✕ button to close</p> */}
             <YTVideoUploadForm />
           </div>
         </dialog>

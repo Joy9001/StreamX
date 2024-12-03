@@ -1,39 +1,39 @@
 // import { loginState } from '@/states/loginState.js'
+import { setAllVideos, setRecentVideos } from '@/store/slices/videoSlice.js'
+import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
 import { useEffect, useRef, useState } from 'react'
-// import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { drawerState } from '../../states/drawerState.js'
-import { navbarOpenState } from '../../states/navbarState.js'
-import { allVidState, recentVidState } from '../../states/videoState.js'
-import Navbar from '../Navbar.jsx'
+import { useDispatch, useSelector } from 'react-redux'
+import Navbar from '../NavBar/Navbar.jsx'
 import ContentTable from './ContentTable.jsx'
 import RecentCard from './RecentCard.jsx'
 import StorageNav from './StorageNav.jsx'
 import VideoDrawer from './VideoDrawer.jsx'
 
 function Storage() {
-  const drawer = useRecoilValue(drawerState)
-  const navOpen = useRecoilValue(navbarOpenState)
+  const drawer = useSelector((state) => state.ui.drawerOpen)
+  const navOpen = useSelector((state) => state.ui.navbarOpen)
   const fileInputRef = useRef(null)
   const [uploading, setUploading] = useState(false)
-  const [recentVideos, setRecentVideos] = useRecoilState(recentVidState)
-  const setAllVideos = useRecoilState(allVidState)[1]
-  // const navigate = useNavigate()
-  // const setLoginState = useRecoilState(loginState)[1]
+  const recentVideos = useSelector((state) => state.video.recentVideos)
+  const allVideos = useSelector((state) => state.video.allVideos)
+  const userData = useSelector((state) => state.user.userData)
+  const { getAccessTokenSilently } = useAuth0()
+  const [accessToken, setAccessToken] = useState(null)
 
-  // const [searchParams] = useSearchParams()
-  // const login = searchParams.get('login')
+  const dispatch = useDispatch()
 
-  // useEffect(() => {
-  //   if (login !== 'true') {
-  //     setLoginState(false)
-  //     navigate('/')
-  //   } else {
-  //     console.log('User logged in')
-  //     setLoginState(true)
-  //   }
-  // }, [login, navigate, setLoginState])
+  useEffect(() => {
+    async function fetchAccessToken() {
+      try {
+        const token = await getAccessTokenSilently()
+        setAccessToken(token)
+      } catch (error) {
+        console.error('Error fetching access token:', error)
+      }
+    }
+    fetchAccessToken()
+  }, [getAccessTokenSilently])
 
   function handleNewBtnClick() {
     fileInputRef.current.click()
@@ -46,29 +46,32 @@ function Storage() {
     if (file) {
       const formData = new FormData()
       formData.append('file', file)
-
+      console.log('formData', formData)
+      console.log('accessToken in handleFileUpload', accessToken)
       try {
         const res = await axios.post(
-          'http://localhost:3000/api/videos/upload',
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/upload/${userData.user_metadata.role}/${userData._id}`,
           formData,
           {
             headers: {
               'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${accessToken}`,
             },
             withCredentials: true,
           }
         )
 
-        console.log(res)
-        setUploading(false)
-        setRecentVideos((prev) => [res.data.savedVideo, ...prev])
-        setAllVideos((prev) => [res.data.savedVideo, ...prev])
+        console.log('res.data', res.data)
+
+        dispatch(setRecentVideos([res.data.videoData, ...recentVideos]))
+        dispatch(setAllVideos([res.data.videoData, ...allVideos]))
         alert(res.data.message)
       } catch (error) {
         console.error('Error uploading file:', error)
         alert('File upload failed!')
       } finally {
         e.target.value = ''
+        setUploading(false)
       }
     }
   }
@@ -77,18 +80,25 @@ function Storage() {
   useEffect(() => {
     async function fetchRecentVideos() {
       try {
-        const res = await axios.get('http://localhost:3000/api/videos/recent', {
-          withCredentials: true,
-        })
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/recent/${userData.user_metadata.role}/${userData._id}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+          }
+        )
         console.log(res.data)
-        setRecentVideos(res.data.videos)
+        dispatch(setRecentVideos(res.data.videos))
       } catch (error) {
         console.error('Error fetching recent videos:', error)
       }
     }
 
-    fetchRecentVideos()
-  }, [setRecentVideos])
+    if (JSON.stringify(userData) !== '{}') fetchRecentVideos()
+  }, [dispatch, accessToken, userData])
 
   return (
     <div className='storage-main flex h-screen'>

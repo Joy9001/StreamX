@@ -1,9 +1,10 @@
-import { visibilityState } from '@/states/YtFormStates/visibilityState'
+import { useDispatch, useSelector } from 'react-redux'
+import { setVisibility } from '@/store/slices/ytFormSlice'
 import PropTypes from 'prop-types'
-import { useRecoilState } from 'recoil'
 
 const VisibilityOptions = () => {
-  const [visibility, setVisibility] = useRecoilState(visibilityState)
+  const dispatch = useDispatch()
+  const visibility = useSelector((state) => state.ytForm.visibility)
 
   return (
     <div className='mt-6'>
@@ -18,7 +19,7 @@ const VisibilityOptions = () => {
             name='radio-2'
             value='private'
             checked={visibility === 'private'}
-            onChange={() => setVisibility('private')}
+            onChange={() => dispatch(setVisibility('private'))}
             className='radio radio-sm mr-2'
           />
           Private - Only you and people who you choose can watch your video
@@ -29,7 +30,7 @@ const VisibilityOptions = () => {
             name='radio-2'
             value='unlisted'
             checked={visibility === 'unlisted'}
-            onChange={() => setVisibility('unlisted')}
+            onChange={() => dispatch(setVisibility('unlisted'))}
             className='radio radio-sm mr-2'
           />
           Unlisted - Anyone with the video link can watch your video
@@ -40,7 +41,7 @@ const VisibilityOptions = () => {
             name='radio-2'
             value='public'
             checked={visibility === 'public'}
-            onChange={() => setVisibility('public')}
+            onChange={() => dispatch(setVisibility('public'))}
             className='radio radio-sm mr-2'
           />
           Public - Everyone can watch your video
