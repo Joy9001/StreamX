@@ -7,8 +7,13 @@ import Video from '../models/video.model.js'
 
 const getAllController = async (req, res) => {
 	const { userId, role } = req.params
+	let videos
 	try {
-		const videos = await Video.find({ ownerId: userId }).lean()
+		if (role === 'Owner') {
+			videos = await Video.find({ ownerId: userId }).lean()
+		} else if (role === 'Editor') {
+			videos = await Video.find({ editorId: userId }).lean()
+		}
 
 		if (!videos) {
 			return res.status(StatusCodes.NOT_FOUND).json({ message: 'No videos found' })
@@ -26,6 +31,7 @@ const getAllController = async (req, res) => {
 			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Owner not found' })
 		}
 
+		console.log('videos in getAllController', videos)
 		const editorIds = videos.map((video) => video.editorId)
 		console.log('editorIds in getAllController', editorIds)
 		const editors = await Editor.find({ _id: { $in: editorIds } })
@@ -35,8 +41,8 @@ const getAllController = async (req, res) => {
 			// console.log('video', { ...video })
 			const editor = editors.find((editor) => editor._id.equals(video.editorId))
 			return {
-				owner: owner.username,
-				ownerPic: owner.profilephoto,
+				owner: owner._id.equals(video.editorId) ? '' : owner.username,
+				ownerPic: owner._id.equals(video.editorId) ? '' : owner.profilephoto,
 				editor: editor?.name,
 				editorPic: editor?.profilephoto,
 				...video,
