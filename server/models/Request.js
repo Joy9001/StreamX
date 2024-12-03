@@ -5,7 +5,6 @@ const requestSchema = new mongoose.Schema(
         // from
 		to_id: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'EditorGig',
 			required: true,
 		},
 		video_id: {

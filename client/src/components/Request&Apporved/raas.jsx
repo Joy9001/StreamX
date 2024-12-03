@@ -3,12 +3,18 @@ import { useState } from 'react'
 import Navbar from '../NavBar/Navbar.jsx'
 import ContentTable from './RAContentTable.jsx'
 import RaContentTableApprove from './RaContentTableApprove.jsx'
+import EditorContentTableApprove from './EditorContentTableApprove.jsx'
 import RaasNav from './raasNav.jsx'
 
 const RequestApprove = () => {
   const [showApproved, setShowApproved] = useState(false)
   const navOpen = useSelector((state) => state.ui.navbarOpen)
   const drawer = useSelector((state) => state.ui.drawer)
+  const { userData } = useSelector((state) => state.user)
+
+  const ApprovalComponent = userData?.user_metadata?.role === 'Editor' 
+    ? EditorContentTableApprove 
+    : RaContentTableApprove;
 
   return (
     <div className='storage-main flex h-screen'>
@@ -43,7 +49,7 @@ const RequestApprove = () => {
               </span>
             </div>
             <div className='storage-content-body'>
-              {showApproved ? <RaContentTableApprove /> : <ContentTable />}
+              {showApproved ? <ApprovalComponent /> : <ContentTable />}
             </div>
           </div>
         </div>

@@ -35,6 +35,7 @@ function Card({ editor, userData }) {
 
   useEffect(() => {
     const fetchOwnerVideos = async () => {
+      console.log('accessToken:', accessToken)
       if (userData?._id && accessToken) {
         try {
           const response = await axios.get(

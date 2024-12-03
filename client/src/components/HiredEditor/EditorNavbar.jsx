@@ -20,7 +20,7 @@ function EditorNavbar() {
   const navigate = useNavigate()
 
   return (
-    <nav className="navbar sticky top-0 z-50 bg-gradient-to-r from-violet-100 via-pink-100 to-purple-100 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out mb-6">
+    <nav className="navbar sticky top-0 z-50 bg-gradient-to-r from-violet-100 via-pink-100 to-purple-100 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out">
       <div className="navbar-start w-1/4">
         <a
           className="btn btn-ghost text-2xl font-bold normal-case"
