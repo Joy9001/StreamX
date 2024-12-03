@@ -15,9 +15,7 @@ function ContentTable() {
   useEffect(() => {
     async function fetchAccessToken() {
       try {
-        const token = await getAccessTokenSilently({
-          cacheMode: 'on',
-        })
+        const token = await getAccessTokenSilently()
         setAccessToken(token)
       } catch (error) {
         console.error('Error fetching access token:', error)
@@ -84,8 +82,6 @@ function ContentTable() {
                 ✕
               </button>
             </form>
-            {/* <h3 className='text-lg font-bold'>Hello!</h3>
-            <p className='py-4'>Press ESC key or click on ✕ button to close</p> */}
             <YTVideoUploadForm />
           </div>
         </dialog>

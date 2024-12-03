@@ -45,14 +45,6 @@ function ContentTableRow({ content }) {
   function handleYtUpload() {
     document.getElementById('my_modal_3').showModal()
     dispatch(setYtVideoUpload(content))
-    // axios
-    //   .post('/api/yt/upload', { videoId: content._id })
-    //   .then((res) => {
-    //     console.log(res.data)
-    //   })
-    //   .catch((err) => {
-    //     console.log(err)
-    //   })
     console.log('uploading to youtube')
   }
 
@@ -132,7 +124,9 @@ function ContentTableRow({ content }) {
         <td onClick={handleRowClick}>
           <span className='text-sm'>{filesize(content.metaData.size)}</span>
         </td>
-        <td className='w-40' onClick={handleYtUpload}>
+        <td
+          className='w-40'
+          onClick={content.ytUploadStatus === 'None' ? handleYtUpload : null}>
           {ytBtn}
         </td>
         <td className='w-40'>
