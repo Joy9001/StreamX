@@ -1,9 +1,9 @@
+import { setUserData } from '@/store/slices/userSlice'
 import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { setUserData } from '@/store/slices/userSlice'
 
 const AuthenticationWrapper = ({ children }) => {
   const { isAuthenticated, user, getAccessTokenSilently } = useAuth0()
@@ -14,18 +14,17 @@ const AuthenticationWrapper = ({ children }) => {
     async function fetchUserData() {
       console.log('isAuthenticated:', isAuthenticated)
       console.log('userData:', userData)
+      console.log('user:', user)
       if (isAuthenticated && JSON.stringify(userData) === '{}') {
         console.log('Fetching user metadata...')
         try {
-          const accessToken = await getAccessTokenSilently({
-            cacheMode: 'on',
-          })
+          const accessToken = await getAccessTokenSilently()
           console.log('Access token:', accessToken)
 
           // Get and Create user data in backend
           const res = await axios.post(
             `${import.meta.env.VITE_BACKEND_URL}/auth0/create`,
-            { email: user.email },
+            { email: user.email, userId: user.sub },
             {
               headers: {
                 'Content-Type': 'application/json',
