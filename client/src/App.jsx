@@ -6,6 +6,8 @@ import HiredEditor from './components/HiredEditor/HiredEditor.jsx'
 import Profile from './components/OwnerProfile/Profile.jsx'
 import RequestApprove from './components/Request&Apporved/raas.jsx'
 import Storage from './components/Storage/Storage.jsx'
+import GigProfile from './components/GigProfile/GigProfile.jsx'
+import EditorUi from './components/EditorProfile/EditorUi.jsx'
 
 function App() {
   const { isAuthenticated } = useAuth0()
@@ -39,7 +41,14 @@ function App() {
       path: '/profile/owner',
       element: <Profile />,
     },
-
+    {
+      path: '/profile/editor',
+      element: <EditorUi />,
+    },
+    {
+      path: '/gig-profile',
+      element: <GigProfile />,
+    },
     {
       path: '/HireEditor',
       element: <HiredEditor />,
