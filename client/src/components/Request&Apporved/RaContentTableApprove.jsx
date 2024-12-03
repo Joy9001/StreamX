@@ -118,10 +118,10 @@ function ContentTableApprove() {
     fetchRequests()
   }, [userData, accessToken, userRole])
 
-  const handleApprove = async (requestId) => {
+  const handleApprove = async (requestId, videoId, toId) => {
     try {
       setLoading(true)
-      // Send PATCH request to update status
+      // Send PATCH request to update request status
       const response = await axios.patch(
         `${import.meta.env.VITE_BACKEND_URL}/requests/${requestId}/status`,
         { status: 'approved' },
@@ -134,17 +134,32 @@ function ContentTableApprove() {
         }
       )
 
-      // Update local state only if backend update was successful
       if (response.data) {
+        // Update video ownership
+        const videoResponse = await axios.patch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/${videoId}/owner`,
+          { owner_id: toId },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+          }
+        )
+        
+        console.log('Video ownership updated:', videoResponse.data)
+
+        // Update the local state with the response from the server
         setRequests(prevRequests =>
           prevRequests.map(req =>
             req._id === requestId ? response.data : req
           )
         )
-        console.log('Request approved successfully:', response.data)
+        console.log('Request approved and video ownership updated successfully')
       }
     } catch (error) {
-      console.error('Error approving request:', error)
+      console.error('Error approving request or updating video ownership:', error)
     } finally {
       setLoading(false)
     }
@@ -185,7 +200,7 @@ function ContentTableApprove() {
                 <td>
                   <button 
                     className="btn btn-sm btn-success"
-                    onClick={() => handleApprove(request._id)}
+                    onClick={() => handleApprove(request._id, request.video_id, request.to_id)}
                     disabled={request.status === 'approved' || loading}
                   >
                     {request.status === 'approved' ? 'Approved' : 'Approve'}

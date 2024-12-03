@@ -220,10 +220,16 @@ const getVideoNameById = async (req, res) => {
 }
 
 // Update video owner
-export const updateOwner = async (req, res) => {
+const updateOwner = async (req, res) => {
     try {
         const { videoId } = req.params
         const { owner_id } = req.body
+
+        console.log('Updating video owner:', {
+            videoId,
+            newOwnerId: owner_id,
+            body: req.body
+        })
 
         const updatedVideo = await Video.findByIdAndUpdate(
             videoId,
@@ -232,9 +238,11 @@ export const updateOwner = async (req, res) => {
         )
 
         if (!updatedVideo) {
+            console.log('Video not found:', videoId)
             return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
         }
 
+        console.log('Video owner updated successfully:', updatedVideo)
         res.status(StatusCodes.OK).json(updatedVideo)
     } catch (error) {
         console.error('Error updating video owner:', error)
@@ -245,7 +253,7 @@ export const updateOwner = async (req, res) => {
     }
 }
 
-export { deleteController, downloadController, getAllController, getVideoNameById, recentController, uploadController }
+export { deleteController, downloadController, getAllController, getVideoNameById, recentController, uploadController, updateOwner }
 
 /*
   lastModified: 1723095830000

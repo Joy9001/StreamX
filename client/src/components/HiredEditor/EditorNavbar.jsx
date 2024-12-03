@@ -1,88 +1,56 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Home, User, FileText, Menu, Zap } from 'lucide-react'
+
+function NavItem({ icon, text, onClick }) {
+  return (
+    <li className="flex justify-center">
+      <a
+        onClick={onClick}
+        className="btn btn-ghost mx-1 flex items-center justify-center rounded-full text-gray-700 hover:bg-purple-100 hover:text-purple-700"
+      >
+        {icon}
+        <span className="ml-2">{text}</span>
+      </a>
+    </li>
+  )
+}
 
 function EditorNavbar() {
   const navigate = useNavigate()
 
   return (
-    <nav className='sticky top-0 z-50 border-b border-gray-100 bg-gradient-to-r from-rose-50/90 via-pink-50/90 to-purple-50/90 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] backdrop-blur-md transition-all duration-300 ease-in-out'>
-      <div className='relative w-full'>
-        <div className='flex h-16 items-center'>
-          {/* Logo at absolute corner */}
-          <div className='absolute left-0 top-0 flex h-full items-center pl-3'>
-            <a
-              className='cursor-pointer rounded-lg bg-gradient-to-r from-rose-500 to-purple-600 bg-clip-text px-3 py-2 text-2xl font-bold text-transparent transition-all duration-300 hover:bg-white/40 hover:from-rose-400 hover:to-purple-500'
-              onClick={() => navigate('/storage')}>
-              StreamX
-            </a>
-          </div>
+    <nav className="navbar sticky top-0 z-50 bg-gradient-to-r from-violet-100 via-pink-100 to-purple-100 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out mb-6">
+      <div className="navbar-start w-1/4">
+        <a
+          className="btn btn-ghost text-2xl font-bold normal-case"
+          onClick={() => navigate('/storage')}
+        >
+          <Zap className="mr-2 h-6 w-6 text-purple-600" />
+          <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+            StreamX
+          </span>
+        </a>
+      </div>
 
-          {/* Desktop Menu - Centered */}
-          <div className='hidden flex-1 items-center justify-center space-x-2 lg:flex'>
-            <a
-              className='cursor-pointer rounded-lg px-5 py-2.5 font-medium text-gray-600 transition-all duration-300 hover:bg-white/60 hover:text-gray-900 hover:shadow-sm active:scale-95'
-              onClick={() => navigate('/storage')}>
-              Storage
-            </a>
-            <a
-              className='cursor-pointer rounded-lg px-5 py-2.5 font-medium text-gray-600 transition-all duration-300 hover:bg-white/60 hover:text-gray-900 hover:shadow-sm active:scale-95'
-              onClick={() => navigate('/profile/owner')}>
-              Profile
-            </a>
-            <a
-              className='cursor-pointer rounded-lg px-5 py-2.5 font-medium text-gray-600 transition-all duration-300 hover:bg-white/60 hover:text-gray-900 hover:shadow-sm active:scale-95'
-              onClick={() => navigate('/raas')}>
-              Request Section
-            </a>
-          </div>
+      <div className="navbar-center w-2/4 hidden lg:flex justify-center">
+        <ul className="menu menu-horizontal px-1 flex justify-center items-center gap-2">
+          <NavItem icon={<Home />} text="Storage" onClick={() => navigate('/storage')} />
+          <NavItem icon={<User />} text="Profile" onClick={() => navigate('/profile/owner')} />
+          <NavItem icon={<FileText />} text="Request Section" onClick={() => navigate('/raas')} />
+        </ul>
+      </div>
 
-          {/* Mobile Menu - Right Corner */}
-          <div className='absolute right-3 top-0 flex h-full items-center lg:hidden'>
-            <div className='dropdown dropdown-end'>
-              <button
-                tabIndex={0}
-                role='button'
-                className='rounded-lg p-2.5 text-gray-600 transition-all duration-300 hover:bg-white/60 hover:text-gray-900 hover:shadow-sm active:scale-95'>
-                <svg
-                  className='h-6 w-6'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'>
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M4 6h16M4 12h16M4 18h16'
-                  />
-                </svg>
-              </button>
-              <ul
-                tabIndex={0}
-                className='menu dropdown-content mt-3 w-56 rounded-xl bg-white/95 p-2 shadow-lg ring-1 ring-black/5 backdrop-blur-sm transition-all duration-300 ease-in-out'>
-                <li className='mb-1'>
-                  <a
-                    className='block rounded-lg px-4 py-2.5 text-sm font-medium text-gray-600 transition-colors duration-300 hover:bg-gray-50/80 hover:text-gray-900'
-                    onClick={() => navigate('/storage')}>
-                    Storage
-                  </a>
-                </li>
-                <li className='mb-1'>
-                  <a
-                    className='block rounded-lg px-4 py-2.5 text-sm font-medium text-gray-600 transition-colors duration-300 hover:bg-gray-50/80 hover:text-gray-900'
-                    onClick={() => navigate('/profile')}>
-                    Profile
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className='block rounded-lg px-4 py-2.5 text-sm font-medium text-gray-600 transition-colors duration-300 hover:bg-gray-50/80 hover:text-gray-900'
-                    onClick={() => navigate('/raaq')}>
-                    Raaq
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
+      <div className="navbar-end w-1/4 lg:hidden">
+        <div className="dropdown dropdown-end">
+          <label tabIndex={0} className="btn btn-ghost btn-circle">
+            <Menu className="h-5 w-5" />
+          </label>
+          <ul tabIndex={0} className="menu dropdown-content rounded-box menu-sm z-[1] mt-3 w-52 bg-base-100 p-2 shadow">
+            <li><a onClick={() => navigate('/storage')}>Storage</a></li>
+            <li><a onClick={() => navigate('/profile/owner')}>Profile</a></li>
+            <li><a onClick={() => navigate('/raas')}>Request Section</a></li>
+          </ul>
         </div>
       </div>
     </nav>
