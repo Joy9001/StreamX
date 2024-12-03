@@ -11,10 +11,10 @@ import auth0Router from './routes/auth0.router.js'
 import editor_gig_route from './routes/editor_gig_router.js'
 import editorProfileRoute from './routes/editorProfileRoute.js'
 import OwnerRouter from './routes/owner.route.js'
+import requestRoutes from './routes/requestRoutes.js'
 import UserRoute from './routes/UserRoute.js'
 import VideoRouter from './routes/video.route.js'
 import YTRouter from './routes/yt.route.js'
-import requestRoutes from './routes/requestRoutes.js'
 
 dotenv.config()
 
@@ -55,7 +55,7 @@ app.get('/', (req, res) => {
 
 app.use('/requests', requestRoutes)
 app.use('/auth0', authCheck, auth0Router)
-app.use('/api/videos', VideoRouter)
+app.use('/api/videos', authCheck, VideoRouter)
 app.use('/api/yt', YTRouter)
 app.use('/api', OwnerRouter)
 app.use('/editor_gig', editor_gig_route)

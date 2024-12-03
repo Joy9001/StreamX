@@ -22,7 +22,7 @@ export const auth0CreateController = async (req, res) => {
 				}
 				console.log(message)
 
-				return res.status(200).json({ message, user })
+				return res.status(200).json({ message, user: { ...user, _id: findOwner._id } })
 			}
 			const owner = new Owner({
 				username: user.nickname,
@@ -32,7 +32,13 @@ export const auth0CreateController = async (req, res) => {
 			})
 			await owner.save()
 			console.log('Owner created successfully')
-			return res.status(200).json({ message: 'Owner created successfully', user })
+			return res.status(200).json({
+				message: 'Owner created successfully',
+				user: {
+					...user,
+					_id: owner._id,
+				},
+			})
 		} else if (user.user_metadata.role === 'Editor') {
 			const findEditor = await Editor.findOne({ email: user.email })
 			const providerSub = user.identities.map((identity) => `${identity.provider}|${identity.user_id}`)
@@ -44,7 +50,13 @@ export const auth0CreateController = async (req, res) => {
 				}
 				console.log(message)
 
-				return res.status(200).json({ message, user })
+				return res.status(200).json({
+					message,
+					user: {
+						...user,
+						_id: findEditor._id,
+					},
+				})
 			}
 			const editor = new Editor({
 				name: user.nickname,
@@ -54,7 +66,7 @@ export const auth0CreateController = async (req, res) => {
 			})
 			await editor.save()
 			console.log('Editor created successfully')
-			return res.status(200).json({ message: 'Editor created successfully', user })
+			return res.status(200).json({ message: 'Editor created successfully', user: { ...user, _id: editor._id } })
 		} else {
 			console.log('User role undefined')
 		}

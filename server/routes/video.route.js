@@ -9,10 +9,10 @@ import {
 import { upload } from '../middlewares/multer.middleware.js'
 const router = Router()
 
-router.get('/all', getAllController)
-router.get('/recent', recentController)
-router.post('/upload', upload.single('file'), uploadController)
+router.get('/all/:role/:userId', getAllController)
+router.get('/recent/:role/:userId', recentController)
+router.post('/upload/:role/:userId', upload.single('file'), uploadController)
 router.delete('/delete', deleteController)
-router.post('/download/:id', downloadController)
+router.get('/download/:id', downloadController)
 
 export default router

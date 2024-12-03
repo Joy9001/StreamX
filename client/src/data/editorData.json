@@ -1,0 +1,321 @@
+{
+  "editors": [
+    {
+      "name": "Michael Chen",
+      "profilePicture": "https://api.dicebear.com/7.x/avataaars/svg?seed=Michael",
+      "title": "Senior Video Editor",
+      "bio": "Professional video editor with 5+ years of experience in motion graphics and visual effects. Specialized in creating engaging content for YouTube creators.",
+      "email": "michael.chen@example.com",
+      "phone": "(097) 123-4567",
+      "mobile": "(098) 765-4321",
+      "address": "Los Angeles, California",
+      "website": "https://michaelchen.edit",
+      "github": "mchenedits",
+      "twitter": "@MChenEdits",
+      "instagram": "michaelchenedits",
+      "facebook": "MichaelChenEditor",
+      "membership": "Gold",
+      "skills": [
+        "Adobe Premiere Pro",
+        "After Effects",
+        "DaVinci Resolve",
+        "Motion Graphics",
+        "Color Grading"
+      ],
+      "completedProjects": [
+        {
+          "title": "Tech Review Series",
+          "client": "TechWithJohn",
+          "date": "2024-01-15",
+          "rating": 4.9,
+          "feedback": "Excellent work on the visual effects and transitions!"
+        },
+        {
+          "title": "Cooking Show Episodes",
+          "client": "CookingWithMaria",
+          "date": "2024-01-10",
+          "rating": 5.0,
+          "feedback": "Perfect editing and great attention to detail."
+        }
+      ],
+      "currentProjects": [
+        {
+          "title": "Gaming Highlights Compilation",
+          "client": "GamersHub",
+          "startDate": "2024-01-20",
+          "status": "In Progress",
+          "deadline": "2024-02-05"
+        }
+      ],
+      "portfolio": [
+        {
+          "title": "VFX Showreel 2024",
+          "thumbnail": "https://example.com/thumbnails/vfx-2024.jpg",
+          "videoUrl": "https://example.com/videos/vfx-showreel-2024",
+          "category": "Showreel",
+          "uploadDate": "2024-01-15T14:30:00",
+          "fileSize": "256MB",
+          "status": "Uploaded"
+        },
+        {
+          "title": "Commercial Projects Compilation",
+          "thumbnail": "https://example.com/thumbnails/commercial-2023.jpg",
+          "videoUrl": "https://example.com/videos/commercial-compilation",
+          "category": "Commercial",
+          "uploadDate": "2024-01-10T09:15:00",
+          "fileSize": "512MB",
+          "status": "Uploaded"
+        }
+      ],
+      "ratings": {
+        "overall": 4.9,
+        "communication": 5.0,
+        "qualityOfWork": 4.9,
+        "timeliness": 4.8,
+        "totalReviews": 45
+      },
+      "availability": {
+        "status": "Available",
+        "nextAvailableDate": "2024-02-10",
+        "workingHours": "9 AM - 6 PM EST",
+        "preferredProjectLength": "1-4 weeks"
+      },
+      "pricing": {
+        "hourlyRate": 45,
+        "packages": [
+          {
+            "name": "Basic",
+            "price": 200,
+            "description": "Basic video editing, cuts and transitions",
+            "deliveryTime": "2-3 days"
+          },
+          {
+            "name": "Standard",
+            "price": 400,
+            "description": "Advanced editing with motion graphics",
+            "deliveryTime": "4-5 days"
+          },
+          {
+            "name": "Premium",
+            "price": 800,
+            "description": "Full production with VFX and color grading",
+            "deliveryTime": "7-10 days"
+          }
+        ]
+      },
+      "hiredBy": [
+        {
+          "name": "John Smith",
+          "profilePicture": "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
+          "projectCount": 5
+        },
+        {
+          "name": "Sarah Wilson",
+          "profilePicture": "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+          "projectCount": 3
+        },
+        {
+          "name": "David Chen",
+          "profilePicture": "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
+          "projectCount": 2
+        }
+      ],
+      "gig": {
+        "name": "Professional Video Editing Service",
+        "email": "michael.chen@example.com",
+        "address": "Los Angeles, California",
+        "languages": ["English", "Spanish"],
+        "profileImage": "/images/gigs/video-editing.jpg",
+        "bio": "I will edit your videos professionally",
+        "skills": ["Color Grading", "Sound Design", "Motion Graphics"],
+        "gigDescription": "Professional video editing service with quick turnaround",
+        "plans": {
+          "basic": {
+            "price": 50,
+            "description": "Basic video editing package",
+            "deliveryTime": 2,
+            "services": [
+              "Basic color correction",
+              "Simple transitions",
+              "Background music"
+            ],
+            "serviceOptions": [1, 2, 3]
+          },
+          "standard": {
+            "price": 100,
+            "description": "Standard video editing package with more features",
+            "deliveryTime": 4,
+            "services": [
+              "Advanced color grading",
+              "Custom transitions",
+              "Sound effects",
+              "Basic motion graphics"
+            ],
+            "serviceOptions": [1, 2, 3, 4]
+          },
+          "premium": {
+            "price": 200,
+            "description": "Premium video editing package with all features",
+            "deliveryTime": 7,
+            "services": [
+              "Professional color grading",
+              "Complex transitions",
+              "Professional sound design",
+              "Advanced motion graphics",
+              "Custom intro/outro"
+            ],
+            "serviceOptions": [1, 2, 3, 4, 5]
+          }
+        }
+      }
+    },
+    {
+      "name": "Emma Rodriguez",
+      "profilePicture": "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
+      "title": "Motion Graphics Specialist",
+      "bio": "Creative motion graphics artist and video editor with a passion for storytelling through animation. Experienced in creating engaging content for social media.",
+      "email": "emma.rodriguez@example.com",
+      "phone": "(097) 234-5678",
+      "mobile": "(098) 876-5432",
+      "address": "Miami, Florida",
+      "website": "https://emmaedits.design",
+      "github": "emmaedits",
+      "twitter": "@EmmaEdits",
+      "instagram": "emma.edits",
+      "facebook": "EmmaRodriguezEditor",
+      "membership": "Silver",
+      "skills": [
+        "Adobe After Effects",
+        "Cinema 4D",
+        "Character Animation",
+        "Motion Design",
+        "Typography Animation"
+      ],
+      "completedProjects": [
+        {
+          "title": "Brand Animation Package",
+          "client": "StyleWithSarah",
+          "date": "2024-01-05",
+          "rating": 4.8,
+          "feedback": "Beautiful animations and very professional work!"
+        }
+      ],
+      "currentProjects": [
+        {
+          "title": "YouTube Channel Rebrand",
+          "client": "FitnessWithDave",
+          "startDate": "2024-01-15",
+          "status": "In Progress",
+          "deadline": "2024-02-01"
+        }
+      ],
+      "portfolio": [
+        {
+          "title": "Motion Graphics Demo",
+          "thumbnail": "https://example.com/thumbnails/motion-2024.jpg",
+          "videoUrl": "https://example.com/videos/motion-demo-2024",
+          "category": "Animation",
+          "uploadDate": "2024-01-20T16:45:00",
+          "fileSize": "384MB",
+          "status": "Uploading"
+        }
+      ],
+      "ratings": {
+        "overall": 4.8,
+        "communication": 4.9,
+        "qualityOfWork": 4.8,
+        "timeliness": 4.7,
+        "totalReviews": 32
+      },
+      "availability": {
+        "status": "Busy",
+        "nextAvailableDate": "2024-02-15",
+        "workingHours": "10 AM - 7 PM CST",
+        "preferredProjectLength": "2-3 weeks"
+      },
+      "pricing": {
+        "hourlyRate": 40,
+        "packages": [
+          {
+            "name": "Basic",
+            "price": 250,
+            "description": "Basic motion graphics and animation",
+            "deliveryTime": "3-4 days"
+          },
+          {
+            "name": "Standard",
+            "price": 500,
+            "description": "Custom animation and motion graphics package",
+            "deliveryTime": "5-7 days"
+          },
+          {
+            "name": "Premium",
+            "price": 1000,
+            "description": "Full brand animation package with 3D elements",
+            "deliveryTime": "10-14 days"
+          }
+        ]
+      },
+      "hiredBy": [
+        {
+          "name": "Alex Johnson",
+          "profilePicture": "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
+          "projectCount": 2
+        },
+        {
+          "name": "Maria Garcia",
+          "profilePicture": "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
+          "projectCount": 1
+        }
+      ],
+      "gig": {
+        "name": "Motion Graphics Design Service",
+        "email": "emma.rodriguez@example.com",
+        "address": "Miami, Florida",
+        "languages": ["English", "Spanish"],
+        "profileImage": "/images/gigs/motion-graphics.jpg",
+        "bio": "I will create motion graphics for your videos",
+        "skills": ["Character Animation", "Motion Design", "Typography Animation"],
+        "gigDescription": "Motion graphics design service with quick turnaround",
+        "plans": {
+          "basic": {
+            "price": 50,
+            "description": "Basic motion graphics package",
+            "deliveryTime": 2,
+            "services": [
+              "Basic animation",
+              "Simple transitions",
+              "Background music"
+            ],
+            "serviceOptions": [1, 2, 3]
+          },
+          "standard": {
+            "price": 100,
+            "description": "Standard motion graphics package with more features",
+            "deliveryTime": 4,
+            "services": [
+              "Advanced animation",
+              "Custom transitions",
+              "Sound effects",
+              "Basic motion graphics"
+            ],
+            "serviceOptions": [1, 2, 3, 4]
+          },
+          "premium": {
+            "price": 200,
+            "description": "Premium motion graphics package with all features",
+            "deliveryTime": 7,
+            "services": [
+              "Professional animation",
+              "Complex transitions",
+              "Professional sound design",
+              "Advanced motion graphics",
+              "Custom intro/outro"
+            ],
+            "serviceOptions": [1, 2, 3, 4, 5]
+          }
+        }
+      }
+    }
+  ]
+}
