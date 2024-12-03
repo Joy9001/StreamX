@@ -1,5 +1,16 @@
 import mongoose from 'mongoose'
 
+const gTokenSchema = new mongoose.Schema({
+	accessToken: {
+		type: String,
+		default: '',
+	},
+	refreshToken: {
+		type: String,
+		default: '',
+	},
+})
+
 const ownerSchema = new mongoose.Schema({
 	username: {
 		type: String,
@@ -33,6 +44,7 @@ const ownerSchema = new mongoose.Schema({
 		type: Number,
 		default: 10 * 1024,
 	},
+	gTokens: gTokenSchema,
 	usedStorage: {
 		type: Number,
 		default: 0,
