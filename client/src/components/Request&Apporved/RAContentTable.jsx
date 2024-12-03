@@ -36,17 +36,17 @@ function ContentTable() {
   useEffect(() => {
     async function fetchRequests() {
       try {
-        if (!userRole || !userData?._id) return;
+        if (!userRole || !userData?._id) return
 
         let endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests`
-        
+
         // If user is owner, get requests by from_id
         if (userRole === 'Owner') {
-          endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/owner/${userData._id}`
+          endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/to-id/${userData._id}`
         }
         // If user is editor, get requests by to_id
         else if (userRole === 'Editor') {
-          endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/editor/${userData._id}`
+          endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/from-id/${userData._id}`
         }
 
         const res = await axios.get(endpoint, {
@@ -62,7 +62,7 @@ function ContentTable() {
         const videoNamesMap = {}
         await Promise.all(
           res.data.map(async (request) => {
-            if (!request.video_id) return;
+            if (!request.video_id) return
             try {
               const videoRes = await axios.get(
                 `${import.meta.env.VITE_BACKEND_URL}/api/videos/name/${request.video_id}`,
@@ -86,12 +86,12 @@ function ContentTable() {
           const editorNamesMap = {}
           await Promise.all(
             res.data.map(async (request) => {
-              if (!request.to_id) return;
+              if (!request.to_id) return
               try {
                 const editorRes = await axios.get(
                   `${import.meta.env.VITE_BACKEND_URL}/editorProfile/name/${request.to_id}`,
                   {
-                    withCredentials: true
+                    withCredentials: true,
                   }
                 )
                 editorNamesMap[request.to_id] = editorRes.data.name
@@ -114,7 +114,7 @@ function ContentTable() {
   }, [userData, accessToken, userRole])
 
   if (!userRole) {
-    return <div className="text-center p-4">Loading...</div>
+    return <div className='p-4 text-center'>Loading...</div>
   }
 
   return (
@@ -137,18 +137,20 @@ function ContentTable() {
                 <td>
                   {userRole === 'Owner'
                     ? editorNames[request.to_id] || 'Loading...' // Show editor name for owner
-                    : request.from_id} {/* Show from_id for editor */}
+                    : request.from_id}{' '}
+                  {/* Show from_id for editor */}
                 </td>
                 <td>{request.description}</td>
                 <td>${request.price}</td>
                 <td>
-                  <span className={`badge ${
-                    request.status === 'approved'
-                      ? 'badge-success'
-                      : request.status === 'rejected'
-                      ? 'badge-error'
-                      : 'badge-warning'
-                  }`}>
+                  <span
+                    className={`badge ${
+                      request.status === 'approved'
+                        ? 'badge-success'
+                        : request.status === 'rejected'
+                          ? 'badge-error'
+                          : 'badge-warning'
+                    }`}>
                     {request.status}
                   </span>
                 </td>
