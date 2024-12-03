@@ -37,14 +37,20 @@ const getAllController = async (req, res) => {
 		const editors = await Editor.find({ _id: { $in: editorIds } })
 		console.log('editors in getAllController', editors)
 
+		const ownerIds = videos.map((video) => video.ownerId)
+		console.log('ownerIds in getAllController', ownerIds)
+		const owners = await Owner.find({ _id: { $in: ownerIds } })
+		console.log('owners in getAllController', owners)
+
 		const videosData = videos.map((video) => {
 			// console.log('video', { ...video })
 			const editor = editors.find((editor) => editor._id.equals(video.editorId))
+			const owner = owners.find((owner) => owner._id.equals(video.ownerId))
 			return {
-				owner: owner._id.equals(video.editorId) ? '' : owner.username,
-				ownerPic: owner._id.equals(video.editorId) ? '' : owner.profilephoto,
-				editor: editor?.name,
-				editorPic: editor?.profilephoto,
+				owner: owner ? owner.username : '',
+				ownerPic: owner ? owner.profilephoto : '',
+				editor: editor ? editor.name : '',
+				editorPic: editor ? editor.profilephoto : '',
 				...video,
 			}
 		})
