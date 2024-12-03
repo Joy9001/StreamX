@@ -3,14 +3,15 @@ import { useRecoilValue } from 'recoil'
 import AdminPanel from './AdminPanel/AdminPanel.jsx'
 import Login from './components/Auth/Login.jsx'
 import LoginEditor from './components/Auth/LoginEditor.jsx'
-import Logout from './components/Auth/Logout.jsx'
 import SignUp from './components/Auth/SignUp.jsx'
 import Profile from './components/Profile.jsx'
 import ProfileForm from './components/ProfileForm.jsx'
 import Request_Approve from './components/Request&Apporved/main.jsx'
 import Storage from './components/Storage/Storage.jsx'
 import HiredEditor from './HiredEditor/HiredEditor.jsx'
-import { loginState, userTypeState } from './states/loginState.js'
+import { loginState } from './states/loginState.js'
+import { userTypeState } from './states/userTypeState.js'
+import Land from './components/Landing/LandingPage.jsx'
 
 function App() {
   const isLoggedIn = useRecoilValue(loginState)
@@ -29,6 +30,10 @@ function App() {
       ),
     },
     {
+      path: '/landing',
+      element: <Land />,
+    },
+    {
       path: '/login/owner',
       element: isLoggedIn ? <Storage /> : <Login />,
     },
@@ -45,29 +50,24 @@ function App() {
       element: isLoggedIn ? <Storage /> : <LoginEditor />,
     },
     {
-      path: '/logout',
-      // element: isLoggedIn ? <Logout /> : <Login />,
-      element: <Logout />,
-    },
-    {
       path: '/storage',
-      element: <Storage />,
+      element: isLoggedIn ? <Storage /> : <Login />,
     },
     {
       path: '/profile/owner',
-      element: <Profile />,
+      element: isLoggedIn ? <Profile /> : <Login />,
     },
     {
       path: '/settings',
-      element: <ProfileForm />,
+      element: isLoggedIn ? <ProfileForm /> : <Login />,
     },
     {
       path: '/HireEditor',
-      element: <HiredEditor />,
+      element: isLoggedIn ? <HiredEditor /> : <Login />,
     },
     {
       path: '/AdminPanel',
-      element: <AdminPanel />,
+      element: isLoggedIn ? <AdminPanel /> : <Login />,
     },
   ])
   return (

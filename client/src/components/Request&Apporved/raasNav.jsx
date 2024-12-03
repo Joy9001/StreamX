@@ -13,7 +13,7 @@ function StorageNav() {
           </span>
         </span>
       </div>
-      <div className='flex flex-none items-center gap-2'>
+      {/* <div className='flex flex-none items-center gap-2'>
         <div className='form-control'>
           <label className='input input-md input-bordered input-primary flex w-60 items-center gap-2'>
             <svg
@@ -30,7 +30,7 @@ function StorageNav() {
             <input type='text' className='grow' placeholder='Search' />
           </label>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

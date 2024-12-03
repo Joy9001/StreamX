@@ -10,12 +10,11 @@ function SignUp() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-
   // Handler for Google sign-up
-  const handleGoogleSignUp = () => {
-    console.log('Google sign-up initiated. Preparing Google OAuth flow...')
-    window.open('http://localhost:3000/auth/google/callback', '_self')
-  }
+  // const handleGoogleSignUp = () => {
+  //   console.log('Google sign-up initiated. Preparing Google OAuth flow...')
+  //   window.open('http://localhost:3000/auth/google/callback', '_self')
+  // }
 
   // Handler for sign-up form submission
   const handleSignUp = (event) => {
@@ -30,14 +29,14 @@ function SignUp() {
       console.log('Sign-up process initiated. Validating inputs...')
       // Add sign-up logic here, such as API call for registration
       axios
-        .post('http://localhost:3000/jwt/register', {
+        .post('http://localhost:3000/jwt/register/owner', {
           name,
           email,
           password,
         })
         .then((user) => {
           console.log('User registered successfully', user)
-          navigate('/login')
+          navigate('/login/owner')
         })
         .catch((err) => {
           console.log(err)
@@ -46,15 +45,23 @@ function SignUp() {
       console.log('Sign-up failed. One or more fields are empty.')
     }
   }
-
-  // Handler for login link click
-  const handleLoginRedirect = () => {
-    console.log('Login link clicked. Navigating to login page...')
-  }
-
-  // Handler for back to home
-  const handleBackToHome = () => {
-    console.log('Back to home clicked. Navigating to homepage...')
+  const handleEditor = (editor) => {
+    console.log('Attempting sign-up as editor with email:', email)
+    console.log('Sign-up process initiated. Validating inputs...')
+    // Add sign-up logic here, such as API call for registration
+    axios
+      .post('http://localhost:3000/jwt/register/editor', {
+        name,
+        email,
+        password,
+      })
+      .then((user) => {
+        console.log('User registered successfully', user)
+        navigate('/login/editor')
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
 
   return (
@@ -139,37 +146,34 @@ function SignUp() {
             {/* Sign Up Button */}
             <div className='form-control mt-6'>
               <button type='submit' className='btn btn-primary w-full'>
-                Sign Up
+                Sign Up as Owner
               </button>
             </div>
           </form>
+
+          <div className='form-control mt-6'>
+            <button onClick={handleEditor} className='btn btn-primary w-full'>
+              Sign Up as Editor
+            </button>
+          </div>
 
           {/* Divider */}
           <div className='divider'>OR</div>
 
           {/* Google Sign Up Button */}
-          <button
+          {/* <button
             className='btn btn-outline w-full'
             onClick={handleGoogleSignUp}>
             Sign Up with Google
-          </button>
+          </button> */}
 
           {/* Login and Back Links */}
           <p className='mt-4 text-center'>
             Already have an account?{' '}
-            <NavLink
-              to='/login/owner'
-              onClick={handleLoginRedirect}
-              className='link-hover link text-primary'>
+            <NavLink to='/login/owner' className='link-hover link text-primary'>
               Login
             </NavLink>
           </p>
-          <NavLink
-            to='/'
-            onClick={handleBackToHome}
-            className='link-hover link mt-2 text-center'>
-            Back to Home
-          </NavLink>
         </div>
       </div>
     </div>

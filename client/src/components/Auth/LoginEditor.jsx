@@ -2,20 +2,22 @@ import axios from 'axios'
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
-import { userTypeState } from '../../states/loginState.js'
+import { loginState } from '../../states/loginState.js'
+import { userTypeState } from '../../states/userTypeState.js'
 function LoginEditor() {
   // State to manage input values
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
   const setUserType = useRecoilState(userTypeState)[1]
-  setUserType('editor')
+  const [LoginState, setLoginState] = useRecoilState(loginState)
 
   // Handler for Google login
   const handleGoogleLogin = () => {
     console.log('Google login initiated. Preparing Google OAuth flow...')
+    setUserType('editor')
+    setLoginState(true)
     window.location.href = 'http://localhost:3000/auth/editor/google/callback'
-    // navigate('http://localhost:3000/auth/google/callback')
   }
 
   // Handler for normal login form submission
@@ -28,14 +30,16 @@ function LoginEditor() {
       console.log('Login process initiated. Validating credentials...')
       // Add login logic here, such as API call for authentication
       axios
-        .post('http://localhost:3000/jwt/login', {
+        .post('http://localhost:3000/jwt/login/editor', {
           email,
           password,
         })
         .then((user) => {
           console.log(user)
-          localStorage.setItem('token', user.data.token)
-          navigate('/protected')
+          document.cookie = `token=${user.data.token}; path=/; max-age=86400` // Cookie valid for 1 day (86400 seconds)
+          setUserType('editor')
+          setLoginState(true) // Set login state to true to enable navigation
+          navigate('/storage')
         })
         .catch((err) => {
           console.log(err)
@@ -43,23 +47,6 @@ function LoginEditor() {
     } else {
       console.log('Login failed. Email or password field is empty.')
     }
-  }
-
-  // Handler for forgot password
-  const handleForgotPassword = () => {
-    console.log('Forgot password clicked. Redirecting to reset page...')
-    // Logic to handle redirect or password reset initiation
-  }
-
-  // Handler for sign-up redirect
-  const handleSignUpRedirect = () => {
-    console.log('Sign-up link clicked. Navigating to sign-up page...')
-  }
-
-  // Handler for back to home
-  const handleBackToHome = () => {
-    console.log('Back to home clicked. Navigating to homepage...')
-    navigate('/')
   }
 
   return (
@@ -106,15 +93,6 @@ function LoginEditor() {
                 }} // onChange handler for password
                 required
               />
-
-              <label className='label'>
-                <NavLink
-                  to='/sfdhbgbsd'
-                  onClick={handleForgotPassword}
-                  className='link-hover link label-text-alt text-base'>
-                  Forgot password?
-                </NavLink>
-              </label>
             </div>
 
             {/* Login Button */}
@@ -138,10 +116,7 @@ function LoginEditor() {
           {/* Sign Up and Back Links */}
           <p className='mt-4 text-center'>
             Don&apos;t have an account?{' '}
-            <NavLink
-              to='/signup'
-              onClick={handleSignUpRedirect}
-              className='link-hover link text-primary'>
+            <NavLink to='/signup' className='link-hover link text-primary'>
               Sign Up
             </NavLink>
           </p>
@@ -155,11 +130,6 @@ function LoginEditor() {
               Owner
             </NavLink>
           </p>
-          <NavLink
-            onClick={handleBackToHome}
-            className='link-hover link mt-2 text-center'>
-            Back to Home
-          </NavLink>
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@ const localStorageEffect =
   ({ setSelf, onSet }) => {
     const savedValue = localStorage.getItem(key)
     if (savedValue != null) {
-      setSelf(JSON.parse(savedValue))
+      setSelf(savedValue)
     }
 
     onSet((newValue, _, isReset) => {
@@ -15,10 +15,10 @@ const localStorageEffect =
     })
   }
 
-const loginState = atom({
-  key: 'loginState',
-  default: false,
-  effects: [localStorageEffect('login_state')],
+const userTypeState = atom({
+  key: 'userTypeState',
+  default: 'owner',
+  effects: [localStorageEffect('user_type_state')],
 })
 
-export { loginState }
+export { userTypeState }

@@ -13,13 +13,17 @@ import PropTypes from 'prop-types'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useRecoilState } from 'recoil'
+import { loginState } from '../states/loginState.js'
 import { navbarOpenState } from '../states/navbarState.js'
+import { userTypeState } from '../states/userTypeState.js'
 
 function Navbar({ title }) {
   const [open, setOpen] = useRecoilState(navbarOpenState)
   const [showPopup, setShowPopup] = useState(false)
   const popupRef = useRef(null)
   const navigate = useNavigate()
+  const setUserType = useRecoilState(userTypeState)[1]
+  const [LoginState, setLoginState] = useRecoilState(loginState)
 
   const Menus = [
     // { title: 'Dashboard', icon: LayoutDashboard },
@@ -45,6 +49,9 @@ function Navbar({ title }) {
   }, [])
   const handleLogout = async () => {
     // Clear cookies
+    setUserType('owner')
+    setLoginState(false)
+    // Clear cookies
     document.cookie =
       'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; samesite=strict;'
     axios
@@ -55,6 +62,7 @@ function Navbar({ title }) {
       .catch((error) => {
         console.error('Logout failed:', error)
       })
+    navigate('/')
   }
 
   return (
