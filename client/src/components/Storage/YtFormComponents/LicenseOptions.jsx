@@ -1,6 +1,6 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { setLicense, setAllowEmbedding } from '@/store/slices/ytFormSlice'
+import { setAllowEmbedding, setLicense } from '@/store/slices/ytFormSlice'
 import PropTypes from 'prop-types'
+import { useDispatch, useSelector } from 'react-redux'
 
 const LicenseOptions = () => {
   const dispatch = useDispatch()
@@ -24,8 +24,8 @@ const LicenseOptions = () => {
         value={license}
         onChange={(e) => dispatch(setLicense(e.target.value))}
         className='w-full rounded-md border-2 border-solid border-black p-2'>
-        <option value='standard'>Standard YouTube License</option>
-        <option value='creative_commons'>Creative Commons - Attribution</option>
+        <option value='youtube'>Standard YouTube License</option>
+        <option value='creativeCommon'>Creative Commons - Attribution</option>
       </select>
 
       <div className='mt-4 flex items-center'>

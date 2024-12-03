@@ -1,6 +1,14 @@
-import { setRecordingDate, setLocation } from '@/store/slices/ytFormSlice'
+import { setLocation, setRecordingDate } from '@/store/slices/ytFormSlice'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
+
+const getDate = (date) => {
+  if (!date) return
+  // format date to YYYY-MM-DD with padding
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${date.getFullYear()}-${month}-${day}`
+}
 
 const RecordingDateLocation = () => {
   const dispatch = useDispatch()
@@ -9,7 +17,8 @@ const RecordingDateLocation = () => {
 
   const handleDateChange = (e) => {
     const date = new Date(e.target.value)
-    dispatch(setRecordingDate(date))
+    console.log(date)
+    dispatch(setRecordingDate(getDate(date)))
   }
 
   return (
@@ -30,9 +39,7 @@ const RecordingDateLocation = () => {
           <input
             type='date'
             id='recordingDate'
-            value={
-              recordingDate ? recordingDate.toISOString().split('T')[0] : ''
-            }
+            value={recordingDate ? getDate(new Date(recordingDate)) : ''}
             onChange={handleDateChange}
             className='w-full rounded-md border-2 border-solid border-black p-2'
           />
