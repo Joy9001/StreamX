@@ -17,10 +17,10 @@ router.post('/create', createRequest)
 router.get('/', getAllRequests)
 
 // Get requests by owner ID
-router.get('/owner/:from_id', getRequestsByFromId)
+router.get('/to-id/:to_id', getRequestsByToId)
 
 // Get requests by editor ID
-router.get('/editor/:to_id', getRequestsByToId)
+router.get('/from-id/:from_id', getRequestsByFromId)
 
 // Update request status
 router.patch('/:id/status', updateRequestStatus)
