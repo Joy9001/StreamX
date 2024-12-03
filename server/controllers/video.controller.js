@@ -224,7 +224,109 @@ const recentController = async (req, res) => {
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message })
 	}
 }
-export { deleteController, downloadController, getAllController, recentController, uploadController }
+
+// Get video name by ID
+const getVideoNameById = async (req, res) => {
+	try {
+		const { videoId } = req.params
+		const video = await Video.findById(videoId).select('metaData')
+		
+		if (!video) {
+			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
+		}
+
+		const videoName = video.metaData.name || 'Untitled Video'
+		return res.status(StatusCodes.OK).json({ name: videoName })
+	} catch (error) {
+		console.error('Error fetching video name:', error)
+		return res.status(StatusCodes.INTERNAL_SERVER_ERROR)
+			.json({ message: 'Failed to fetch video name', error: error.message })
+	}
+}
+
+// Update video owner
+const updateOwner = async (req, res) => {
+    try {
+        const { videoId } = req.params
+        const { owner_id } = req.body
+
+        console.log('Updating video owner:', {
+            videoId,
+            newOwnerId: owner_id,
+            body: req.body
+        })
+
+        const updatedVideo = await Video.findByIdAndUpdate(
+            videoId,
+            { ownerId: owner_id },
+            { new: true }
+        )
+
+        if (!updatedVideo) {
+            console.log('Video not found:', videoId)
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
+        }
+
+        console.log('Video owner updated successfully:', updatedVideo)
+        res.status(StatusCodes.OK).json(updatedVideo)
+    } catch (error) {
+        console.error('Error updating video owner:', error)
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+            message: 'Error updating video owner', 
+            error: error.message 
+        })
+    }
+}
+
+// Update video editor
+const updateEditor = async (req, res) => {
+    try {
+        const { videoId } = req.params
+        const { editorId } = req.body
+
+        console.log('Attempting to update video editor:', {
+            videoId,
+            newEditorId: editorId,
+            requestBody: req.body
+        })
+
+        // First verify the video exists
+        const video = await Video.findById(videoId)
+        if (!video) {
+            console.log('Video not found:', videoId)
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
+        }
+
+        console.log('Current video state:', video)
+
+        // Update only the editor fields
+        const updatedVideo = await Video.findByIdAndUpdate(
+            videoId,
+            {
+                $set: {
+                    editorId: editorId,
+                    editorAccess: true
+                }
+            },
+            { 
+                new: true,
+                runValidators: true
+            }
+        )
+
+        console.log('Video editor updated successfully:', updatedVideo)
+        res.status(StatusCodes.OK).json(updatedVideo)
+    } catch (error) {
+        console.error('Error updating video editor:', error)
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+            message: 'Error updating video editor', 
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        })
+    }
+}
+
+export { deleteController, downloadController, getAllController, getVideoNameById, recentController, uploadController, updateOwner, updateEditor }
 
 /*
   lastModified: 1723095830000

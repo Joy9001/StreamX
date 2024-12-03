@@ -9,11 +9,11 @@ function StorageNav() {
             <img src={storageIcon} alt='storage-icon' />
           </span>
           <span className='flex items-center justify-center text-xl font-bold'>
-            Request & Approval Section
+            Request Section
           </span>
         </span>
       </div>
-      <div className='flex flex-none items-center gap-2'>
+      {/* <div className='flex flex-none items-center gap-2'>
         <div className='form-control'>
           <label className='input input-md input-bordered input-primary flex w-60 items-center gap-2'>
             <svg
@@ -30,7 +30,7 @@ function StorageNav() {
             <input type='text' className='grow' placeholder='Search' />
           </label>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

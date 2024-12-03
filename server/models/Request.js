@@ -13,7 +13,6 @@ const requestSchema = new mongoose.Schema(
 		},
 		from_id: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Owner',
 			required: true,
 		},
 		description: {
