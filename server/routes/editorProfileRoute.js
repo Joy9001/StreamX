@@ -1,6 +1,6 @@
 import express from 'express'
 import deleteEditorByEmail from '../controllers/DeleteEditor.js'
-import { createEditorProfile, getEditorNameById } from '../controllers/EditorProfileController.js'
+import { createEditorProfile, getEditorNameById, getHiredByOwners } from '../controllers/EditorProfileController.js'
 import updateEditor from '../controllers/EditorProfileEdit.js'
 import { EditorData } from '../controllers/GetEditor.js'
 import GetEditorByEmail from '../controllers/GetEditorUsingMail.js'
@@ -14,4 +14,5 @@ router.get('/:email', GetEditorByEmail)
 router.put('/:email', updateEditor)
 router.delete('/:email', deleteEditorByEmail)
 
+router.get('/hiredby/:editorId', getHiredByOwners)
 export default router
