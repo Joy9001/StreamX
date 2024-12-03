@@ -12,31 +12,31 @@ function SocialLinks({ profile }) {
       <ul className='space-y-4'>
         <li className='hover:text-primary-500 flex items-center gap-4 text-gray-700 transition-colors duration-300'>
           <Globe className='h-5 w-5' />
-          <a href={profile.website} className='hover:underline'>
+          <a href='#' className='hover:underline'>
             {profile.website}
           </a>
         </li>
         <li className='hover:text-primary-500 flex items-center gap-4 text-gray-700 transition-colors duration-300'>
           <Github className='h-5 w-5' />
-          <a href={profile.github} className='hover:underline'>
+          <a href='#' className='hover:underline'>
             {profile.github}
           </a>
         </li>
         <li className='hover:text-primary-500 flex items-center gap-4 text-gray-700 transition-colors duration-300'>
           <Twitter className='h-5 w-5' />
-          <a href={profile.twitter} className='hover:underline'>
+          <a href ='#' className='hover:underline'>
             {profile.twitter}
           </a>
         </li>
         <li className='hover:text-primary-500 flex items-center gap-4 text-gray-700 transition-colors duration-300'>
           <Instagram className='h-5 w-5' />
-          <a href={profile.instagram} className='hover:underline'>
+          <a href='#' className='hover:underline'>
             {profile.instagram}
           </a>
         </li>
         <li className='hover:text-primary-500 flex items-center gap-4 text-gray-700 transition-colors duration-300'>
           <Facebook className='h-5 w-5' />
-          <a href={profile.facebook} className='hover:underline'>
+          <a href='#' className='hover:underline'>
             {profile.facebook}
           </a>
         </li>
