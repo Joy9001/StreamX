@@ -7,7 +7,7 @@ import Profile from './components/OwnerProfile/Profile.jsx'
 import RequestApprove from './components/Request&Apporved/raas.jsx'
 import Storage from './components/Storage/Storage.jsx'
 import GigProfile from './components/GigProfile/GigProfile.jsx'
-import EditorUi from './EditorProfile/EditorUi'
+import EditorUi from './components/EditorProfile/EditorUi.jsx'
 
 function App() {
   const { isAuthenticated } = useAuth0()
