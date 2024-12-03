@@ -32,7 +32,7 @@ function ContentTableRowOptions({ video }) {
   async function handleDelete() {
     try {
       const res = await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/api/videos/delete`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/videos/delete/${userData.user_metadata.role}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -47,10 +47,12 @@ function ContentTableRowOptions({ video }) {
       )
       console.log(res)
       dispatch(
-        setRecentVideos(recentVideos.filter((video) => video._id !== video._id))
+        setRecentVideos(
+          recentVideos.filter((recentVideo) => recentVideo._id !== video._id)
+        )
       )
       dispatch(
-        setAllVideos(allVideos.filter((video) => video._id !== video._id))
+        setAllVideos(allVideos.filter((allVideo) => allVideo._id !== video._id))
       )
       alert(res.data.message)
     } catch (error) {

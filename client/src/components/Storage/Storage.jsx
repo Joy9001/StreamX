@@ -90,7 +90,7 @@ function Storage() {
             withCredentials: true,
           }
         )
-        console.log(res.data)
+        console.log('recent videos', res.data)
         dispatch(setRecentVideos(res.data.videos))
       } catch (error) {
         console.error('Error fetching recent videos:', error)
