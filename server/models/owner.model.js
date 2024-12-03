@@ -41,6 +41,15 @@ const ownerSchema = new mongoose.Schema({
 		type: Array,
 		required: true,
 	},
+	membership: {
+		type: String,
+		enum: ['bronze', 'silver', 'gold'],
+		default: 'bronze',
+	},
+	bio: {
+		type: String,
+		default: '',
+	},
 })
 
 const Owner = mongoose.model('Owner', ownerSchema)
