@@ -11,7 +11,7 @@ function Login() {
             access_type: 'offline',
             connection_scope: 'https://www.googleapis.com/auth/youtube',
             authorizationParams: {
-              connection: 'google-oauth2',
+              // connection: 'google-oauth2',
               access_type: 'offline',
               connection_scope: 'https://www.googleapis.com/auth/youtube',
               prompt: 'consent',
