@@ -17,6 +17,7 @@ export const createRequest = async (req, res) => {
 
 		// Save the request
 		const savedRequest = await newRequest.save()
+		console.log('Saved request:', savedRequest)
 		res.status(201).json(savedRequest)
 	} catch (error) {
 		console.error('Error creating request:', error)
@@ -84,24 +85,35 @@ export const updateRequestStatus = async (req, res) => {
 
 // Approve request
 export const approveRequest = async (req, res) => {
-    try {
-        const { id } = req.params
+	try {
+		const { id } = req.params
 
-        const updatedRequest = await Request.findByIdAndUpdate(
-            id,
-            { status: 'approved' },
-            { new: true }
-        )
+		const updatedRequest = await Request.findByIdAndUpdate(id, { status: 'approved' }, { new: true })
 
-        if (!updatedRequest) {
-            return res.status(404).json({ message: 'Request not found' })
-        }
+		if (!updatedRequest) {
+			return res.status(404).json({ message: 'Request not found' })
+		}
 
-        res.status(200).json(updatedRequest)
-    } catch (error) {
-        console.error('Error approving request:', error)
-        res.status(500).json({ message: 'Error approving request', error: error.message })
-    }
+		res.status(200).json(updatedRequest)
+	} catch (error) {
+		console.error('Error approving request:', error)
+		res.status(500).json({ message: 'Error approving request', error: error.message })
+	}
 }
 
-// export { createRequest, getAllRequests, getRequestsByOwnerId, getRequestsByEditorId, updateRequestStatus };
+export const deleteRequest = async (req, res) => {
+	try {
+		const { id } = req.params
+
+		const deletedRequest = await Request.findByIdAndDelete(id)
+
+		if (!deletedRequest) {
+			return res.status(404).json({ message: 'Request not found' })
+		}
+
+		res.status(200).json({ message: 'Request deleted successfully', deletedRequest })
+	} catch (error) {
+		console.error('Error deleting request:', error)
+		res.status(500).json({ message: 'Error deleting request', error: error.message })
+	}
+}
