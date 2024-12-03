@@ -1,6 +1,7 @@
 import express from 'express'
 import {
 	createRequest,
+	deleteRequest,
 	getAllRequests,
 	getRequestsByFromId,
 	getRequestsByToId,
@@ -23,5 +24,7 @@ router.get('/editor/:to_id', getRequestsByToId)
 
 // Update request status
 router.patch('/:id/status', updateRequestStatus)
+
+router.delete('/delete/:id', deleteRequest)
 
 export default router
