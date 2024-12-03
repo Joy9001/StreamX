@@ -166,10 +166,16 @@ const uploadController = async (req, res) => {
 }
 
 const deleteController = async (req, res) => {
+	const { role } = req.params
 	const { id, userId } = req.body
 	console.log('/delete: ', req.body)
 	try {
-		const video = await Video.findOne({ _id: id, ownerId: userId }).lean()
+		let video
+		if (role === 'Owner') {
+			video = await Video.findOne({ _id: id, ownerId: userId }).lean()
+		} else if (role === 'Editor') {
+			video = await Video.findOne({ _id: id, editorId: userId }).lean()
+		}
 
 		if (!video) {
 			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
@@ -210,29 +216,45 @@ const downloadController = async (req, res) => {
 const recentController = async (req, res) => {
 	const { userId, role } = req.params
 	try {
-		const videos = await Video.find({ ownerId: userId }).sort({ createdAt: -1 }).limit(10)
+		let videos
+		if (role === 'Owner') {
+			videos = await Video.find({ ownerId: userId }).sort({ createdAt: -1 }).limit(10)
+		} else if (role === 'Editor') {
+			videos = await Video.find({ editorId: userId }).sort({ createdAt: -1 }).limit(10)
+		}
 
+		console.log('videos in recentController', videos)
 		if (!videos) {
 			return res.status(StatusCodes.NOT_FOUND).json({ message: 'No videos found' })
 		}
 
 		// find owner of videos
-		let owner
+		let user
 		if (role === 'Owner') {
-			owner = await Owner.findOne({ _id: userId }).lean()
+			user = await Owner.findOne({ _id: userId }).lean()
 		} else if (role === 'Editor') {
-			owner = await Editor.findOne({ _id: userId }).lean()
+			user = await Editor.findOne({ _id: userId }).lean()
 		}
 
-		if (!owner) {
-			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Owner not found' })
+		if (!user) {
+			return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' })
 		}
+
+		const ownerIds = videos.map((video) => video.ownerId)
+		const owners = await Owner.find({ _id: { $in: ownerIds } })
+
+		const editorIds = videos.map((video) => video.editorId)
+		const editors = await Editor.find({ _id: { $in: editorIds } })
 
 		const videosData = videos.map((video) => {
 			// console.log('video', { ...video })
+			let owner = owners.find((owner) => owner._id.equals(video.ownerId))
+			let editor = editors.find((editor) => editor._id.equals(video.editorId))
 			return {
-				owner: owner.username,
-				ownerPic: owner.profilephoto,
+				owner: owner ? owner.username : '',
+				ownerPic: owner ? owner.profilephoto : '',
+				editor: editor ? editor.name : '',
+				editorPic: editor ? editor.profilephoto : '',
 				...video._doc,
 			}
 		})
