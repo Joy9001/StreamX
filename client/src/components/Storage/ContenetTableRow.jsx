@@ -4,7 +4,7 @@ import { setYtVideoUpload } from '@/store/slices/videoSlice'
 import { filesize } from 'filesize'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import ContenetTableRowOptions from './ContentTableRowOptions'
 import YtUPendingBtn from './YtStatusBtnComponents/YtPendingBtn'
 import YtRetryBtn from './YtStatusBtnComponents/YtRetryBtn'
@@ -15,6 +15,7 @@ import YtUploadingBtn from './YtStatusBtnComponents/YtUploadingBtn'
 function ContentTableRow({ content }) {
   console.log('content in ContentTableRow', content)
   const [ytBtn, setYtBtn] = useState('')
+  const userData = useSelector((state) => state.user.userData)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -124,11 +125,13 @@ function ContentTableRow({ content }) {
         <td onClick={handleRowClick}>
           <span className='text-sm'>{filesize(content.metaData.size)}</span>
         </td>
-        <td
-          className='w-40'
-          onClick={content.ytUploadStatus === 'None' ? handleYtUpload : null}>
-          {ytBtn}
-        </td>
+        {userData?.user_metadata?.role === 'Owner' && (
+          <td
+            className='w-40'
+            onClick={content.ytUploadStatus === 'None' ? handleYtUpload : null}>
+            {ytBtn}
+          </td>
+        )}
         <td className='w-40'>
           <span className='text-sm'>{content.approvalStatus}</span>
         </td>
