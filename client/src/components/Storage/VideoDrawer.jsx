@@ -1,4 +1,3 @@
-import keySvg from '@/assets/key.svg'
 import userCircle from '@/assets/user-circle.svg'
 import { setDrawerOpen } from '@/store/slices/uiSlice'
 import { filesize } from 'filesize'
@@ -78,10 +77,10 @@ const VideoDrawer = () => {
           </div>
         </div>
 
-        <button className='btn btn-primary text-black'>
+        {/* <button className='btn btn-primary text-black'>
           <img src={keySvg} alt='key' className='h-4 w-4' />
           Manage Access
-        </button>
+        </button> */}
       </section>
 
       <hr className='my-6 border-neutral-200' />
