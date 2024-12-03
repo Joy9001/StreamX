@@ -10,4 +10,34 @@ const OAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_U
 
 let scopes = ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/userinfo.profile']
 
-export { OAuth2Client, scopes }
+const getChanelIds = async (authClient) => {
+	try {
+		const youtube = google.youtube({
+			version: 'v3',
+			auth: authClient,
+		})
+
+    const response = await youtube.channels.list({
+      auth: authClient,
+      part: 'snippet',
+      forHandle: '@GoogleDevelopers'
+    })
+
+    console.log('res in getChanelIds', response.data)
+
+    const channels = response.data.items
+
+    if (channels && channels.length > 0) {
+      const channelId = channels[0].id
+      return channelId
+    } else {
+      return null
+    }
+	} catch (error) {
+		console.log('Error in getChanelIds:', error)
+    return null
+	}
+}
+
+export { getChanelIds, OAuth2Client, scopes }
+
