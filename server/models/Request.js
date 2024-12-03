@@ -2,9 +2,8 @@ import mongoose from 'mongoose'
 
 const requestSchema = new mongoose.Schema(
 	{
-		editor_id: {
+		to_id: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Editor',
 			required: true,
 		},
 		video_id: {
@@ -12,7 +11,7 @@ const requestSchema = new mongoose.Schema(
 			ref: 'Video',
 			required: true,
 		},
-		owner_id: {
+		from_id: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'Owner',
 			required: true,
