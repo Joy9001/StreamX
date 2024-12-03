@@ -1,55 +1,91 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import locationIcon from '../../assets/location.svg'
 import languageIcon from '../../assets/language.svg'
 import starIcon from '../../assets/star.svg'
-import checkIcon from '../../assets/tick.svg'
 import crossIcon from '../../assets/cross.svg'
+import tickIcon from '../../assets/tick.svg'
 import Drawer from '../Drawer.jsx'
 import Model from './Model.jsx'
-import dummyVideos from './dummyVideos.json'
+import { useAuth0 } from '@auth0/auth0-react'
 
-function Card({ data }) {
+function Card({ editor, userData }) {
   const [selectedPlan, setSelectedPlan] = useState('Basic')
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isModelOpen, setIsModelOpen] = useState(false)
-  const [customPrice, setCustomPrice] = useState('')
   const [description, setDescription] = useState('')
   const [showCustomPrice, setShowCustomPrice] = useState(false)
   const [selectedVideo, setSelectedVideo] = useState(null)
+  const [ownerVideos, setOwnerVideos] = useState([])
+  const { getAccessTokenSilently } = useAuth0()
+  const [accessToken, setAccessToken] = useState(null)
 
-  // For demo purposes, let's use the first owner's videos
-  const ownerVideos = dummyVideos.videos.filter(
-    (video) => video.ownerId === '507f1f77bcf86cd799439011'
-  )
+  useEffect(() => {
+    async function fetchAccessToken() {
+      try {
+        const token = await getAccessTokenSilently()
+        setAccessToken(token)
+      } catch (error) {
+        console.error('Error fetching access token:', error)
+      }
+    }
+    fetchAccessToken()
+  }, [getAccessTokenSilently])
+
+  useEffect(() => {
+    const fetchOwnerVideos = async () => {
+      if (userData?._id && accessToken) {
+        try {
+          const response = await axios.get(
+            `http://localhost:3000/api/videos/all/Owner/${userData._id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`
+              }
+            }
+          )
+          console.log('Full API Response:', response)
+          console.log('Response Data:', response.data)
+          console.log('Videos Structure:', JSON.stringify(response.data, null, 2))
+          
+          if (response.data && response.data.videos) {
+            setOwnerVideos(response.data.videos || [])
+          }
+        } catch (error) {
+          console.error('Error fetching owner videos:', error)
+        }
+      }
+    }
+    fetchOwnerVideos()
+  }, [userData?._id, isModelOpen, accessToken])
 
   const toggleDrawer = () => {
     setIsDrawerOpen((prevState) => !prevState)
   }
 
-  const plans = data.plans
+  const plans = editor.plans
     ? {
         Basic: {
-          price: `₹${data.plans[0].basic.price}`,
-          description: data.plans[0].basic.desc,
-          delivery: `${data.plans[0].basic.deliveryTime} day delivery`,
+          price: `₹${editor.plans[0].basic.price}`,
+          description: editor.plans[0].basic.desc,
+          delivery: `${editor.plans[0].basic.deliveryTime} day delivery`,
           revisions: 'Unlimited revisions',
-          availableSkills: data.plans[0].basic.ServiceOptions,
+          availableSkills: editor.plans[0].basic.ServiceOptions,
         },
         Standard: {
-          price: `₹${data.plans[0].standard.price}`,
-          description: data.plans[0].standard.desc,
-          delivery: `${data.plans[0].standard.deliveryTime} day delivery`,
+          price: `₹${editor.plans[0].standard.price}`,
+          description: editor.plans[0].standard.desc,
+          delivery: `${editor.plans[0].standard.deliveryTime} day delivery`,
           revisions: 'Unlimited revisions',
-          availableSkills: data.plans[0].standard.ServiceOptions,
+          availableSkills: editor.plans[0].standard.ServiceOptions,
         },
         Premium: {
-          price: `₹${data.plans[0].premium.price}`,
-          description: data.plans[0].premium.desc,
-          delivery: `${data.plans[0].premium.deliveryTime} day delivery`,
+          price: `₹${editor.plans[0].premium.price}`,
+          description: editor.plans[0].premium.desc,
+          delivery: `${editor.plans[0].premium.deliveryTime} day delivery`,
           revisions: 'Unlimited revisions',
-          availableSkills: data.plans[0].premium.ServiceOptions,
+          availableSkills: editor.plans[0].premium.ServiceOptions,
         },
       }
     : {}
@@ -91,8 +127,8 @@ function Card({ data }) {
                   src={videos[currentVideoIndex]}
                   controls
                   className='h-full w-full object-cover'
-                  onMouseEnter={(e) => e.target.play()}
-                  onMouseLeave={(e) => e.target.pause()}
+                  muted
+                  playsInline
                 />
               </div>
               <button
@@ -104,7 +140,7 @@ function Card({ data }) {
 
             <div className='card-body'>
               <h2 className='card-title ml-4 text-3xl font-bold text-black'>
-                {data.name}
+                {editor.name}
               </h2>
               <div className='ml-4 mt-2 flex items-center'>
                 <img
@@ -112,10 +148,10 @@ function Card({ data }) {
                   alt='Location'
                   className='mr-2 h-5 w-5'
                 />
-                <p className='font-bold'>{data.address}</p>
+                <p className='font-bold'>{editor.address}</p>
                 <div className='ml-6 flex'>
                   <img src={starIcon} alt='Rating' className='mr-2 h-5 w-5' />
-                  <p>{data.rating}</p>
+                  <p>{editor.rating}</p>
                 </div>
                 <div className='ml-8 flex items-center'>
                   <img
@@ -123,19 +159,19 @@ function Card({ data }) {
                     alt='Languages'
                     className='mr-2 h-5 w-5'
                   />
-                  <p className='font-bold'>{data.languages.join(', ')}</p>
+                  <p className='font-bold'>{editor.languages.join(', ')}</p>
                 </div>
               </div>
               <div className='description mt-6 text-gray-800'>
                 <p>
-                  {data.bio}... <span className='text-blue-700'>Read More</span>
+                  {editor.bio}... <span className='text-blue-700'>Read More</span>
                 </p>
               </div>
             </div>
           </div>
           <div className='skills mb-4 ml-4 mt-8 flex'>
             <div className='flex flex-wrap gap-2'>
-              {data.skills.map((skill, index) => (
+              {editor.skills.map((skill, index) => (
                 <span
                   key={index}
                   className='h-8 w-auto rounded-lg bg-gray-200 px-3 py-1 text-black'>
@@ -202,11 +238,11 @@ function Card({ data }) {
                     {plans[selectedPlan]?.availableSkills?.includes(index) ? (
                       <>
                         <img
-                          src={checkIcon}
+                          src={tickIcon}
                           alt='Available'
                           className='mr-2 h-4 w-4'
                         />
-                        <span className='text-black'>{skill}</span>
+                        <span className='text-green-600'>Available</span>
                       </>
                     ) : (
                       <>
@@ -237,7 +273,7 @@ function Card({ data }) {
             </button>
           </div>
           <div className='drawer-content p-4'>
-            <Drawer editorData={data}></Drawer>
+            <Drawer editorData={editor}></Drawer>
           </div>
         </div>
       )}
@@ -247,7 +283,7 @@ function Card({ data }) {
           {/* Header Section */}
           <div className='border-b border-gray-200 pb-6'>
             <h2 className='text-3xl font-bold text-gray-900'>
-              Book {data.name}
+              Book {editor.name}
             </h2>
             <p className='mt-2 text-sm text-gray-500'>
               Fill in the details below to send a booking request
@@ -267,7 +303,7 @@ function Card({ data }) {
                   </label>
                   <input
                     type='text'
-                    value={data.name}
+                    value={editor.name}
                     disabled
                     className='mt-1 block w-full rounded-lg border-gray-300 bg-white py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500'
                   />
@@ -280,7 +316,7 @@ function Card({ data }) {
                   <div className='mt-1 flex items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-3'>
                     <img src={starIcon} alt='Rating' className='h-5 w-5' />
                     <span className='font-medium text-gray-900'>
-                      {data.rating}
+                      {editor.rating}
                     </span>
                   </div>
                 </div>
@@ -297,63 +333,50 @@ function Card({ data }) {
               </p>
 
               <div className='mt-4 max-h-[300px] overflow-y-auto rounded-lg border border-gray-200 bg-white'>
-                {ownerVideos.map((video, index) => (
-                  <div
-                    key={index}
-                    className={`relative flex cursor-pointer border-b border-gray-200 p-4 last:border-b-0 hover:bg-gray-50 ${selectedVideo === video ? 'bg-blue-50 hover:bg-blue-50' : ''}`}
-                    onClick={() => setSelectedVideo(video)}>
-                    <div className='flex flex-1'>
-                      <div className='min-w-0 flex-1'>
-                        <div className='flex items-center justify-between'>
-                          <p className='text-sm font-medium text-gray-900'>
-                            {video.metaData.title}
-                          </p>
-                          <div className='ml-4 flex-shrink-0'>
-                            <span
-                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                video.ytUploadStatus === 'Uploaded'
-                                  ? 'bg-green-100 text-green-800'
-                                  : video.ytUploadStatus === 'Failed'
-                                    ? 'bg-red-100 text-red-800'
-                                    : 'bg-yellow-100 text-yellow-800'
-                              }`}>
-                              {video.ytUploadStatus}
-                            </span>
+                {ownerVideos && ownerVideos.length > 0 ? (
+                  ownerVideos.map((video, index) => (
+                    <div
+                      key={video._id}
+                      className={`relative flex cursor-pointer border-b border-gray-200 p-4 last:border-b-0 hover:bg-gray-50 ${
+                        selectedVideo === video ? 'bg-blue-50 hover:bg-blue-50' : ''
+                      }`}
+                      onClick={() => setSelectedVideo(video)}>
+                      <div className='flex-grow'>
+                        <h3 className='text-lg font-semibold text-gray-900'>
+                          {video.metaData.name}
+                        </h3>
+                        <div className='mt-2 flex flex-col space-y-2 text-sm text-gray-500'>
+                          <div className='flex items-center space-x-4'>
+                            <span>Size: {(video.metaData.size / (1024 * 1024)).toFixed(2)} MB</span>
+                            <span>Type: {video.metaData.contentType}</span>
                           </div>
-                        </div>
-                        <div className='mt-1'>
-                          <p className='line-clamp-2 text-sm text-gray-500'>
-                            {video.metaData.description}
-                          </p>
-                          <div className='mt-2 flex items-center text-xs text-gray-500'>
-                            <span className='mr-4'>
-                              Duration: {video.metaData.duration}
-                            </span>
-                            <span className='mr-4'>
-                              Resolution: {video.metaData.resolution}
-                            </span>
-                            <span>Size: {video.metaData.fileSize}</span>
+                          <div className='flex items-center space-x-4'>
+                            <span>Created: {new Date(video.metaData.timeCreated).toLocaleDateString()}</span>
+                            <span>Updated: {new Date(video.metaData.updated).toLocaleDateString()}</span>
                           </div>
                         </div>
                       </div>
-                      <div
-                        className={`ml-4 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
-                          selectedVideo === video
-                            ? 'border-transparent bg-blue-500 text-white'
-                            : 'border-gray-300 bg-white'
-                        }`}>
-                        {selectedVideo === video && (
+                      {selectedVideo === video && (
+                        <div className='absolute right-4 top-1/2 -translate-y-1/2 transform'>
                           <svg
-                            className='h-3 w-3 text-white'
-                            viewBox='0 0 12 12'
-                            fill='currentColor'>
-                            <path d='M3.707 5.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L5 6.586 3.707 5.293z' />
+                            className='h-5 w-5 text-blue-500'
+                            fill='currentColor'
+                            viewBox='0 0 20 20'>
+                            <path
+                              fillRule='evenodd'
+                              d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                              clipRule='evenodd'
+                            />
                           </svg>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
+                  ))
+                ) : (
+                  <div className='p-4 text-center text-gray-500'>
+                    No videos available. Please upload some videos first.
                   </div>
-                ))}
+                )}
               </div>
             </div>
 
@@ -447,8 +470,8 @@ function Card({ data }) {
                     </div>
                     <input
                       type='number'
-                      value={customPrice}
-                      onChange={(e) => setCustomPrice(e.target.value)}
+                      value={editor.customPrice}
+                      onChange={(e) => editor.customPrice = e.target.value}
                       className='block w-full rounded-lg border-gray-300 py-3 pl-7 focus:border-blue-500 focus:ring-blue-500'
                       placeholder='0.00'
                     />
@@ -495,22 +518,41 @@ function Card({ data }) {
                     return
                   }
 
+                  if (!description || description.trim() === '') {
+                    alert('Please provide a project description')
+                    return
+                  }
+
+                  const price = showCustomPrice
+                    ? Number(editor.customPrice)
+                    : Number(plans[selectedPlan].price.replace('₹', ''))
+
+                  if (isNaN(price) || price <= 0) {
+                    alert('Please enter a valid price')
+                    return
+                  }
+
                   try {
                     const requestData = {
-                      editor_id: data._id, // Editor's ID from the card data
+                      to_id: editor._id, // Editor's ID from the card data
                       video_id: selectedVideo._id,
-                      owner_id: selectedVideo.ownerId,
-                      description: description,
-                      price: showCustomPrice
-                        ? Number(customPrice)
-                        : Number(plans[selectedPlan].price.replace('₹', '')),
-                      status: 'pending',
+                      from_id: userData._id,
+                      description: description.trim(),
+                      price: price,
+                      status: 'pending'
                     }
 
-                    console.log('Sending request with data:', requestData) // Add logging
+                    console.log('Sending request with data:', requestData)
+                    
                     const response = await axios.post(
                       'http://localhost:3000/requests/create',
-                      requestData
+                      requestData,
+                      {
+                        headers: {
+                          'Authorization': `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json'
+                        }
+                      }
                     )
 
                     if (response.status === 201 || response.status === 200) {
@@ -519,13 +561,19 @@ function Card({ data }) {
                       // Reset form
                       setSelectedVideo(null)
                       setDescription('')
-                      setCustomPrice('')
                       setShowCustomPrice(false)
                     }
                   } catch (error) {
                     console.error('Error sending request:', error)
-                    console.error('Request data was:', requestData) // Add error logging
-                    alert('Failed to send request. Please try again.')
+                    if (error.response) {
+                      console.error('Error response:', error.response.data)
+                      const errorMessage = error.response.data.error || error.response.data.message || 'Please try again.'
+                      alert(`Failed to send request: ${errorMessage}`)
+                    } else if (error.request) {
+                      alert('Failed to send request. Please check your connection and try again.')
+                    } else {
+                      alert('Failed to send request. Please try again.')
+                    }
                   }
                 }}
                 className='rounded-lg bg-blue-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>

@@ -9,7 +9,7 @@ function StorageNav() {
             <img src={storageIcon} alt='storage-icon' />
           </span>
           <span className='flex items-center justify-center text-xl font-bold'>
-            Request & Approval Section
+            Request Section
           </span>
         </span>
       </div>

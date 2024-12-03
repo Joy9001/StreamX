@@ -2,8 +2,8 @@ import express from 'express'
 import {
 	createRequest,
 	getAllRequests,
-	getRequestsByOwnerId,
-	getRequestsByEditorId,
+	getRequestsByFromId,
+	getRequestsByToId,
 	updateRequestStatus,
 } from '../controllers/requestController.js'
 
@@ -16,10 +16,10 @@ router.post('/create', createRequest)
 router.get('/', getAllRequests)
 
 // Get requests by owner ID
-router.get('/owner/:owner_id', getRequestsByOwnerId)
+router.get('/owner/:from_id', getRequestsByFromId)
 
 // Get requests by editor ID
-router.get('/editor/:editor_id', getRequestsByEditorId)
+router.get('/editor/:to_id', getRequestsByToId)
 
 // Update request status
 router.patch('/:id/status', updateRequestStatus)

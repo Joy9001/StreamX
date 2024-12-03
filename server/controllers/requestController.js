@@ -3,13 +3,13 @@ import Request from '../models/Request.js'
 // Create a new request
 export const createRequest = async (req, res) => {
 	try {
-		const { editor_id, video_id, owner_id, description, price, status } = req.body
+		const { to_id, video_id, from_id, description, price, status } = req.body
 
 		// Create new request
 		const newRequest = new Request({
-			editor_id,
+			to_id,
 			video_id,
-			owner_id,
+			from_id,
 			description,
 			price,
 			status: status || 'pending', // Default to pending if not provided
@@ -36,10 +36,10 @@ export const getAllRequests = async (req, res) => {
 }
 
 // Get requests by owner ID
-export const getRequestsByOwnerId = async (req, res) => {
+export const getRequestsByFromId = async (req, res) => {
 	try {
-		const { owner_id } = req.params
-		const requests = await Request.find({ owner_id })
+		const { from_id } = req.params
+		const requests = await Request.find({ from_id })
 		res.status(200).json(requests)
 	} catch (error) {
 		console.error('Error fetching owner requests:', error)
@@ -48,10 +48,10 @@ export const getRequestsByOwnerId = async (req, res) => {
 }
 
 // Get requests by editor ID
-export const getRequestsByEditorId = async (req, res) => {
+export const getRequestsByToId = async (req, res) => {
 	try {
-		const { editor_id } = req.params
-		const requests = await Request.find({ editor_id })
+		const { to_id } = req.params
+		const requests = await Request.find({ to_id })
 		res.status(200).json(requests)
 	} catch (error) {
 		console.error('Error fetching editor requests:', error)
@@ -80,6 +80,28 @@ export const updateRequestStatus = async (req, res) => {
 		console.error('Error updating request:', error)
 		res.status(500).json({ message: 'Error updating request', error: error.message })
 	}
+}
+
+// Approve request
+export const approveRequest = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        const updatedRequest = await Request.findByIdAndUpdate(
+            id,
+            { status: 'approved' },
+            { new: true }
+        )
+
+        if (!updatedRequest) {
+            return res.status(404).json({ message: 'Request not found' })
+        }
+
+        res.status(200).json(updatedRequest)
+    } catch (error) {
+        console.error('Error approving request:', error)
+        res.status(500).json({ message: 'Error approving request', error: error.message })
+    }
 }
 
 // export { createRequest, getAllRequests, getRequestsByOwnerId, getRequestsByEditorId, updateRequestStatus };

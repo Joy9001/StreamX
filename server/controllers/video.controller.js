@@ -199,7 +199,53 @@ const recentController = async (req, res) => {
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message })
 	}
 }
-export { deleteController, downloadController, getAllController, recentController, uploadController }
+
+// Get video name by ID
+const getVideoNameById = async (req, res) => {
+	try {
+		const { videoId } = req.params
+		const video = await Video.findById(videoId).select('metaData')
+		
+		if (!video) {
+			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
+		}
+
+		const videoName = video.metaData.name || 'Untitled Video'
+		return res.status(StatusCodes.OK).json({ name: videoName })
+	} catch (error) {
+		console.error('Error fetching video name:', error)
+		return res.status(StatusCodes.INTERNAL_SERVER_ERROR)
+			.json({ message: 'Failed to fetch video name', error: error.message })
+	}
+}
+
+// Update video owner
+export const updateOwner = async (req, res) => {
+    try {
+        const { videoId } = req.params
+        const { owner_id } = req.body
+
+        const updatedVideo = await Video.findByIdAndUpdate(
+            videoId,
+            { ownerId: owner_id },
+            { new: true }
+        )
+
+        if (!updatedVideo) {
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
+        }
+
+        res.status(StatusCodes.OK).json(updatedVideo)
+    } catch (error) {
+        console.error('Error updating video owner:', error)
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+            message: 'Error updating video owner', 
+            error: error.message 
+        })
+    }
+}
+
+export { deleteController, downloadController, getAllController, getVideoNameById, recentController, uploadController }
 
 /*
   lastModified: 1723095830000

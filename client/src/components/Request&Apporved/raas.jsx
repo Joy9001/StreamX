@@ -1,11 +1,15 @@
 import { useSelector } from 'react-redux'
+import { useState } from 'react'
 import Navbar from '../NavBar/Navbar.jsx'
 import ContentTable from './RAContentTable.jsx'
+import RaContentTableApprove from './RaContentTableApprove.jsx'
 import RaasNav from './raasNav.jsx'
 
 const RequestApprove = () => {
+  const [showApproved, setShowApproved] = useState(false)
   const navOpen = useSelector((state) => state.ui.navbarOpen)
   const drawer = useSelector((state) => state.ui.drawer)
+
   return (
     <div className='storage-main flex h-screen'>
       <div
@@ -19,22 +23,27 @@ const RequestApprove = () => {
           className={`storage-main flex-grow p-2 transition-all duration-300 ${
             drawer ? 'mr-4' : 'mr-0'
           }`}>
-          {/* Inside Nav */}
           <RaasNav />
           <div className='flex justify-between p-2'>
-            <div>Description.......... jnlgajngf;fd nvljnaljks</div>
             <div>
-              <button className='mx-4 rounded bg-blue-500 px-4 py-2 text-white transition duration-300 hover:border-2'>
-                New Request
+              <button 
+                onClick={() => setShowApproved(!showApproved)}
+                className={`mx-4 rounded px-4 py-2 text-white transition duration-300 hover:border-2 ${
+                  showApproved ? 'bg-green-500' : 'bg-blue-500'
+                }`}
+              >
+                {showApproved ? 'Request Section' : 'Approve Section'}
               </button>
             </div>
           </div>
           <div className='storage-content mt-2'>
-            <div className='storge-content-header m-2'>
-              <span className='text-xl font-semibold'>My Videos</span>
+            <div className='storage-content-header mb-4'>
+              <span className='text-xl font-semibold'>
+                {showApproved ? 'Approved Requests' : 'All Requests'}
+              </span>
             </div>
             <div className='storage-content-body'>
-              <ContentTable />
+              {showApproved ? <RaContentTableApprove /> : <ContentTable />}
             </div>
           </div>
         </div>
