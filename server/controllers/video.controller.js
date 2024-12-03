@@ -27,6 +27,7 @@ const getAllController = async (req, res) => {
 		}
 
 		const editorIds = videos.map((video) => video.editorId)
+		console.log('editorIds in getAllController', editorIds)
 		const editors = await Editor.find({ _id: { $in: editorIds } })
 		console.log('editors in getAllController', editors)
 
@@ -137,7 +138,7 @@ const uploadController = async (req, res) => {
 			}
 		} else if (role === 'Editor') {
 			videoData = {
-				editor: user.username,
+				editor: user.name,
 				editorPic: user.profilephoto,
 				...savedVideo._doc,
 			}
