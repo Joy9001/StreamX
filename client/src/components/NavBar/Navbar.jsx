@@ -3,18 +3,21 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { Briefcase, ChevronLeft, Settings, User, Video } from 'lucide-react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import NavLogin from './NavLogin.jsx'
 import NavProfile from './NavProfile.jsx'
+
 function Navbar({ title }) {
   const open = useSelector((state) => state.ui.navbarOpen)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const location = useLocation()
   const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0()
   console.log('user in navbar', user)
 
   const Menus = [
     { title: 'Profile', icon: User, route: '/profile/owner' },
+    { title: 'Editor Profile', icon: User, route: '/profile/editor' },
     { title: 'Storage', icon: Video, route: '/storage' },
     { title: 'Hire Editors', icon: Briefcase, route: '/HireEditor' },
     { title: 'raas', icon: Settings, route: '/raas' },
@@ -55,7 +58,9 @@ function Navbar({ title }) {
             {Menus.map((menu, index) => (
               <li
                 key={index}
-                className={`mt-2 flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm ease-in hover:bg-secondary hover:duration-300 ${title == menu.title ? 'bg-secondary' : ''}`}
+                className={`mt-2 flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm ease-in hover:bg-secondary hover:duration-300 ${
+                  location.pathname === menu.route ? 'bg-secondary' : ''
+                }`}
                 onClick={() => navigate(`${menu.route}`)}>
                 <menu.icon className='h-5 w-5' />
                 <span
