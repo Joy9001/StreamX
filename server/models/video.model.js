@@ -31,8 +31,14 @@ const videoSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			required: false,
 		},
+		ytFormData: {
+			type: Object,
+			default: {},
+			required: false,
+		},
 		ytData: {
 			type: Object,
+			default: {},
 			required: false,
 		},
 		ytUploadStatus: {

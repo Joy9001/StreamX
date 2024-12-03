@@ -13,17 +13,21 @@ const ownerSchema = new mongoose.Schema({
 	password: {
 		type: String,
 	},
-	YTchannelname: {
+	ytChannelId: {
 		type: String,
+		default: '',
+	},
+	ytChannelname: {
+		type: String,
+		default: '',
+	},
+	ytChannelLink: {
+		type: String,
+		default: '',
 	},
 	profilephoto: {
 		type: String,
 		default: '',
-	},
-	hiredEditors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Editor' }],
-	videoIds: [{ type: String }],
-	ytChannelLink: {
-		type: String,
 	},
 	storageLimit: {
 		type: Number,
