@@ -1,3 +1,4 @@
+import { setDrawerContent } from '@/store/slices/uiSlice'
 import { setAllVideos } from '@/store/slices/videoSlice'
 import { resetYtForm } from '@/store/slices/ytFormSlice'
 import { useAuth0 } from '@auth0/auth0-react'
@@ -60,20 +61,32 @@ export const YTVideoUploadForm = () => {
     }
   }
 
-  const updateVideos = () => {
+  const updateVideos = (type) => {
     dispatch(
       setAllVideos(
         allVideos.map((video) => {
           if (video._id === ytVideoUpload._id) {
-            video.ytUploadStatus = 'Uploaded'
+            return type === 'requested'
+              ? {
+                  ...video,
+                  approvalStatus: 'Pending',
+                  ytUploadStatus: 'Pending',
+                }
+              : { ...video, ytUploadStatus: 'Uploaded' }
           }
           return video
         })
       )
     )
+
+    dispatch(
+      setDrawerContent(
+        allVideos.find((video) => video._id === ytVideoUpload._id)
+      )
+    )
   }
 
-  const handleSubmit = (e) => {
+  const handleUpload = (e) => {
     e.preventDefault()
     let validationErrors = { title: false, description: false }
     if (title.trim() === '') {
@@ -85,10 +98,7 @@ export const YTVideoUploadForm = () => {
     setErrors(validationErrors)
 
     if (!validationErrors.title && !validationErrors.description) {
-      // Perform form submission logic here
-
       let reqBody = {
-        id: ytVideoUpload._id,
         title,
         description,
       }
@@ -106,7 +116,7 @@ export const YTVideoUploadForm = () => {
       reqBody['gRefreshToken'] = googleIdentity.refresh_token
       console.log('Form Data', reqBody)
 
-      const postUrl = `${import.meta.env.VITE_BACKEND_URL}/api/yt/upload/${userData.user_metadata.role}/${userData._id}`
+      const postUrl = `${import.meta.env.VITE_BACKEND_URL}/api/yt/upload/${userData.user_metadata.role}/${userData._id}/${ytVideoUpload._id}`
       console.log('postUrl', postUrl)
 
       axios
@@ -119,10 +129,52 @@ export const YTVideoUploadForm = () => {
         .then((response) => {
           console.log('Form submitted successfully!', response.data)
           resetForm()
-          updateVideos()
+          updateVideos('uploaded')
         })
         .catch((error) => {
           console.error('Error submitting form:', error)
+        })
+    }
+  }
+
+  const handleRequest = (e) => {
+    e.preventDefault()
+    let validationErrors = { title: false, description: false }
+    if (title.trim() === '') {
+      validationErrors.title = true
+    }
+    if (description.trim() === '') {
+      validationErrors.description = true
+    }
+    setErrors(validationErrors)
+
+    if (!validationErrors.title && !validationErrors.description) {
+      let reqBody = {
+        id: ytVideoUpload._id,
+        title,
+        description,
+      }
+
+      for (const [key, value] of Object.entries(ytForm)) {
+        reqBody[key] = value
+      }
+
+      const postUrl = `${import.meta.env.VITE_BACKEND_URL}/api/yt/req-admin/${ytVideoUpload._id}`
+
+      axios
+        .post(postUrl, reqBody, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+        .then((response) => {
+          console.log('Request submitted successfully!', response.data)
+          resetForm()
+          updateVideos('requested')
+        })
+        .catch((error) => {
+          console.error('Error submitting request:', error)
         })
     }
   }
@@ -221,7 +273,7 @@ export const YTVideoUploadForm = () => {
           <VisibilityOptions />
 
           {/* Footer Section */}
-          <UploadFooter onUpload={handleSubmit} />
+          <UploadFooter onUpload={handleUpload} onRequest={handleRequest} />
         </div>
       </div>
     </>

@@ -60,7 +60,13 @@ const uploadController = async (req, res) => {
 	try {
 		const filename = file.originalname || `video-${Date.now()}`
 
-		const findVideo = await Video.findOne({ metaData: { name: filename }, ownerId: userId })
+		let findVideo
+		if (role === 'Owner') {
+			findVideo = await Video.findOne({ metaData: { name: filename }, ownerId: userId })
+		} else if (role === 'Editor') {
+			findVideo = await Video.findOne({ metaData: { name: filename }, editorId: userId })
+		}
+
 		if (findVideo) {
 			filename = `${filename}-${Date.now()}`
 		}
@@ -80,11 +86,21 @@ const uploadController = async (req, res) => {
 		const downloadURL = await getDownloadURL(storageRef)
 		const vidMetaData = uploadTask.snapshot.metadata
 
-		const newVideo = new Video({
-			ownerId: userId,
-			url: downloadURL,
-			metaData: vidMetaData,
-		})
+		let newVideo
+		if (role === 'Owner') {
+			newVideo = new Video({
+				ownerId: userId,
+				url: downloadURL,
+				metaData: vidMetaData,
+			})
+		} else if (role === 'Editor') {
+			newVideo = new Video({
+				editorId: userId,
+				editorAccess: true,
+				url: downloadURL,
+				metaData: vidMetaData,
+			})
+		}
 
 		const savedVideo = await newVideo.save()
 
@@ -95,21 +111,30 @@ const uploadController = async (req, res) => {
 		console.log('savedVideo', { ...savedVideo._doc })
 
 		// find owner of videos
-		let owner
+		let user
 		if (role === 'Owner') {
-			owner = await Owner.findOne({ _id: userId }).lean()
+			user = await Owner.findOne({ _id: userId }).lean()
 		} else if (role === 'Editor') {
-			owner = await Editor.findOne({ _id: userId }).lean()
+			user = await Editor.findOne({ _id: userId }).lean()
 		}
 
-		if (!owner) {
-			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Owner not found' })
+		if (!user) {
+			return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' })
 		}
 
-		const videoData = {
-			owner: owner.username,
-			ownerPic: owner.profilephoto,
-			...savedVideo._doc,
+		let videoData
+		if (role === 'Owner') {
+			videoData = {
+				owner: user.username,
+				ownerPic: user.profilephoto,
+				...savedVideo._doc,
+			}
+		} else if (role === 'Editor') {
+			videoData = {
+				editor: user.username,
+				editorPic: user.profilephoto,
+				...savedVideo._doc,
+			}
 		}
 
 		return res.status(StatusCodes.OK).json({ message: 'File uploaded successfully', url: downloadURL, videoData })

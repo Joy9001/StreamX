@@ -1,10 +1,10 @@
 import keySvg from '@/assets/key.svg'
 import userCircle from '@/assets/user-circle.svg'
+import { setDrawerOpen } from '@/store/slices/uiSlice'
 import { filesize } from 'filesize'
 import { useState } from 'react'
 import ReactPlayer from 'react-player'
 import { useDispatch, useSelector } from 'react-redux'
-import { setDrawerOpen } from '@/store/slices/uiSlice'
 
 const VideoDrawer = () => {
   const [light, setLight] = useState(
@@ -138,7 +138,7 @@ const VideoDrawer = () => {
           <span className=''>
             {drawerContent.ytUploadStatus == 'None'
               ? '-'
-              : drawerContent.ytStatus}
+              : drawerContent.ytUploadStatus}
           </span>
         </div>
         <div className='flex flex-col text-sm'>

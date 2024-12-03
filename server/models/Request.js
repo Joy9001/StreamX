@@ -1,8 +1,7 @@
 import mongoose from 'mongoose'
 
 const requestSchema = new mongoose.Schema(
-	{   
-        // from
+	{
 		to_id: {
 			type: mongoose.Schema.Types.ObjectId,
 			required: true,
@@ -12,7 +11,6 @@ const requestSchema = new mongoose.Schema(
 			ref: 'Video',
 			required: true,
 		},
-        // to
 		from_id: {
 			type: mongoose.Schema.Types.ObjectId,
 			required: true,
