@@ -1,62 +1,72 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
+import axios from 'axios'
 import Navbar from '../NavBar/Navbar'
 import GigHeader from './GigHeader'
 import EditGig from './EditGig'
-import { Mail, MapPin, Globe, Briefcase, Star, DollarSign, Clock, Play } from 'lucide-react'
-
-// Mock data for demonstration
-const editorData = {
-  name: "Jane Doe",
-  email: "jane.doe@example.com",
-  address: "123 Editor Street, Writeville, WC 12345",
-  languages: ["English", "Spanish", "French"],
-  image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=256&q=80",
-  bio: "Experienced editor with a passion for perfecting written content.",
-  skills: ["Proofreading", "Copy Editing", "Content Editing"],
-  gig_description: "I offer top-notch editing services to polish your writing to perfection.",
-  rating: 4.8,
-  plans: {
-    basic: {
-      price: 50,
-      desc: "Basic proofreading and grammar check",
-      deliveryTime: 2,
-      services: ["Grammar check", "Spelling check", "Punctuation check"],
-      serviceOptions: [1, 2, 3]
-    },
-    standard: {
-      price: 100,
-      desc: "Comprehensive editing including style improvements",
-      deliveryTime: 4,
-      serviceOptions: [1, 2, 3, 4]
-    },
-    premium: {
-      price: 200,
-      desc: "In-depth editing with multiple revisions",
-      deliveryTime: 7,
-      serviceOptions: [1, 2, 3, 4, 5]
-    }
-  },
-  preview: {
-    videos: [
-      {
-        video_id: 1,
-        thumbnail: "/placeholder.svg?height=150&width=150",
-        metadata: { filename: "sample_1.mp4", size: 15000000 }
-      },
-      {
-        video_id: 2,
-        thumbnail: "/placeholder.svg?height=150&width=150",
-        metadata: { filename: "sample_2.mp4", size: 20000000 }
-      }
-    ]
-  }
-}
+import {
+  Mail,
+  MapPin,
+  Globe,
+  Briefcase,
+  Star,
+  DollarSign,
+  Clock,
+  Play,
+} from 'lucide-react'
 
 function GigProfile() {
   const [showEditForm, setShowEditForm] = useState(false)
   const [activeTab, setActiveTab] = useState('basic')
+  const [editorData, setEditorData] = useState(null)
+  const [editorPlans, setEditorPlans] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const { user, getAccessTokenSilently } = useAuth0()
+
+  useEffect(() => {
+    const fetchEditorData = async () => {
+      if (!user?.email) return
+
+      try {
+        setLoading(true)
+        const token = await getAccessTokenSilently()
+
+        // Fetch editor gig data
+        const gigResponse = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/editor_gig/email/${user.email}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+
+        // Fetch editor plans data
+        const plansResponse = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/editor_gig/plans/email/${user.email}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+
+        setEditorData(gigResponse.data.data)
+        setEditorPlans(plansResponse.data.data)
+        setError(null)
+      } catch (err) {
+        console.error('Error fetching editor data:', err)
+        setError(err.response?.data?.message || 'Error fetching editor data')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchEditorData()
+  }, [user?.email, getAccessTokenSilently])
 
   const formatFileSize = (bytes) => {
     if (bytes < 1024) return bytes + ' bytes'
@@ -64,123 +74,200 @@ function GigProfile() {
     else return (bytes / 1048576).toFixed(1) + ' MB'
   }
 
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-pink-500"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-red-500 text-center">
+          <h2 className="text-2xl font-bold mb-2">Error Loading Profile</h2>
+          <p>{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (!editorData || !editorPlans) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <h2 className="mb-2 text-2xl font-bold">No Profile Found</h2>
+          <p>Please create your editor profile first.</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-screen">
       <div className="navbar h-full transition-all duration-300 w-[15%] pl-0">
         <Navbar title='Gig Profile'/>
       </div>
-      <div className="flex-1 flex flex-col overflow-auto p-2">
+      <div className="flex flex-1 flex-col overflow-auto p-2">
         <GigHeader onEditClick={() => setShowEditForm(true)} />
-        
-        <div className="p-6 space-y-4">
-          {/* Gig Cards Container */}
+
+        <div className="space-y-4 p-6">
           <div className="grid grid-cols-1 gap-6">
-            {/* Gig Card */}
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+            <div className="overflow-hidden rounded-lg bg-white shadow-xl">
               <div className="flex flex-col md:flex-row">
-                {/* Left Section - Image and Basic Info */}
-                <div className="w-full md:w-1/3 bg-pink-50 p-6">
+                <div className="w-full bg-pink-50 p-6 md:w-1/3">
                   <div className="flex flex-col items-center space-y-6">
                     <div className="relative">
-                      <img src={editorData.image} alt={editorData.name} className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg" />
-                      <div className="absolute -bottom-2 -right-2 bg-pink-100 rounded-full p-2 shadow-md">
-                        <Star className="text-yellow-400 w-6 h-6" />
+                      <img
+                        src={
+                          editorData.image || 'https://via.placeholder.com/150'
+                        }
+                        alt={editorData.name}
+                        className="h-36 w-36 rounded-full border-4 border-white object-cover shadow-lg"
+                      />
+                      <div className="absolute -bottom-2 -right-2 rounded-full bg-pink-100 p-2 shadow-md">
+                        <Star className="h-6 w-6 text-yellow-400" />
                       </div>
                     </div>
 
-                    <div className="text-center space-y-2">
-                      <h2 className="text-2xl font-bold text-pink-800">{editorData.name}</h2>
+                    <div className="space-y-2 text-center">
+                      <h2 className="text-2xl font-bold text-pink-800">
+                        {editorData.name}
+                      </h2>
                       <div className="flex items-center justify-center">
-                        <span className="text-lg font-semibold text-gray-600">{editorData.rating} Rating</span>
-                      </div>
-                    </div>
-
-                    <div className="w-full space-y-4 pt-4 border-t border-pink-200">
-                      <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                        <Mail className="text-pink-500 w-5 h-5" />
-                        <div className="flex flex-col">
-                          <span className="text-xs text-pink-500 font-medium">Email</span>
-                          <span className="text-sm text-gray-700">{editorData.email}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                        <MapPin className="text-pink-500 w-5 h-5" />
-                        <div className="flex flex-col">
-                          <span className="text-xs text-pink-500 font-medium">Address</span>
-                          <span className="text-sm text-gray-700">{editorData.address}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                        <Globe className="text-pink-500 w-5 h-5" />
-                        <div className="flex flex-col">
-                          <span className="text-xs text-pink-500 font-medium">Languages</span>
-                          <span className="text-sm text-gray-700">{editorData.languages.join(", ")}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                        <Briefcase className="text-pink-500 w-5 h-5" />
-                        <div className="flex flex-col">
-                          <span className="text-xs text-pink-500 font-medium">Skills</span>
-                          <span className="text-sm text-gray-700">{editorData.skills.join(", ")}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="w-full pt-4 border-t border-pink-200">
-                      <div className="text-center">
-                        <span className="inline-block px-4 py-2 bg-pink-100 text-pink-700 rounded-full text-sm font-medium">
-                          Professional Editor
+                        <span className="text-lg font-semibold text-gray-600">
+                          {editorData.rating || '0'} Rating
                         </span>
+                      </div>
+                    </div>
+
+                    <div className="w-full space-y-4 border-t border-pink-200 pt-4">
+                      <div className="flex items-center space-x-3 rounded-lg bg-white p-3 shadow-sm transition-shadow hover:shadow-md">
+                        <Mail className="h-5 w-5 text-pink-500" />
+                        <div className="flex flex-col">
+                          <span className="text-sm text-gray-500">Email</span>
+                          <span className="text-sm font-medium">
+                            {editorData.email}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3 rounded-lg bg-white p-3 shadow-sm transition-shadow hover:shadow-md">
+                        <MapPin className="h-5 w-5 text-pink-500" />
+                        <div className="flex flex-col">
+                          <span className="text-sm text-gray-500">
+                            Location
+                          </span>
+                          <span className="text-sm font-medium">
+                            {editorData.address}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3 rounded-lg bg-white p-3 shadow-sm transition-shadow hover:shadow-md">
+                        <Globe className="h-5 w-5 text-pink-500" />
+                        <div className="flex flex-col">
+                          <span className="text-sm text-gray-500">
+                            Languages
+                          </span>
+                          <span className="text-sm font-medium">
+                            {editorData.languages?.join(', ')}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Right Section - Pricing Plans */}
-                <div className="w-full md:w-2/3 p-6">
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-pink-700 mb-2">About This Gig</h3>
-                    <p className="text-gray-700">{editorData.gig_description}</p>
-                  </div>
+                <div className="w-full p-6 md:w-2/3">
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="mb-2 text-xl font-bold text-gray-800">
+                        About Me
+                      </h3>
+                      <p className="text-gray-600">{editorData.bio}</p>
+                    </div>
 
-                  <div className="space-y-4">
-                    {Object.entries(editorData.plans).map(([planName, plan]) => (
-                      <div key={planName} className="bg-gray-50 rounded-lg p-4">
-                        <div className="flex justify-between items-center mb-2">
-                          <h4 className="text-lg font-semibold text-pink-600 capitalize">{planName}</h4>
-                          <div className="flex items-center">
-                            <DollarSign className="text-green-500 w-4 h-4" />
-                            <span className="text-xl font-bold text-green-600">{plan.price}</span>
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-2">{plan.desc}</p>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Clock className="w-4 h-4 mr-1" />
-                          <span>{plan.deliveryTime} days delivery</span>
-                        </div>
+                    <div>
+                      <h3 className="mb-2 text-xl font-bold text-gray-800">
+                        Skills
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {editorData.skills?.map((skill, index) => (
+                          <span
+                            key={index}
+                            className="rounded-full bg-pink-100 px-3 py-1 text-sm text-pink-800">
+                            {skill}
+                          </span>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </div>
 
-                  {/* Preview Videos */}
-                  <div className="mt-6">
-                    <h3 className="text-lg font-semibold text-pink-700 mb-2">Sample Work</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      {editorData.preview.videos.map((video) => (
-                        <div key={video.video_id} className="bg-gray-50 p-2 rounded">
-                          <div className="relative">
-                            <img src={video.thumbnail} alt={`Thumbnail ${video.video_id}`} className="w-full h-24 object-cover rounded" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <Play className="text-white bg-pink-500 rounded-full p-1" />
+                    <div>
+                      <h3 className="mb-4 text-xl font-bold text-gray-800">
+                        Gig Description
+                      </h3>
+                      <p className="text-gray-600">
+                        {editorData.gig_description}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="mb-4 text-xl font-bold text-gray-800">
+                        Pricing Plans
+                      </h3>
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                        {['basic', 'standard', 'premium'].map((plan) => (
+                          <div
+                            key={plan}
+                            className={`rounded-lg border-2 p-4 ${
+                              activeTab === plan
+                                ? 'border-pink-500 bg-pink-50'
+                                : 'border-gray-200'
+                            }`}>
+                            <h4 className="mb-2 text-lg font-semibold capitalize">
+                              {plan}
+                            </h4>
+                            <div className="mb-4 flex items-center">
+                              <DollarSign className="h-5 w-5 text-pink-500" />
+                              <span className="text-2xl font-bold">
+                                {editorPlans[plan]?.price || 0}
+                              </span>
                             </div>
+                            <p className="mb-4 text-gray-600">
+                              {editorPlans[plan]?.desc}
+                            </p>
+                            <div className="mb-2 flex items-center text-gray-500">
+                              <Clock className="mr-2 h-4 w-4" />
+                              <span>
+                                {editorPlans[plan]?.deliveryTime || 0} days
+                                delivery
+                              </span>
+                            </div>
+                            {editorPlans[plan]?.services && (
+                              <ul className="space-y-2">
+                                {editorPlans[plan].services.map(
+                                  (service, index) => (
+                                    <li
+                                      key={index}
+                                      className="flex items-center">
+                                      <span className="mr-2 h-2 w-2 rounded-full bg-pink-500"></span>
+                                      {service}
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            )}
                           </div>
-                          <p className="text-sm mt-1 truncate">{video.metadata.filename}</p>
-                          <p className="text-xs text-gray-500">{formatFileSize(video.metadata.size)}</p>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -188,28 +275,31 @@ function GigProfile() {
             </div>
           </div>
         </div>
-
-        {/* Edit Gig Modal */}
-        <dialog
-          id="edit_gig_modal"
-          className={`modal ${showEditForm ? 'modal-open' : ''}`}
-        >
-          <div className="modal-box max-w-4xl">
-            <form method="dialog">
-              <button
-                className="btn btn-circle btn-ghost btn-sm absolute right-2 top-2"
-                onClick={() => setShowEditForm(false)}
-              >
-                ✕
-              </button>
-            </form>
-            <EditGig onClose={() => setShowEditForm(false)} />
-          </div>
-          <form method="dialog" className="modal-backdrop">
-            <button onClick={() => setShowEditForm(false)}>close</button>
-          </form>
-        </dialog>
       </div>
+      {/* Edit Gig Modal */}
+      <dialog
+        id='edit_gig_modal'
+        className={`modal ${showEditForm ? 'modal-open' : ''}`}>
+        <div className="modal-box max-w-4xl">
+          <form method="dialog">
+            <button
+              className="btn btn-circle btn-ghost btn-sm absolute right-2 top-2"
+              onClick={() => setShowEditForm(false)}>
+              ✕
+            </button>
+          </form>
+          {showEditForm && (
+            <EditGig
+              onClose={() => setShowEditForm(false)}
+              editorData={editorData}
+              editorPlans={editorPlans}
+            />
+          )}
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button onClick={() => setShowEditForm(false)}>close</button>
+        </form>
+      </dialog>
     </div>
   )
 }
