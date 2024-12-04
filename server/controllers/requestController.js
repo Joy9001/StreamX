@@ -286,3 +286,39 @@ export const getAdminRequests = async (req, res) => {
 		})
 	}
 }
+
+export const aggregateRequestsController = async (req, res) => {
+	const { fromId } = req.params
+	try {
+		const requests = await Request.find({ from_id: fromId })
+
+		let totalRequests = 0
+		let totalPendingRequests = 0
+		let totalApprovedRequests = 0
+		let totalRejectedRequests = 0
+
+		requests.forEach((request) => {
+			totalRequests++
+			if (request.status === 'pending') {
+				totalPendingRequests++
+			} else if (request.status === 'approved') {
+				totalApprovedRequests++
+			} else if (request.status === 'rejected') {
+				totalRejectedRequests++
+			}
+		})
+
+		const response = {
+			totalRequests,
+			totalPendingRequests,
+			totalApprovedRequests,
+			totalRejectedRequests,
+		}
+
+		console.log(response)
+		return res.status(200).json(response)
+	} catch (error) {
+		console.error('Error fetching requests:', error)
+		res.status(500).json({ message: 'Error fetching requests', error: error.message })
+	}
+}

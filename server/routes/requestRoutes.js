@@ -1,5 +1,6 @@
 import express from 'express'
 import {
+	aggregateRequestsController,
 	createRequest,
 	deleteRequest,
 	getAdminRequests,
@@ -33,5 +34,7 @@ router.get('/admin', getAdminRequests)
 router.patch('/:id/status', updateRequestStatus)
 
 router.delete('/delete/:id', deleteRequest)
+
+router.get('/aggregate/:fromId', aggregateRequestsController)
 
 export default router
