@@ -2,9 +2,9 @@ import express from 'express'
 import {
 	createRequest,
 	deleteRequest,
+	getAdminRequests,
 	getAllRequests,
 	getAllUpdatedRequests,
-	getAdminRequests,
 	getRequestsByFromId,
 	getRequestsByToId,
 	updateRequestStatus,
