@@ -6,6 +6,7 @@ import {
 	getVideoNameById,
 	getVideosByEditorId,
 	recentController,
+	storageUsageController,
 	updateEditor,
 	updateOwner,
 	uploadController,
@@ -28,7 +29,7 @@ const logRequest = (req, res, next) => {
 
 router.get('/all/:role/:userId', getAllController)
 router.get('/recent/:role/:userId', recentController)
-router.get('/editor/:editorId', getVideosByEditorId)  
+router.get('/editor/:editorId', getVideosByEditorId)
 router.post('/upload/:role/:userId', upload.single('file'), uploadController)
 router.delete('/delete/:role', deleteController)
 router.get('/download/:id', downloadController)
@@ -39,5 +40,7 @@ router.patch('/:videoId/editor', logRequest, updateEditor)
 
 // Update video owner
 router.patch('/:videoId/owner', updateOwner)
+
+router.get('/storage-usages/:role/:userId', storageUsageController)
 
 export default router

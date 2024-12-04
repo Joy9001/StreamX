@@ -421,6 +421,37 @@ const getVideosByEditorId = async (req, res) => {
 		res.status(500).json({ message: 'Error fetching videos', error: error.message })
 	}
 }
+
+const storageUsageController = async (req, res) => {
+	const { role, userId } = req.params
+
+	try {
+		let videos
+		if (role === 'Owner') {
+			videos = await Video.find({ ownerId: userId }).lean()
+		} else if (role === 'Editor') {
+			videos = await Video.find({ editorId: userId }).lean()
+		}
+
+		if (!videos) {
+			return res.status(StatusCodes.NOT_FOUND).json({ message: 'No videos found' })
+		}
+
+		const storageUsage = videos.reduce((totalSize, video) => {
+			const fileSize = video.metaData?.size || 0
+			return totalSize + fileSize
+		}, 0)
+
+		console.log('storageUsage in storageUsageController: ', storageUsage)
+		return res.status(StatusCodes.OK).json({ storageUsage })
+	} catch (error) {
+		console.log('Error in storageUsageController: ', error)
+		return res
+			.status(StatusCodes.INTERNAL_SERVER_ERROR)
+			.json({ message: 'Failed to get storage usage', error: error.message })
+	}
+}
+
 export {
 	deleteController,
 	downloadController,
@@ -428,6 +459,7 @@ export {
 	getVideoNameById,
 	getVideosByEditorId,
 	recentController,
+	storageUsageController,
 	updateEditor,
 	updateOwner,
 	uploadController,
