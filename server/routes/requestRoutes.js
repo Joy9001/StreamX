@@ -3,6 +3,7 @@ import {
 	createRequest,
 	deleteRequest,
 	getAllRequests,
+	getAllUpdatedRequests,
 	getRequestsByFromId,
 	getRequestsByToId,
 	updateRequestStatus,
@@ -15,6 +16,8 @@ router.post('/create', createRequest)
 
 // Get all requests
 router.get('/', getAllRequests)
+
+router.get('/all', getAllUpdatedRequests)
 
 // Get requests by owner ID
 router.get('/to-id/:to_id', getRequestsByToId)
