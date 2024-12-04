@@ -1,10 +1,10 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import AdminPanel from './components/AdminPanel/AdminPanel.jsx'
-import Login from './components/Auth/Login.jsx'
 import EditorUi from './components/EditorProfile/EditorUi.jsx'
 import GigProfile from './components/GigProfile/GigProfile.jsx'
 import HiredEditor from './components/HiredEditor/HiredEditor.jsx'
+import Landing from './components/LandingPage/Landing.jsx'
 import Profile from './components/OwnerProfile/Profile.jsx'
 import RequestApprove from './components/Request&Apporved/raas.jsx'
 import Storage from './components/Storage/Storage.jsx'
@@ -15,47 +15,39 @@ function App() {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: isAuthenticated ? <Navigate to='/storage' replace /> : <Login />,
-    },
-    {
-      path: '/login/owner',
-      element: isAuthenticated ? <Storage /> : <Login />,
-    },
-    {
-      path: '/raas',
-      element: <RequestApprove />,
-    },
-    {
-      path: '/signup',
-      element: isAuthenticated ? <Storage /> : <Login />,
-    },
-    {
-      path: '/login/editor',
-      element: isAuthenticated ? <Storage /> : <Login />,
-    },
-    {
-      path: '/storage',
-      element: <Storage />,
+      element: isAuthenticated ? (
+        <Navigate to='/storage' replace />
+      ) : (
+        <Landing />
+      ),
     },
     {
       path: '/profile/owner',
-      element: <Profile />,
+      element: isAuthenticated ? <Profile /> : <Landing />,
     },
     {
       path: '/profile/editor',
-      element: <EditorUi />,
+      element: isAuthenticated ? <EditorUi /> : <Landing />,
     },
     {
       path: '/gig-profile',
-      element: <GigProfile />,
+      element: isAuthenticated ? <GigProfile /> : <Landing />,
     },
     {
-      path: '/HireEditor',
-      element: <HiredEditor />,
+      path: '/storage',
+      element: isAuthenticated ? <Storage /> : <Landing />,
     },
     {
-      path: '/AdminPanel/*',
-      element: <AdminPanel />,
+      path: '/req-n-approve',
+      element: isAuthenticated ? <RequestApprove /> : <Landing />,
+    },
+    {
+      path: '/hire-editors',
+      element: isAuthenticated ? <HiredEditor /> : <Landing />,
+    },
+    {
+      path: '/admin-panel',
+      element: isAuthenticated ? <AdminPanel /> : <Landing />,
     },
   ])
   return (
