@@ -3,8 +3,6 @@ import Editor from '../models/editor.models.js'
 import Editor_Gig from '../models/Editor_gig.js'
 import Owner from '../models/owner.model.js'
 import Request from '../models/Request.js'
-import Editor_Gig from '../models/Editor_gig.js'
-import Editor from '../models/editor.models.js'
 
 // Create a new request
 export const createRequest = async (req, res) => {
