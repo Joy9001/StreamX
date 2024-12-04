@@ -4,15 +4,20 @@ import { storage } from '../helpers/firebase.helper.js'
 import Editor from '../models/editor.models.js'
 import Owner from '../models/owner.model.js'
 import Video from '../models/video.model.js'
+// import Admin from '../models/admin.model.js'
 
 const getAllController = async (req, res) => {
 	const { userId, role } = req.params
+	console.log('getAllController', userId, role)
 	let videos
+
 	try {
 		if (role === 'Owner') {
 			videos = await Video.find({ ownerId: userId }).lean()
 		} else if (role === 'Editor') {
 			videos = await Video.find({ editorId: userId }).lean()
+		} else if (role === 'Admin') {
+			videos = await Video.find().lean()
 		}
 
 		if (!videos) {
@@ -20,16 +25,16 @@ const getAllController = async (req, res) => {
 		}
 
 		// find owner of videos
-		let owner
-		if (role === 'Owner') {
-			owner = await Owner.findOne({ _id: userId }).lean()
-		} else if (role === 'Editor') {
-			owner = await Editor.findOne({ _id: userId }).lean()
-		}
+		// let owner
+		// if (role === 'Owner') {
+		// 	owner = await Owner.findOne({ _id: userId }).lean()
+		// } else if (role === 'Editor') {
+		// 	owner = await Editor.findOne({ _id: userId }).lean()
+		// }
 
-		if (!owner) {
-			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Owner not found' })
-		}
+		// if (!owner) {
+		// 	return res.status(StatusCodes.NOT_FOUND).json({ message: 'Owner not found' })
+		// }
 
 		console.log('videos in getAllController', videos)
 		const editorIds = videos.map((video) => video.editorId)
@@ -367,56 +372,55 @@ const updateEditor = async (req, res) => {
 // Get videos by editor ID
 const getVideosByEditorId = async (req, res) => {
 	try {
-		const { editorId } = req.params;
-		console.log('Fetching videos for editor:', editorId);
+		const { editorId } = req.params
+		console.log('Fetching videos for editor:', editorId)
 
-		const videos = await Video.find({ editorId: editorId }).lean();
-		
+		const videos = await Video.find({ editorId: editorId }).lean()
+
 		if (!videos || videos.length === 0) {
-			return res.status(200).json([]);
+			return res.status(200).json([])
 		}
 
 		// Get unique owner IDs from videos
-		const ownerIds = [...new Set(videos.map(video => video.ownerId))];
-		
+		const ownerIds = [...new Set(videos.map((video) => video.ownerId))]
+
 		// Fetch owners and editors in parallel
 		const [owners, editor] = await Promise.all([
 			Owner.find({ _id: { $in: ownerIds } }).lean(),
-			Editor.findById(editorId).lean()
-		]);
+			Editor.findById(editorId).lean(),
+		])
 
 		// Map videos with owner and editor details
-		const videosWithDetails = videos.map(video => {
-			const owner = owners.find(o => o._id.toString() === video.ownerId.toString());
+		const videosWithDetails = videos.map((video) => {
+			const owner = owners.find((o) => o._id.toString() === video.ownerId.toString())
 			return {
 				...video,
 				metadata: {
 					fileName: video.metaData?.name || 'Untitled',
 					duration: video.metaData?.duration || '0:00',
-					fileSize: (video.metaData?.size ? `${(video.metaData.size / (1024 * 1024)).toFixed(2)} MB` : '0 MB'),
-					contentType: video.metaData?.contentType || 'video/mp4'
+					fileSize: video.metaData?.size ? `${(video.metaData.size / (1024 * 1024)).toFixed(2)} MB` : '0 MB',
+					contentType: video.metaData?.contentType || 'video/mp4',
 				},
 				owner: {
 					name: owner?.username || 'Unknown',
 					email: owner?.email || '',
-					profilephoto: owner?.profilephoto || ''
+					profilephoto: owner?.profilephoto || '',
 				},
 				editor: {
 					name: editor?.name || 'Unknown',
 					email: editor?.email || '',
-					profilephoto: editor?.profilephoto || ''
-				}
-			};
-		});
+					profilephoto: editor?.profilephoto || '',
+				},
+			}
+		})
 
-		console.log(`Found ${videosWithDetails.length} videos for editor ${editorId}`);
-		res.status(200).json(videosWithDetails);
+		console.log(`Found ${videosWithDetails.length} videos for editor ${editorId}`)
+		res.status(200).json(videosWithDetails)
 	} catch (error) {
-		console.error('Error fetching videos by editor:', error);
-		res.status(500).json({ message: 'Error fetching videos', error: error.message });
+		console.error('Error fetching videos by editor:', error)
+		res.status(500).json({ message: 'Error fetching videos', error: error.message })
 	}
-};
-
+}
 export {
 	deleteController,
 	downloadController,
