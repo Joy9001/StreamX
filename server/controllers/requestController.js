@@ -1,4 +1,6 @@
 import Request from '../models/Request.js'
+import Editor_Gig from '../models/Editor_gig.js'
+import Editor from '../models/editor.models.js'
 
 // Create a new request
 export const createRequest = async (req, res) => {
@@ -40,7 +42,26 @@ export const getAllRequests = async (req, res) => {
 export const getRequestsByToId = async (req, res) => {
 	try {
 		const { to_id } = req.params
-		const requests = await Request.find({ to_id })
+		console.log('to_id:', to_id)
+
+		const findEditor = await Editor.findOne({ _id: to_id })
+
+		let requests
+		if (!findEditor) {
+			requests = await Request.find({ to_id })
+		} else {
+			const gigProfile = await Editor_Gig.findOne({ email: findEditor.email })
+			if (gigProfile) {
+				const gig_id = gigProfile._id
+				requests = await Request.find({ to_id: { $in: [gig_id, to_id] } })
+			}
+		}
+		console.log('requests in getRequestsByToId:', requests)
+
+		if (!requests) {
+			return res.status(404).json({ message: 'Requests not found' })
+		}
+
 		res.status(200).json(requests)
 	} catch (error) {
 		console.error('Error fetching owner requests:', error)
