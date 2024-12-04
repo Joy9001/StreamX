@@ -40,7 +40,7 @@ function ContentTableApprove() {
         if (!userRole || !userData?._id || !accessToken) return
 
         // Use the editor endpoint to get requests where to_id matches owner's ID
-        const endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/from-id/${userData._id}`
+        const endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/to-id/${userData._id}`
         console.log('Using endpoint:', endpoint)
 
         const res = await axios.get(endpoint, {

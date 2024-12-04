@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 function EditorContentTableApprove() {
-  const [requests, setRequests] = useState([])
   const [approvals, setApprovals] = useState([])
+  const [videoNames, setVideoNames] = useState({})
+  const [ownerNames, setOwnerNames] = useState({})
   const [loading, setLoading] = useState(false)
   const { getAccessTokenSilently } = useAuth0()
   const [accessToken, setAccessToken] = useState(null)
@@ -24,38 +25,12 @@ function EditorContentTableApprove() {
   }, [getAccessTokenSilently])
 
   useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        if (!accessToken || !userData?._id) return
-
-        const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/requests/from-id/${userData._id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-            withCredentials: true,
-          }
-        )
-        console.log('Fetched requests:', response.data)
-        setRequests(response.data)
-      } catch (error) {
-        console.error('Error fetching requests:', error)
-      }
-    }
-
-    if (accessToken && userData) {
-      fetchRequests()
-    }
-  }, [userData, accessToken])
-
-  useEffect(() => {
     const fetchApprovals = async () => {
       try {
         if (!accessToken || !userData?._id) return
 
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/requests/approvals/${userData._id}`,
+          `${import.meta.env.VITE_BACKEND_URL}/requests/to-id/${userData._id}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -65,6 +40,49 @@ function EditorContentTableApprove() {
         )
         console.log('Fetched approvals:', response.data)
         setApprovals(response.data)
+
+        // Fetch video names for approvals
+        const videoNamesMap = {}
+        await Promise.all(
+          response.data.map(async (approval) => {
+            if (!approval.video_id) return
+            try {
+              const videoRes = await axios.get(
+                `${import.meta.env.VITE_BACKEND_URL}/api/videos/name/${approval.video_id}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                  },
+                }
+              )
+              videoNamesMap[approval.video_id] = videoRes.data.name
+            } catch (error) {
+              console.error('Error fetching video name:', error)
+              videoNamesMap[approval.video_id] = 'Unknown Video'
+            }
+          })
+        )
+        setVideoNames(videoNamesMap)
+
+        // Fetch owner names using to_id
+        const ownerNamesMap = {}
+        await Promise.all(
+          response.data.map(async (approval) => {
+            try {
+              const ownerRes = await axios.get(
+                `${import.meta.env.VITE_BACKEND_URL}/api/owner/name/${approval.from_id}`,
+                {
+                  withCredentials: true,
+                }
+              )
+              ownerNamesMap[approval.from_id] = ownerRes.data.name
+            } catch (error) {
+              console.error('Error fetching owner name:', error)
+              ownerNamesMap[approval.to_id] = 'Unknown Owner'
+            }
+          })
+        )
+        setOwnerNames(ownerNamesMap)
       } catch (error) {
         console.error('Error fetching approvals:', error)
       }
@@ -78,13 +96,13 @@ function EditorContentTableApprove() {
   const handleApprove = async (requestId, videoId) => {
     try {
       setLoading(true)
-      const request = requests.find((req) => req._id === requestId)
-      console.log('Processing request:', request)
+      const approval = approvals.find((req) => req._id === requestId)
+      console.log('Processing request:', approval)
       console.log('Starting approval process for editor:', {
         requestId,
         videoId,
         editorId: userData._id,
-        currentRequest: request,
+        currentRequest: approval,
       })
 
       // First update request status
@@ -122,8 +140,8 @@ function EditorContentTableApprove() {
         if (videoResponse.data) {
           console.log('Video editor updated:', videoResponse.data)
           // Update local state to reflect both changes
-          setRequests((prevRequests) =>
-            prevRequests.map((req) =>
+          setApprovals((prevApprovals) =>
+            prevApprovals.map((req) =>
               req._id === requestId
                 ? {
                     ...req,
@@ -150,25 +168,38 @@ function EditorContentTableApprove() {
   }
 
   return (
-    <div className='container mx-auto px-4'>
-      <div className='overflow-x-auto'>
-        <table className='table w-full'>
+    <>
+      <div className='no-scrollbar h-[30rem] overflow-x-auto'>
+        <table className='table table-pin-rows'>
           <thead>
             <tr>
               <th>Video Name</th>
-              <th>From</th>
-              <th>To</th>
+              <th>Owner Name</th>
+              <th>Description</th>
+              <th>Price</th>
               <th>Status</th>
-              <th>Actions</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {approvals.map((approval) => (
               <tr key={approval._id}>
-                <td>{approval.video_name}</td>
-                <td>{approval.from_name}</td>
-                <td>{approval.to_name}</td>
-                <td>{approval.status}</td>
+                <td>{videoNames[approval.video_id] || 'Loading...'}</td>
+                <td>{ownerNames[approval.from_id] || 'Loading...'}</td>
+                <td>{approval.description}</td>
+                <td>${approval.price}</td>
+                <td>
+                  <span
+                    className={`badge ${
+                      approval.status === 'pending'
+                        ? 'badge-warning'
+                        : approval.status === 'approved'
+                        ? 'badge-success'
+                        : 'badge-error'
+                    }`}>
+                    {approval.status}
+                  </span>
+                </td>
                 <td>
                   <button
                     className='btn btn-success btn-sm'
@@ -184,7 +215,7 @@ function EditorContentTableApprove() {
           </tbody>
         </table>
       </div>
-    </div>
+    </>
   )
 }
 
