@@ -1,5 +1,5 @@
 import { google } from 'googleapis'
-import OAuth2Data from '../.secrets/client_secret_528945799755-doq1f7itrq60a9k243lgi8ipdvm7j4e7.apps.googleusercontent.com.json' with { type: 'json' }
+import OAuth2Data from '../.secrets/client_secret_723604024986-f3cg8j1688kgtm0sq16uqomvtgfl87j3.apps.googleusercontent.com.json' with { type: 'json' }
 import Owner from '../models/owner.model.js'
 
 const CLIENT_ID = OAuth2Data.web.client_id

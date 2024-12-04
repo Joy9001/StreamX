@@ -25,6 +25,32 @@ function EditorContentTableApprove() {
   }, [getAccessTokenSilently])
 
   useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        if (!accessToken || !userData?._id) return
+
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/requests/to-id/${userData._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+          }
+        )
+        console.log('Fetched requests:', response.data)
+        setRequests(response.data)
+      } catch (error) {
+        console.error('Error fetching requests:', error)
+      }
+    }
+
+    if (accessToken && userData) {
+      fetchRequests()
+    }
+  }, [userData, accessToken])
+
+  useEffect(() => {
     const fetchApprovals = async () => {
       try {
         if (!accessToken || !userData?._id) return
@@ -182,36 +208,31 @@ function EditorContentTableApprove() {
             </tr>
           </thead>
           <tbody>
-            {approvals.map((approval) => (
-              <tr key={approval._id}>
-                <td>{videoNames[approval.video_id] || 'Loading...'}</td>
-                <td>{ownerNames[approval.from_id] || 'Loading...'}</td>
-                <td>{approval.description}</td>
-                <td>${approval.price}</td>
-                <td>
-                  <span
-                    className={`badge ${
-                      approval.status === 'pending'
-                        ? 'badge-warning'
-                        : approval.status === 'approved'
-                        ? 'badge-success'
-                        : 'badge-error'
-                    }`}>
-                    {approval.status}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    className='btn btn-success btn-sm'
-                    onClick={() =>
-                      handleApprove(approval._id, approval.video_id)
-                    }
-                    disabled={approval.status === 'approved' || loading}>
-                    {approval.status === 'approved' ? 'Approved' : 'Approve'}
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {approvals.map(
+              (approval) => (
+                console.log('approval', approval),
+                (
+                  <tr key={approval._id}>
+                    <td>{approval.video.title}</td>
+                    <td>{approval.from.name}</td>
+                    <td>{approval.to.name}</td>
+                    <td>{approval.status}</td>
+                    <td>
+                      <button
+                        className='btn btn-success btn-sm'
+                        onClick={() =>
+                          handleApprove(approval._id, approval.video._id)
+                        }
+                        disabled={approval.status === 'approved' || loading}>
+                        {approval.status === 'approved'
+                          ? 'Approved'
+                          : 'Approve'}
+                      </button>
+                    </td>
+                  </tr>
+                )
+              )
+            )}
           </tbody>
         </table>
       </div>

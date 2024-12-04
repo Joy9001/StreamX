@@ -1,6 +1,6 @@
+import dotenv from 'dotenv'
 import { initializeApp } from 'firebase/app'
 import { getStorage } from 'firebase/storage'
-import dotenv from 'dotenv'
 
 dotenv.config()
 
