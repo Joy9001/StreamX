@@ -137,6 +137,7 @@ export const getHiredEditors = async (req, res) => {
 		const { ownerId } = req.params
 
 		const findVideos = await Video.find({ ownerId: ownerId })
+		console.log('findVideos in getHiredEditors', findVideos)
 
 		if (!findVideos) {
 			return res.status(404).json({ message: 'Videos not found' })

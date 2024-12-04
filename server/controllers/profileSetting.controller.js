@@ -163,12 +163,13 @@ export const updateBasicProfile = async (req, res) => {
 		const { file } = req;
 
 		let findOwner = await Owner.findOne({ _id: id });
+		console.log('findOwner in updateBasicProfile', findOwner);
 		if (!findOwner) {
 			return res.status(404).json({ message: 'Owner not found' });
 		}
 
 		// Update name and bio if provided
-		if (name) findOwner.name = name;
+		if (name) findOwner.username = name;
 		if (bio) findOwner.bio = bio;
 
 		// Handle profile photo update if a new file is provided
