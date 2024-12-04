@@ -18,7 +18,14 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import axios from 'axios'
-import { CheckCircle, Clock, ListFilter, Trash2, XCircle, Youtube } from 'lucide-react'
+import {
+  CheckCircle,
+  Clock,
+  ListFilter,
+  Trash2,
+  XCircle,
+  Youtube,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 // import { useSelector } from 'react-redux'
@@ -43,9 +50,9 @@ export function AdminRequestsDashboard() {
       try {
         const [requestsResponse, adminRequestsResponse] = await Promise.all([
           axios.get('http://localhost:3000/requests/all'),
-          axios.get('http://localhost:3000/requests/admin')
-        ]);
-        
+          axios.get('http://localhost:3000/requests/admin'),
+        ])
+
         setRequestData(requestsResponse.data.requests)
         setAdminRequestData(adminRequestsResponse.data.requests)
         setLoading(false)
@@ -63,8 +70,12 @@ export function AdminRequestsDashboard() {
     try {
       await axios.delete(`http://localhost:3000/requests/delete/${requestId}`)
       // Update the local state to remove the deleted request
-      setRequestData((prevData) => prevData.filter((request) => request.request_id !== requestId))
-      setAdminRequestData((prevData) => prevData.filter((request) => request.request_id !== requestId))
+      setRequestData((prevData) =>
+        prevData.filter((request) => request.request_id !== requestId)
+      )
+      setAdminRequestData((prevData) =>
+        prevData.filter((request) => request.request_id !== requestId)
+      )
     } catch (err) {
       console.error('Error deleting request:', err)
       // You might want to show an error message to the user here
@@ -74,39 +85,45 @@ export function AdminRequestsDashboard() {
   const handleUploadToYoutube = async (request) => {
     try {
       if (!request.video?.url) {
-        alert('No video URL available')
+        toast.error('No video URL available')
         return
       }
 
       // Show loading state
       const loadingToast = toast.loading('Uploading to YouTube...')
 
-      const response = await axios.post(`http://localhost:3000/requests/${request.request_id}/upload-youtube`, {
-        videoUrl: request.video.url,
-        title: request.video.title || 'Uploaded Video',
-        description: request.description || 'Video uploaded through admin dashboard'
-      })
+      // Make the upload request - no need to send video data for admin role
+      const response = await axios.post(
+        `http://localhost:3000/api/yt/upload/Admin/${request.to.id}/${request.video.id}`
+      )
 
-      // Remove loading toast and show success/error
+      // Remove loading toast
       toast.dismiss(loadingToast)
-      
-      if (response.data.success) {
+
+      if (response.data.response) {
         toast.success('Successfully uploaded to YouTube!')
-        
+
         // Update the request data to reflect the upload
-        setAdminRequestData(prevData => 
-          prevData.map(req => 
-            req.request_id === request.request_id 
-              ? { ...req, youtubeUrl: response.data.youtubeUrl }
+        setAdminRequestData((prevData) =>
+          prevData.map((req) =>
+            req.request_id === request.request_id
+              ? {
+                  ...req,
+                  video: {
+                    ...req.video,
+                    ytUploadStatus: 'Uploaded',
+                    ytData: response.data.response.data,
+                  },
+                }
               : req
           )
         )
       } else {
-        toast.error('Failed to upload to YouTube')
+        toast.error(response.data.error || 'Failed to upload to YouTube')
       }
     } catch (error) {
       console.error('Error uploading to YouTube:', error)
-      toast.error(error.response?.data?.message || 'Error uploading to YouTube')
+      toast.error(error.response?.data?.error || 'Error uploading to YouTube')
     }
   }
 
@@ -198,7 +215,7 @@ export function AdminRequestsDashboard() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              
+
               {/* All Requests Table */}
               <Card>
                 <CardHeader>
@@ -225,12 +242,11 @@ export function AdminRequestsDashboard() {
                           <TableCell>{request.from.name}</TableCell>
                           <TableCell>{request.to.name}</TableCell>
                           <TableCell>
-                            <a 
-                              href={request.video.url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-blue-500 hover:text-blue-700"
-                            >
+                            <a
+                              href={request.video.url}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                              className='text-blue-500 hover:text-blue-700'>
                               {request.video.title || 'View Video'}
                             </a>
                           </TableCell>
@@ -254,16 +270,19 @@ export function AdminRequestsDashboard() {
                             {new Date(request.createdAt).toLocaleDateString()}
                           </TableCell>
                           <TableCell>
-                            <Button 
-                              variant='ghost' 
+                            <Button
+                              variant='ghost'
                               size='icon'
                               onClick={() => {
-                                if (window.confirm('Are you sure you want to delete this request?')) {
+                                if (
+                                  window.confirm(
+                                    'Are you sure you want to delete this request?'
+                                  )
+                                ) {
                                   handleDelete(request.request_id)
                                 }
                               }}
-                              className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                            >
+                              className='text-red-500 hover:bg-red-50 hover:text-red-700'>
                               <Trash2 className='h-4 w-4' />
                             </Button>
                           </TableCell>
@@ -276,7 +295,7 @@ export function AdminRequestsDashboard() {
 
               {/* Admin Requests Table */}
               <div className='mt-8'>
-                <div className='flex items-center gap-2 mb-4'>
+                <div className='mb-4 flex items-center gap-2'>
                   <div className='flex-1'>
                     <Input
                       placeholder='Search admin requests...'
@@ -311,12 +330,11 @@ export function AdminRequestsDashboard() {
                             <TableCell>{request.from.name}</TableCell>
                             <TableCell>{request.to.name}</TableCell>
                             <TableCell>
-                              <a 
-                                href={request.video.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-blue-500 hover:text-blue-700"
-                              >
+                              <a
+                                href={request.video.url}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='text-blue-500 hover:text-blue-700'>
                                 {request.video.title || 'View Video'}
                               </a>
                             </TableCell>
@@ -340,26 +358,31 @@ export function AdminRequestsDashboard() {
                               {new Date(request.createdAt).toLocaleDateString()}
                             </TableCell>
                             <TableCell>
-                              <div className="flex gap-2">
-                                <Button 
-                                  variant='ghost' 
+                              <div className='flex gap-2'>
+                                <Button
+                                  variant='ghost'
                                   size='icon'
                                   onClick={() => {
-                                    if (window.confirm('Are you sure you want to delete this request?')) {
+                                    if (
+                                      window.confirm(
+                                        'Are you sure you want to delete this request?'
+                                      )
+                                    ) {
                                       handleDelete(request.request_id)
                                     }
                                   }}
-                                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                                >
+                                  className='text-red-500 hover:bg-red-50 hover:text-red-700'>
                                   <Trash2 className='h-4 w-4' />
                                 </Button>
                                 <Button
                                   variant='ghost'
                                   size='icon'
                                   onClick={() => handleUploadToYoutube(request)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  title="Upload to YouTube"
-                                >
+                                  className='text-red-600 hover:bg-red-50 hover:text-red-700'
+                                  title='Upload to YouTube'
+                                  disabled={
+                                    request.video?.ytUploadStatus === 'Uploaded'
+                                  }>
                                   <Youtube className='h-4 w-4' />
                                 </Button>
                               </div>
