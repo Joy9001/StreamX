@@ -30,6 +30,11 @@ const editorSchema = new mongoose.Schema(
 			type: Array,
 			required: true,
 		},
+		membership: {
+			type: String,
+			enum: ['bronze', 'silver', 'gold'],
+			default: 'bronze',
+		},
 	},
 	{ timestamps: true }
 )

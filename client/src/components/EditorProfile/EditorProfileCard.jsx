@@ -1,38 +1,54 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 
 const membershipStyles = {
-  Free: 'bg-white text-gray-700 border border-gray-300',
-  Bronze: 'bg-amber-700 text-white',
-  Silver: 'bg-gray-400 text-white',
-  Gold: 'bg-yellow-500 text-white',
+  bronze: 'bg-amber-700 text-white',
+  silver: 'bg-gray-400 text-white',
+  gold: 'bg-yellow-500 text-white',
 }
 
-function EditorProfileCard({ editor, onEditProfile }) {
+function EditorProfileCard({ onEditProfile }) {
+  const { userData } = useSelector((state) => state.user)
+
+  if (!userData) {
+    return (
+      <div className='w-[300px] rounded-lg bg-white p-6 shadow-lg'>
+        <div className='mb-6'>
+          <div className='h-8 w-48 animate-pulse rounded bg-gray-200'></div>
+        </div>
+        <div className='space-y-4'>
+          <div className='h-6 w-full animate-pulse rounded bg-gray-200'></div>
+          <div className='h-6 w-2/3 animate-pulse rounded bg-gray-200'></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='w-[300px] rounded-lg bg-white p-6 shadow-lg transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl'>
-      <img
-        src={editor.profilePicture}
-        alt={editor.name}
-        className='border-primary-100 mx-auto block h-[100px] w-[100px] rounded-full border-4 object-cover'
-      />
-      <h2 className='mt-4 text-center text-xl font-bold text-gray-800'>
-        {editor.name}
-      </h2>
-      <div className='mt-2 flex justify-center'>
-        <span
-          className={`rounded-full px-3 py-1 text-sm font-medium ${membershipStyles[editor.membership]}`}>
-          {editor.membership}
-        </span>
+      <div className='mb-6 flex items-center justify-between'>
+        <h3 className='bg-gradient-to-r from-pink-300 to-pink-500 bg-clip-text text-2xl font-bold text-transparent'>
+          Profile
+        </h3>
       </div>
-      <p className='mt-4 text-center text-sm text-gray-500'>
-        {editor.bio}
-      </p>
-      <div className='mt-6'>
-        <button
-          onClick={onEditProfile}
-          className='btn w-full border-none bg-pink-200 text-gray-700 hover:bg-pink-300'>
-          EDIT PROFILE
-        </button>
+
+      <div className='space-y-4'>
+        <div className='text-center'>
+          <div className='avatar mb-4'>
+            <div className='w-24 rounded-full ring ring-primary ring-offset-2 ring-offset-base-100'>
+              <img src={userData?.profilephoto || 'https://via.placeholder.com/150'} alt='profile' />
+            </div>
+          </div>
+          <h4 className='text-xl font-bold text-gray-800'>{userData?.name || 'Anonymous'}</h4>
+          <p className='text-gray-500'>{userData?.email}</p>
+        </div>
+
+        <div>
+          <p className='mb-2 font-medium text-gray-700'>Membership Level</p>
+          <div className={`rounded-lg ${membershipStyles[userData?.membership || 'bronze']} p-2 text-center`}>
+            {userData?.membership?.charAt(0).toUpperCase() + userData?.membership?.slice(1) || 'Bronze'}
+          </div>
+        </div>
       </div>
     </div>
   )

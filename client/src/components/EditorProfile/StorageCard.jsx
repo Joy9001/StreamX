@@ -1,12 +1,20 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 
-function StorageCard() {
-  const { userData } = useSelector((state) => state.user);
-  const totalStorage = userData?.storage?.total || 10240; // 10GB in MB if not specified
-  const usedStorage = userData?.storage?.used || 0;
-  const remainingStorage = totalStorage - usedStorage;
-  const usagePercentage = (usedStorage / totalStorage) * 100;
+function StorageCard({ editorData }) {
+  const totalStorage = editorData?.storageLimit || 10240 // 10GB in MB default
+  const videos = editorData?.portfolio || []
+
+  // Calculate total used storage from video file sizes
+  const usedStorage = videos.reduce((total, video) => {
+    const sizeInMB = typeof video.fileSize === 'string' 
+      ? parseInt(video.fileSize.replace('MB', ''))
+      : video.fileSize || 0
+    return total + sizeInMB
+  }, 0)
+
+  const remainingStorage = totalStorage - usedStorage
+  const usagePercentage = (usedStorage / totalStorage) * 100
 
   return (
     <div className='w-[300px] rounded-lg bg-white p-6 shadow-lg transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl'>

@@ -3,19 +3,20 @@ import { useSelector } from 'react-redux'
 import editorData from '../../data/editorData.json'
 import Navbar from '../NavBar/Navbar'
 import ProfileHeader from '../OwnerProfile/ProfileHeader'
-import RequestsCard from '../OwnerProfile/RequestsCard'
+import EditorProfileCard from './EditorProfileCard'
+import EditorVideosList from './EditorVideosList'
 import SocialLinks from '../OwnerProfile/SocialLinks'
 import StorageCard from '../OwnerProfile/StorageCard'
 import UploadedVideosList from '../OwnerProfile/UploadedVideosList'
-import EditorProfileCard from './EditorProfileCard'
 import EditorProfileForm from './EditorProfileForm'
 import HiredByCard from './HiredByCard'
+import RequestsCard from '../OwnerProfile/RequestsCard'
+
 
 function EditorUi() {
-  const [currentEditorIndex, setCurrentEditorIndex] = useState(0)
   const [showProfileForm, setShowProfileForm] = useState(false)
-  const currentEditor = editorData.editors[currentEditorIndex]
   const navOpen = useSelector((state) => state.ui.navbarOpen)
+  const { userData } = useSelector((state) => state.user)
 
   return (
     <div className='flex h-screen'>
@@ -30,22 +31,21 @@ function EditorUi() {
         <div id='webcrumbs' className='no-scrollbar overflow-auto'>
           <div className='w-full rounded-lg bg-white p-8'>
             <div className='flex gap-8'>
-              <EditorProfileCard
-                editor={currentEditor}
+              <EditorProfileCard 
                 onEditProfile={() => setShowProfileForm(true)}
               />
 
               <div className='no-scrollbar flex-1 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl'>
-                <UploadedVideosList videos={currentEditor?.portfolio || []} />
+                <EditorVideosList />
               </div>
             </div>
 
             <div className='mt-8 flex gap-8'>
-              <SocialLinks profile={currentEditor} />
+              <SocialLinks profile={userData} />
 
               <div className='flex flex-1 gap-4'>
                 <StorageCard />
-                <HiredByCard hiredByList={currentEditor?.hiredBy || []} />
+                <HiredByCard hiredByList={userData?.hiredBy || []} />
                 <RequestsCard />
               </div>
             </div>
@@ -64,10 +64,7 @@ function EditorUi() {
                 ✕
               </button>
             </form>
-            <EditorProfileForm
-              initialData={currentEditor}
-              onClose={() => setShowProfileForm(false)}
-            />
+            <EditorProfileForm initialData={userData} onClose={() => setShowProfileForm(false)} />
           </div>
           <form method='dialog' className='modal-backdrop'>
             <button onClick={() => setShowProfileForm(false)}>close</button>

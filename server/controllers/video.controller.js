@@ -364,21 +364,67 @@ const updateEditor = async (req, res) => {
 	}
 }
 
+// Get videos by editor ID
+const getVideosByEditorId = async (req, res) => {
+	try {
+		const { editorId } = req.params;
+		console.log('Fetching videos for editor:', editorId);
+
+		const videos = await Video.find({ editorId: editorId }).lean();
+		
+		if (!videos || videos.length === 0) {
+			return res.status(200).json([]);
+		}
+
+		// Get unique owner IDs from videos
+		const ownerIds = [...new Set(videos.map(video => video.ownerId))];
+		
+		// Fetch owners and editors in parallel
+		const [owners, editor] = await Promise.all([
+			Owner.find({ _id: { $in: ownerIds } }).lean(),
+			Editor.findById(editorId).lean()
+		]);
+
+		// Map videos with owner and editor details
+		const videosWithDetails = videos.map(video => {
+			const owner = owners.find(o => o._id.toString() === video.ownerId.toString());
+			return {
+				...video,
+				metadata: {
+					fileName: video.metaData?.name || 'Untitled',
+					duration: video.metaData?.duration || '0:00',
+					fileSize: (video.metaData?.size ? `${(video.metaData.size / (1024 * 1024)).toFixed(2)} MB` : '0 MB'),
+					contentType: video.metaData?.contentType || 'video/mp4'
+				},
+				owner: {
+					name: owner?.username || 'Unknown',
+					email: owner?.email || '',
+					profilephoto: owner?.profilephoto || ''
+				},
+				editor: {
+					name: editor?.name || 'Unknown',
+					email: editor?.email || '',
+					profilephoto: editor?.profilephoto || ''
+				}
+			};
+		});
+
+		console.log(`Found ${videosWithDetails.length} videos for editor ${editorId}`);
+		res.status(200).json(videosWithDetails);
+	} catch (error) {
+		console.error('Error fetching videos by editor:', error);
+		res.status(500).json({ message: 'Error fetching videos', error: error.message });
+	}
+};
+
 export {
 	deleteController,
 	downloadController,
 	getAllController,
 	getVideoNameById,
+	getVideosByEditorId,
 	recentController,
 	updateEditor,
 	updateOwner,
 	uploadController,
 }
-
-/*
-  lastModified: 1723095830000
-  lastModifiedDate: Thu Aug 08 2024 11:14:00 GMT+0530 (India Standard Time)
-  name: "satoru-gojo-jujutsu-kaisen-4k-free-live-wallpaper.mp4"
-  size: 10909653
-  type: "video/mp4"
-  */
