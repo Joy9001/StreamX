@@ -5,8 +5,8 @@ import { useSelector } from 'react-redux'
 
 function ContentTableApprove() {
   const [requests, setRequests] = useState([])
-  const [videoNames, setVideoNames] = useState({})
-  const [editorNames, setEditorNames] = useState({})
+  // const [videoNames, setVideoNames] = useState({})
+  // const [editorNames, setEditorNames] = useState({})
   const [loading, setLoading] = useState(false)
   const { getAccessTokenSilently } = useAuth0()
   const [accessToken, setAccessToken] = useState(null)
@@ -40,7 +40,7 @@ function ContentTableApprove() {
         if (!userRole || !userData?._id || !accessToken) return
 
         // Use the editor endpoint to get requests where to_id matches owner's ID
-        const endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/from-id/${userData._id}`
+        const endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/to-id/${userData._id}`
         console.log('Using endpoint:', endpoint)
 
         const res = await axios.get(endpoint, {
@@ -57,62 +57,7 @@ function ContentTableApprove() {
           'Request to_ids:',
           res.data.map((req) => req.to_id)
         )
-
-        // Filter requests where to_id matches owner's _id
-        const filteredRequests = res.data.filter((request) => {
-          console.log('Comparing:', {
-            requestToId: request.to_id,
-            ownerID: userData._id,
-            matches: request.to_id === userData._id,
-          })
-          return request.to_id === userData._id
-        })
-
-        console.log('Filtered requests:', filteredRequests)
-        setRequests(filteredRequests)
-
-        // Fetch video names for filtered requests
-        const videoNamesMap = {}
-        await Promise.all(
-          filteredRequests.map(async (request) => {
-            if (!request.video_id) return
-            try {
-              const videoRes = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/videos/name/${request.video_id}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                  },
-                }
-              )
-              videoNamesMap[request.video_id] = videoRes.data.name
-            } catch (error) {
-              console.error('Error fetching video name:', error)
-              videoNamesMap[request.video_id] = 'Unknown Video'
-            }
-          })
-        )
-        setVideoNames(videoNamesMap)
-
-        // Fetch editor names using from_id
-        const editorNamesMap = {}
-        await Promise.all(
-          filteredRequests.map(async (request) => {
-            try {
-              const editorRes = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/editorProfile/name/${request.from_id}`,
-                {
-                  withCredentials: true,
-                }
-              )
-              editorNamesMap[request.from_id] = editorRes.data.name
-            } catch (error) {
-              console.error('Error fetching editor name:', error)
-              editorNamesMap[request.from_id] = 'Unknown Editor'
-            }
-          })
-        )
-        setEditorNames(editorNamesMap)
+        setRequests(res.data)
       } catch (error) {
         console.error('Error fetching requests:', error)
       }
@@ -154,11 +99,11 @@ function ContentTableApprove() {
         console.log('Video ownership updated:', videoResponse.data)
 
         // Update the local state with the response from the server
-        setRequests((prevRequests) =>
-          prevRequests.map((req) =>
-            req._id === requestId ? response.data : req
-          )
-        )
+        // setRequests((prevRequests) =>
+        //   prevRequests.map((req) =>
+        //     req._id === requestId ? response.data : req
+        //   )
+        // )
         console.log('Request approved and video ownership updated successfully')
       }
     } catch (error) {
@@ -190,34 +135,39 @@ function ContentTableApprove() {
             </tr>
           </thead>
           <tbody>
-            {requests.map((request) => (
-              <tr key={request._id}>
-                <td>{videoNames[request.video_id] || 'Loading...'}</td>
-                <td>{editorNames[request.from_id] || 'Loading...'}</td>
-                <td>{request.description}</td>
-                <td>${request.price}</td>
-                <td>
-                  <span
-                    className={`badge ${request.status === 'approved' ? 'badge-success' : 'badge-warning'}`}>
-                    {request.status}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    className='btn btn-success btn-sm'
-                    onClick={() =>
-                      handleApprove(
-                        request._id,
-                        request.video_id,
-                        request.to_id
-                      )
-                    }
-                    disabled={request.status === 'approved' || loading}>
-                    {request.status === 'approved' ? 'Approved' : 'Approve'}
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {requests.map(
+              (request) => (
+                console.log('Request:', request),
+                (
+                  <tr key={request._id}>
+                    <td>{request.video.title || 'Loading...'}</td>
+                    <td>{request.from.name || 'Loading...'}</td>
+                    <td>{request.description}</td>
+                    <td>${request.price}</td>
+                    <td>
+                      <span
+                        className={`badge ${request.status === 'approved' ? 'badge-success' : 'badge-warning'}`}>
+                        {request.status}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        className='btn btn-success btn-sm'
+                        onClick={() =>
+                          handleApprove(
+                            request._id,
+                            request.video._id,
+                            request.to.id
+                          )
+                        }
+                        disabled={request.status === 'approved' || loading}>
+                        {request.status === 'approved' ? 'Approved' : 'Approve'}
+                      </button>
+                    </td>
+                  </tr>
+                )
+              )
+            )}
           </tbody>
         </table>
         {requests.length === 0 && (

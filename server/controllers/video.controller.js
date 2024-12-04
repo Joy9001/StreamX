@@ -311,6 +311,8 @@ const updateOwner = async (req, res) => {
 		}
 
 		console.log('Video owner updated successfully:', updatedVideo)
+
+		await updatedVideo.save()
 		res.status(StatusCodes.OK).json(updatedVideo)
 	} catch (error) {
 		console.error('Error updating video owner:', error)
