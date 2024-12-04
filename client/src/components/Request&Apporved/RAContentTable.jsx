@@ -42,7 +42,7 @@ function ContentTable() {
 
         // If user is owner, get requests by from_id
         if (userRole === 'Owner') {
-          endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/to-id/${userData._id}`
+          endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/from-id/${userData._id}`
         }
         // If user is editor, get requests by to_id
         else if (userRole === 'Editor') {

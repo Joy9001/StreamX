@@ -311,6 +311,8 @@ const updateOwner = async (req, res) => {
 		}
 
 		console.log('Video owner updated successfully:', updatedVideo)
+
+		await updatedVideo.save()
 		res.status(StatusCodes.OK).json(updatedVideo)
 	} catch (error) {
 		console.error('Error updating video owner:', error)
@@ -387,12 +389,12 @@ const getVideosByEditorId = async (req, res) => {
 		// Fetch owners and editors in parallel
 		const [owners, editor] = await Promise.all([
 			Owner.find({ _id: { $in: ownerIds } }).lean(),
-			Editor.findById(editorId).lean(),
+			Editor.findById(editorId),
 		])
 
 		// Map videos with owner and editor details
 		const videosWithDetails = videos.map((video) => {
-			const owner = owners.find((o) => o._id.toString() === video.ownerId.toString())
+			const owner = owners.find((o) => o._id.equals(video.ownerId))
 			return {
 				...video,
 				metadata: {
