@@ -4,6 +4,7 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import { Dashboard as EditorDashboard } from './components/AdminPanel/AdminEditorDashboard.jsx'
 import { Dashboard as OwnerDashboard } from './components/AdminPanel/AdminOwnerDashboard.jsx'
 import AdminPanel from './components/AdminPanel/AdminPanel.jsx'
+import AdminRequestsDashboard from './components/AdminPanel/AdminRequestsDashboard.jsx'
 import { Dashboard as VideosDashboard } from './components/AdminPanel/AdminVideosDashboard.jsx'
 import EditorUi from './components/EditorProfile/EditorUi.jsx'
 import GigProfile from './components/GigProfile/GigProfile.jsx'
@@ -12,6 +13,7 @@ import Landing from './components/LandingPage/Landing.jsx'
 import Profile from './components/OwnerProfile/Profile.jsx'
 import RequestApprove from './components/Request&Apporved/raas.jsx'
 import Storage from './components/Storage/Storage.jsx'
+
 function App() {
   const { isAuthenticated } = useAuth0()
   const userData = useSelector((state) => state.user.userData)
@@ -154,7 +156,7 @@ function App() {
       path: '/admin-panel/requests',
       element: isAuthenticated ? (
         isAdmin ? (
-          <EditorDashboard />
+          <AdminRequestsDashboard />
         ) : (
           <Landing />
         )
