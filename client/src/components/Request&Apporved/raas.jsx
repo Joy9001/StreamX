@@ -1,10 +1,10 @@
-import { useSelector } from 'react-redux'
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 import Navbar from '../NavBar/Navbar.jsx'
-import ContentTable from './RAContentTable.jsx'
-import RaContentTableApprove from './RaContentTableApprove.jsx'
 import EditorContentTableApprove from './EditorContentTableApprove.jsx'
 import RaasNav from './raasNav.jsx'
+import ContentTable from './RAContentTable.jsx'
+import RaContentTableApprove from './RaContentTableApprove.jsx'
 
 const RequestApprove = () => {
   const [showApproved, setShowApproved] = useState(false)
@@ -12,9 +12,10 @@ const RequestApprove = () => {
   const drawer = useSelector((state) => state.ui.drawer)
   const { userData } = useSelector((state) => state.user)
 
-  const ApprovalComponent = userData?.user_metadata?.role === 'Editor' 
-    ? EditorContentTableApprove 
-    : RaContentTableApprove;
+  const ApprovalComponent =
+    userData?.user_metadata?.role === 'Editor'
+      ? EditorContentTableApprove
+      : RaContentTableApprove
 
   return (
     <div className='storage-main flex h-screen'>
@@ -22,7 +23,7 @@ const RequestApprove = () => {
         className={`navbar h-full transition-all duration-300 ${
           navOpen ? 'w-[15%]' : 'w-[5%]'
         } pl-0`}>
-        <Navbar title='Storage' />
+        <Navbar title='Request & Approve' />
       </div>
       <div className={`storage-container flex flex-grow`}>
         <div
@@ -32,12 +33,11 @@ const RequestApprove = () => {
           <RaasNav />
           <div className='flex justify-between p-2'>
             <div>
-              <button 
+              <button
                 onClick={() => setShowApproved(!showApproved)}
                 className={`mx-4 rounded px-4 py-2 text-white transition duration-300 hover:border-2 ${
                   showApproved ? 'bg-green-500' : 'bg-blue-500'
-                }`}
-              >
+                }`}>
                 {showApproved ? 'Request Section' : 'Approve Section'}
               </button>
             </div>

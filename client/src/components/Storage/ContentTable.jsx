@@ -63,7 +63,7 @@ function ContentTable() {
               <th>Editor</th>
               <th>Last Modified</th>
               <th>File size</th>
-              <th>YT Status</th>
+              {userData?.user_metadata?.role === 'Owner' && <th>YT Status</th>}
               <th>Aproval Status</th>
               <th></th>
             </tr>

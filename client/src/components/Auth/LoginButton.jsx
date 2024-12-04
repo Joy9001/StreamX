@@ -1,6 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react'
 
-function Login() {
+function LoginButton() {
   const { loginWithRedirect } = useAuth0()
 
   return (
@@ -26,4 +26,4 @@ function Login() {
   )
 }
 
-export default Login
+export default LoginButton

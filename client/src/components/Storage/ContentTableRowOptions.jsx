@@ -32,7 +32,7 @@ function ContentTableRowOptions({ video }) {
   async function handleDelete() {
     try {
       const res = await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/api/videos/delete`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/videos/delete/${userData.user_metadata.role}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -47,10 +47,12 @@ function ContentTableRowOptions({ video }) {
       )
       console.log(res)
       dispatch(
-        setRecentVideos(recentVideos.filter((video) => video._id !== video._id))
+        setRecentVideos(
+          recentVideos.filter((recentVideo) => recentVideo._id !== video._id)
+        )
       )
       dispatch(
-        setAllVideos(allVideos.filter((video) => video._id !== video._id))
+        setAllVideos(allVideos.filter((allVideo) => allVideo._id !== video._id))
       )
       alert(res.data.message)
     } catch (error) {
@@ -84,7 +86,7 @@ function ContentTableRowOptions({ video }) {
     console.log('Getting hired-by owners...')
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/editorProfile/hiredby/${userData._id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/editorProfile/hiredby/${userData._id}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -111,7 +113,7 @@ function ContentTableRowOptions({ video }) {
           to_id: user._id,
           video_id: video._id,
           from_id: userData._id,
-          description: `Request to edit video: ${video.metaData.name}`,
+          description: `${userData.user_metadata.role == 'Owner' ? 'Request to edit video' : 'Request for ownership of video'}${video.metaData.name}`,
           price: 0,
           status: 'pending',
         },
@@ -206,7 +208,7 @@ function ContentTableRowOptions({ video }) {
               : 'View Hired By Owners'}
           </h3>
           <div className='overflow-x-auto'>
-            {userData.user_metadata.role === 'Owner' ? (
+            {userData?.user_metadata?.role === 'Owner' ? (
               hiredEditors.length > 0 ? (
                 <table className='table'>
                   <thead>
@@ -247,7 +249,7 @@ function ContentTableRowOptions({ video }) {
                 <tbody>
                   {hiredByOwners.map((owner) => (
                     <tr key={owner._id}>
-                      <td>{owner.name}</td>
+                      <td>{owner.username}</td>
                       <td>{owner.email}</td>
                       <td>
                         <button

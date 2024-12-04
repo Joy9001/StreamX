@@ -1,27 +1,10 @@
-import { useRef } from 'react'
 import { useSelector } from 'react-redux'
 import Navbar from '../NavBar/Navbar.jsx'
 import ProfileHeader from './ProfileHeader.jsx'
 import UiProfile from './UiProfile.jsx'
 
 function Profile() {
-  const scrollContainerRef = useRef(null)
   const navOpen = useSelector((state) => state.ui.navbarOpen)
-
-  // Dummy video data
-  const dummyVideos = [
-    { title: 'Project Showcase 2024' },
-    { title: 'Client Presentation' },
-    { title: 'Product Demo' },
-    { title: 'Tutorial Series' },
-  ]
-
-  // Dummy hired editors data
-  const hiredEditors = [
-    { name: 'Alice Johnson', role: 'Video Editor' },
-    { name: 'Bob Smith', role: 'Motion Graphics' },
-    { name: 'Carol White', role: 'Sound Editor' },
-  ]
 
   return (
     <div className='flex h-screen overflow-hidden'>

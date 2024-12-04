@@ -1,14 +1,17 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { useSelector } from 'react-redux'
+import editorData from '../../data/editorData.json'
 import Navbar from '../NavBar/Navbar'
 import ProfileHeader from '../OwnerProfile/ProfileHeader'
 import EditorProfileCard from './EditorProfileCard'
 import EditorVideosList from './EditorVideosList'
 import SocialLinks from '../OwnerProfile/SocialLinks'
 import StorageCard from '../OwnerProfile/StorageCard'
+import UploadedVideosList from '../OwnerProfile/UploadedVideosList'
+import EditorProfileForm from './EditorProfileForm'
 import HiredByCard from './HiredByCard'
 import RequestsCard from '../OwnerProfile/RequestsCard'
-import EditorProfileForm from './EditorProfileForm'
-import { useSelector } from 'react-redux'
+
 
 function EditorUi() {
   const [showProfileForm, setShowProfileForm] = useState(false)
@@ -16,13 +19,14 @@ function EditorUi() {
   const { userData } = useSelector((state) => state.user)
 
   return (
-    <div className="flex h-screen">
-      <div className={`navbar h-full transition-all duration-300 ${
-        navOpen ? 'w-[15%]' : 'w-[5%]'
-      } pl-0`}>
-        <Navbar title='Editor Profile'/>
+    <div className='flex h-screen'>
+      <div
+        className={`navbar h-full transition-all duration-300 ${
+          navOpen ? 'w-[15%]' : 'w-[5%]'
+        } pl-0`}>
+        <Navbar title='Profile' />
       </div>
-      <div className="flex-1 flex flex-col">
+      <div className='flex flex-1 flex-col'>
         <ProfileHeader />
         <div id='webcrumbs' className='no-scrollbar overflow-auto'>
           <div className='w-full rounded-lg bg-white p-8'>

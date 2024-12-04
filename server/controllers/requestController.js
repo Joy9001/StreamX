@@ -37,10 +37,10 @@ export const getAllRequests = async (req, res) => {
 }
 
 // Get requests by owner ID
-export const getRequestsByFromId = async (req, res) => {
+export const getRequestsByToId = async (req, res) => {
 	try {
-		const { from_id } = req.params
-		const requests = await Request.find({ from_id })
+		const { to_id } = req.params
+		const requests = await Request.find({ to_id })
 		res.status(200).json(requests)
 	} catch (error) {
 		console.error('Error fetching owner requests:', error)
@@ -49,10 +49,10 @@ export const getRequestsByFromId = async (req, res) => {
 }
 
 // Get requests by editor ID
-export const getRequestsByToId = async (req, res) => {
+export const getRequestsByFromId = async (req, res) => {
 	try {
-		const { to_id } = req.params
-		const requests = await Request.find({ to_id })
+		const { from_id } = req.params
+		const requests = await Request.find({ from_id })
 		res.status(200).json(requests)
 	} catch (error) {
 		console.error('Error fetching editor requests:', error)

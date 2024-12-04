@@ -54,7 +54,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/requests', requestRoutes)
-app.use('/auth0',auth0Router)
+app.use('/auth0', authCheck, auth0Router)
 app.use('/api/videos', VideoRouter)
 app.use('/api/yt', YTRouter)
 app.use('/api', OwnerRouter)

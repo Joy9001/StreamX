@@ -12,8 +12,9 @@ const VideoDrawer = () => {
 
   const dispatch = useDispatch()
   const drawerContent = useSelector((state) => state.ui.drawerContent)
+  const userData = useSelector((state) => state.user.userData)
 
-  // console.log('drawerContent', drawerContent)
+  console.log('drawerContent', drawerContent)
   function handleCrossClick() {
     dispatch(setDrawerOpen(false))
   }
@@ -132,14 +133,16 @@ const VideoDrawer = () => {
 
       <section>
         <h3 className='text-md mb-4 font-semibold'>Status</h3>
-        <div className='flex flex-col text-sm'>
-          <span className='font-medium'>Youtube Upload Status</span>
-          <span className=''>
-            {drawerContent.ytUploadStatus == 'None'
-              ? '-'
-              : drawerContent.ytUploadStatus}
-          </span>
-        </div>
+        {userData.user_metadata.role === 'Owner' && (
+          <div className='flex flex-col text-sm'>
+            <span className='font-medium'>Youtube Upload Status</span>
+            <span className=''>
+              {drawerContent.ytUploadStatus == 'None'
+                ? '-'
+                : drawerContent.ytUploadStatus}
+            </span>
+          </div>
+        )}
         <div className='flex flex-col text-sm'>
           <span className='font-medium'>Approve Status</span>
           <span className=''>

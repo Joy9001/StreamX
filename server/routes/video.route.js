@@ -16,21 +16,21 @@ const router = Router()
 
 // Debug middleware
 const logRequest = (req, res, next) => {
-    console.log('Incoming request:', {
-        method: req.method,
-        path: req.path,
-        params: req.params,
-        body: req.body,
-        headers: req.headers
-    });
-    next();
-};
+	console.log('Incoming request:', {
+		method: req.method,
+		path: req.path,
+		params: req.params,
+		body: req.body,
+		headers: req.headers,
+	})
+	next()
+}
 
 router.get('/all/:role/:userId', getAllController)
 router.get('/recent/:role/:userId', recentController)
 router.get('/editor/:editorId', getVideosByEditorId)  
 router.post('/upload/:role/:userId', upload.single('file'), uploadController)
-router.delete('/delete', deleteController)
+router.delete('/delete/:role', deleteController)
 router.get('/download/:id', downloadController)
 router.get('/name/:videoId', getVideoNameById)
 
