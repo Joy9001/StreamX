@@ -90,13 +90,14 @@ function UploadedVideosList() {
       ) : (
         <ul className='space-y-4'>
           {videos.map((video, index) => (
+            console.log('video', video),
             <li
               key={video._id || index}
               className='flex items-center justify-between border-b pb-2'>
               <div className='flex items-center gap-4'>
                 <span className='min-w-[30px] text-gray-500'>{index + 1}.</span>
                 <div className='flex flex-col'>
-                  <span className='font-medium text-gray-800'>{video.title}</span>
+                  <span className='font-medium text-gray-800'>{video.metaData.name}</span>
                   {video.editor && (
                     <span className='text-sm text-gray-500'>
                       Editor: {video.editor}
@@ -120,7 +121,7 @@ function UploadedVideosList() {
                 <div className='flex items-center gap-1'>
                   <span className='font-medium text-gray-600'>File Size:</span>
                   <span className='text-gray-500'>
-                    {formatFileSize(video.fileSize)}
+                    {formatFileSize(video.metaData.size)}
                   </span>
                 </div>
               </div>

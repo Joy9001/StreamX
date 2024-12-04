@@ -1,61 +1,34 @@
 import { Camera, Edit2, Save, X } from 'lucide-react'
-import { useState, useRef } from 'react'
-import profileData from '../../data/profileData.json'
+import { useState, useRef, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import axios from 'axios'
 
 export default function ProfileForm() {
   const [isEditing, setIsEditing] = useState(false)
   const fileInputRef = useRef(null)
-  const currentProfile = profileData.profiles[1] // Using Sarah's profile as default
+  const userData = useSelector((state) => state.user.userData)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   const [formData, setFormData] = useState({
-    username: currentProfile.name,
-    bio: currentProfile.bio,
-    socials: {
-      website: currentProfile.website || '',
-      github: `https://github.com/${currentProfile.github || ''}`,
-      twitter: `https://twitter.com/${currentProfile.twitter?.replace('@', '') || ''}`,
-      instagram: `https://instagram.com/${currentProfile.instagram || ''}`,
-      facebook: `https://facebook.com/${currentProfile.facebook || ''}`,
-    },
-    profilephoto: currentProfile.profilePicture,
+    username: '',
+    bio: '',
+    profilephoto: ''
   })
 
-  const [errors, setErrors] = useState({})
-
-  const validations = {
-    username: /^[A-Za-z0-9_\s]{3,30}$/,
-  }
+  useEffect(() => {
+    if (userData) {
+      setFormData({
+        username: userData.name || '',
+        bio: userData.bio || '',
+        profilephoto: userData.profilephoto || ''
+      })
+    }
+  }, [userData])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    if (name.startsWith('social_')) {
-      const socialNetwork = name.replace('social_', '')
-      setFormData((prev) => ({
-        ...prev,
-        socials: {
-          ...prev.socials,
-          [socialNetwork]: value,
-        },
-      }))
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }))
-    }
-    if (name === 'username') validateField(name, value)
-  }
-
-  const validateField = (name, value) => {
-    let error = ''
-    if (name === 'username' && !validations.username.test(value)) {
-      error =
-        'Username must be 3-30 characters and can only contain letters, numbers, spaces, and underscores.'
-    }
-    setErrors((prev) => ({ ...prev, [name]: error }))
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log('Form submitted:', formData)
-    setIsEditing(false)
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   const handleFileUpload = (e) => {
@@ -63,9 +36,47 @@ export default function ProfileForm() {
     if (file) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setFormData((prev) => ({ ...prev, profilephoto: reader.result }))
+        setFormData(prev => ({ ...prev, profilephoto: reader.result }))
       }
       reader.readAsDataURL(file)
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    try {
+      const formDataToSend = new FormData()
+      formDataToSend.append('name', formData.username)
+      formDataToSend.append('bio', formData.bio)
+
+      // If there's a new profile photo (in base64 format), convert it to a file
+      if (formData.profilephoto && formData.profilephoto.startsWith('data:')) {
+        const response = await fetch(formData.profilephoto)
+        const blob = await response.blob()
+        const file = new File([blob], 'profile-photo.jpg', { type: 'image/jpeg' })
+        formDataToSend.append('file', file)
+      }
+
+      const response = await axios.patch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/owner/profile/basic/${userData._id}`,
+        formDataToSend,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      )
+
+      console.log('Profile updated:', response.data)
+      setIsEditing(false)
+    } catch (err) {
+      console.error('Error updating profile:', err)
+      setError(err.response?.data?.message || 'Error updating profile')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -80,12 +91,20 @@ export default function ProfileForm() {
             <>
               <button
                 onClick={() => setIsEditing(false)}
-                className='btn btn-ghost btn-sm'>
+                className='btn btn-ghost btn-sm'
+                disabled={loading}>
                 <X className='h-5 w-5' />
                 Cancel
               </button>
-              <button onClick={handleSubmit} className='btn btn-primary btn-sm'>
-                <Save className='h-5 w-5' />
+              <button 
+                onClick={handleSubmit} 
+                className='btn btn-primary btn-sm'
+                disabled={loading}>
+                {loading ? (
+                  <span className='loading loading-spinner'></span>
+                ) : (
+                  <Save className='h-5 w-5' />
+                )}
                 Save Changes
               </button>
             </>
@@ -100,6 +119,12 @@ export default function ProfileForm() {
         </div>
       </div>
 
+      {error && (
+        <div className='alert alert-error mb-4'>
+          <span>{error}</span>
+        </div>
+      )}
+
       <div className='flex flex-col gap-8 md:flex-row'>
         <div className='flex-1'>
           <div className='form-control w-full'>
@@ -109,20 +134,12 @@ export default function ProfileForm() {
             <input
               type='text'
               name='username'
-              className={`input input-bordered w-full ${
-                errors.username ? 'input-error' : ''
-              }`}
+              placeholder={userData?.name || 'Enter your name'}
+              className='input input-bordered w-full'
               value={formData.username}
               onChange={handleInputChange}
               disabled={!isEditing}
             />
-            {errors.username && (
-              <label className='label'>
-                <span className='label-text-alt text-error'>
-                  {errors.username}
-                </span>
-              </label>
-            )}
           </div>
 
           <div className='form-control w-full'>
@@ -131,113 +148,39 @@ export default function ProfileForm() {
             </label>
             <textarea
               name='bio'
+              placeholder={userData?.bio || 'Tell us about yourself'}
               className='textarea textarea-bordered h-24'
               value={formData.bio}
               onChange={handleInputChange}
               disabled={!isEditing}
             />
           </div>
-
-          <div className='divider'>Social Links</div>
-
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-            <div className='form-control'>
-              <label className='label'>
-                <span className='label-text'>Website</span>
-              </label>
-              <input
-                type='url'
-                name='social_website'
-                className='input input-bordered'
-                value={formData.socials.website}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-              />
-            </div>
-
-            <div className='form-control'>
-              <label className='label'>
-                <span className='label-text'>GitHub</span>
-              </label>
-              <input
-                type='url'
-                name='social_github'
-                className='input input-bordered'
-                value={formData.socials.github}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-              />
-            </div>
-
-            <div className='form-control'>
-              <label className='label'>
-                <span className='label-text'>Twitter</span>
-              </label>
-              <input
-                type='url'
-                name='social_twitter'
-                className='input input-bordered'
-                value={formData.socials.twitter}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-              />
-            </div>
-
-            <div className='form-control'>
-              <label className='label'>
-                <span className='label-text'>Instagram</span>
-              </label>
-              <input
-                type='url'
-                name='social_instagram'
-                className='input input-bordered'
-                value={formData.socials.instagram}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-              />
-            </div>
-
-            <div className='form-control'>
-              <label className='label'>
-                <span className='label-text'>Facebook</span>
-              </label>
-              <input
-                type='url'
-                name='social_facebook'
-                className='input input-bordered'
-                value={formData.socials.facebook}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-              />
-            </div>
-          </div>
         </div>
 
-        <div className='w-64'>
-          <div className='text-center'>
-            <div className='avatar'>
-              <div className='w-32 rounded-full ring ring-primary ring-offset-2 ring-offset-base-100'>
-                <img src={formData.profilephoto} alt='Profile' />
-              </div>
+        <div className='flex flex-col items-center gap-4'>
+          <div className='relative'>
+            <div className='w-32 h-32 rounded-full ring ring-primary ring-offset-2 ring-offset-base-100 overflow-hidden'>
+              <img
+                src={formData.profilephoto || userData?.profilephoto || '/default-avatar.png'}
+                alt='Profile'
+                className='w-full h-full object-cover'
+              />
             </div>
             {isEditing && (
-              <div className='mt-4'>
-                <input
-                  type='file'
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                  accept='image/*'
-                  className='hidden'
-                />
-                <button
-                  className='btn btn-outline btn-sm'
-                  onClick={() => fileInputRef.current?.click()}>
-                  <Camera className='h-4 w-4' />
-                  Upload Photo
-                </button>
-              </div>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className='absolute bottom-0 right-0 rounded-full bg-primary p-2 text-white hover:bg-primary-focus'>
+                <Camera className='h-4 w-4' />
+              </button>
             )}
           </div>
+          <input
+            ref={fileInputRef}
+            type='file'
+            accept='image/*'
+            className='hidden'
+            onChange={handleFileUpload}
+          />
         </div>
       </div>
     </div>

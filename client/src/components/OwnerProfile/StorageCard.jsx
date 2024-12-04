@@ -1,13 +1,75 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import axios from 'axios'
+import { useAuth0 } from '@auth0/auth0-react'
+import {filesize} from 'filesize'
 
 function StorageCard() {
   const dialogRef = useRef(null)
-  const { userData } = useSelector((state) => state.user);
-  const totalStorage = userData?.storage?.total || 10240; // 10GB in MB if not specified
-  const usedStorage = userData?.storage?.used || 0;
-  const remainingStorage = totalStorage - usedStorage;
-  const usagePercentage = (usedStorage / totalStorage) * 100;
+  const userData  = useSelector((state) => state.user.userData)
+  const { getAccessTokenSilently } = useAuth0()
+  const [storageData, setStorageData] = useState({
+    totalStorage: 10240, // 10GB in MB by default
+    usedStorage: 0,
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const fetchStorageUsage = async () => {
+      try {
+        setLoading(true)
+        const token = await getAccessTokenSilently()
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/storage-usages/${userData.user_metadata.role}/${userData._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        console.log('Storage Usage Response:', response.data)
+        const usedStorageInBytes = response.data.storageUsage
+        const usedStorageInMB = usedStorageInBytes // Convert bytes to MB
+        
+        setStorageData({
+          totalStorage: 1024 * 1024 * 1024, // Default to 10GB if not set
+          usedStorage: usedStorageInMB
+        })
+        setError(null)
+      } catch (err) {
+        console.error('Error fetching storage usage:', err)
+        setError('Failed to fetch storage usage')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (userData?._id && userData?.user_metadata?.role) {
+      fetchStorageUsage()
+    }
+  }, [userData, getAccessTokenSilently])
+
+  const remainingStorage = storageData.totalStorage - storageData.usedStorage
+  const usagePercentage = (storageData.usedStorage / storageData.totalStorage) * 100
+
+  if (loading) {
+    return (
+      <div className='w-[300px] rounded-lg bg-white p-6 shadow-lg'>
+        <div className='flex items-center justify-center'>
+          <div className='h-8 w-8 animate-spin rounded-full border-4 border-pink-300 border-t-transparent'></div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className='w-[300px] rounded-lg bg-white p-6 shadow-lg'>
+        <p className='text-center text-red-500'>{error}</p>
+      </div>
+    )
+  }
 
   return (
     <div className='w-[300px] rounded-lg bg-white p-6 shadow-lg transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl'>
@@ -19,13 +81,13 @@ function StorageCard() {
 
       <div className='space-y-4'>
         <div className='text-gray-700'>
-          <p className='font-medium'>Total Storage: {(totalStorage / 1024).toFixed(2)} GB</p>
+          <p className='font-medium'>Total Storage: {filesize(storageData.totalStorage)}</p>
         </div>
 
         <div>
           <div className='mb-1 flex justify-between'>
             <span className='text-gray-700'>
-              Data Used: {(usedStorage / 1024).toFixed(2)} GB
+              Data Used: {filesize(storageData.usedStorage)}
             </span>
             <span className='text-gray-500'>{usagePercentage.toFixed(1)}%</span>
           </div>
@@ -38,7 +100,7 @@ function StorageCard() {
 
         <div className='text-gray-700'>
           <p className='font-medium'>
-            Remaining: {(remainingStorage / 1024).toFixed(2)} GB
+            Remaining: {filesize((remainingStorage))}
           </p>
         </div>
 

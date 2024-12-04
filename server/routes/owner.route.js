@@ -8,7 +8,7 @@ import {
 	getOwnerProfile,
 	updateOwner,
 } from '../controllers/owner.controller.js'
-import { createOwnerProfile, updateOwnerProfile } from '../controllers/profileSetting.controller.js'
+import { createOwnerProfile, updateOwnerProfile, updateBasicProfile } from '../controllers/profileSetting.controller.js'
 import { upload } from '../middlewares/multer.middleware.js'
 
 const router = express.Router()
@@ -24,6 +24,9 @@ router.delete('/ownerProfile/:email', deleteOwner)
 router.get('/owner/profile/:id', getOwnerProfile)
 router.post('/owner/profile/setup/:id', upload.single('file'), createOwnerProfile)
 router.put('/owner/profile/settings/:id', upload.single('file'), updateOwnerProfile)
+
+// New route for updating basic profile info
+router.patch('/owner/profile/basic/:id', upload.single('file'), updateBasicProfile)
 
 router.get('/hired-editors/:ownerId', getHiredEditors)
 export default router
