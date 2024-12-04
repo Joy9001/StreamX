@@ -29,7 +29,7 @@ function EditorContentTableApprove() {
         if (!accessToken || !userData?._id) return
 
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/requests/from-id/${userData._id}`,
+          `${import.meta.env.VITE_BACKEND_URL}/requests/to-id/${userData._id}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -163,24 +163,31 @@ function EditorContentTableApprove() {
             </tr>
           </thead>
           <tbody>
-            {approvals.map((approval) => (
-              <tr key={approval._id}>
-                <td>{approval.video_name}</td>
-                <td>{approval.from_name}</td>
-                <td>{approval.to_name}</td>
-                <td>{approval.status}</td>
-                <td>
-                  <button
-                    className='btn btn-success btn-sm'
-                    onClick={() =>
-                      handleApprove(approval._id, approval.video_id)
-                    }
-                    disabled={approval.status === 'approved' || loading}>
-                    {approval.status === 'approved' ? 'Approved' : 'Approve'}
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {approvals.map(
+              (approval) => (
+                console.log('approval', approval),
+                (
+                  <tr key={approval._id}>
+                    <td>{approval.video.title}</td>
+                    <td>{approval.from.name}</td>
+                    <td>{approval.to.name}</td>
+                    <td>{approval.status}</td>
+                    <td>
+                      <button
+                        className='btn btn-success btn-sm'
+                        onClick={() =>
+                          handleApprove(approval._id, approval.video._id)
+                        }
+                        disabled={approval.status === 'approved' || loading}>
+                        {approval.status === 'approved'
+                          ? 'Approved'
+                          : 'Approve'}
+                      </button>
+                    </td>
+                  </tr>
+                )
+              )
+            )}
           </tbody>
         </table>
       </div>
