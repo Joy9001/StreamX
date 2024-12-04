@@ -5,8 +5,6 @@ import { useSelector } from 'react-redux'
 
 function EditorContentTableApprove() {
   const [approvals, setApprovals] = useState([])
-  const [videoNames, setVideoNames] = useState({})
-  const [ownerNames, setOwnerNames] = useState({})
   const [loading, setLoading] = useState(false)
   const { getAccessTokenSilently } = useAuth0()
   const [accessToken, setAccessToken] = useState(null)
@@ -39,7 +37,7 @@ function EditorContentTableApprove() {
           }
         )
         console.log('Fetched requests:', response.data)
-        setRequests(response.data)
+        setApprovals(response.data)
       } catch (error) {
         console.error('Error fetching requests:', error)
       }
@@ -66,49 +64,6 @@ function EditorContentTableApprove() {
         )
         console.log('Fetched approvals:', response.data)
         setApprovals(response.data)
-
-        // Fetch video names for approvals
-        const videoNamesMap = {}
-        await Promise.all(
-          response.data.map(async (approval) => {
-            if (!approval.video_id) return
-            try {
-              const videoRes = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/videos/name/${approval.video_id}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                  },
-                }
-              )
-              videoNamesMap[approval.video_id] = videoRes.data.name
-            } catch (error) {
-              console.error('Error fetching video name:', error)
-              videoNamesMap[approval.video_id] = 'Unknown Video'
-            }
-          })
-        )
-        setVideoNames(videoNamesMap)
-
-        // Fetch owner names using to_id
-        const ownerNamesMap = {}
-        await Promise.all(
-          response.data.map(async (approval) => {
-            try {
-              const ownerRes = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/owner/name/${approval.from_id}`,
-                {
-                  withCredentials: true,
-                }
-              )
-              ownerNamesMap[approval.from_id] = ownerRes.data.name
-            } catch (error) {
-              console.error('Error fetching owner name:', error)
-              ownerNamesMap[approval.to_id] = 'Unknown Owner'
-            }
-          })
-        )
-        setOwnerNames(ownerNamesMap)
       } catch (error) {
         console.error('Error fetching approvals:', error)
       }
@@ -215,7 +170,7 @@ function EditorContentTableApprove() {
                   <tr key={approval._id}>
                     <td>{approval.video.title}</td>
                     <td>{approval.from.name}</td>
-                    <td>{approval.to.name}</td>
+                    <td>{approval.description}</td>
                     <td>{approval.status}</td>
                     <td>
                       <button
