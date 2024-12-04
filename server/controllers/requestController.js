@@ -1,3 +1,4 @@
+import Admin from '../models/admin.model.js'
 import Editor from '../models/editor.models.js'
 import Editor_Gig from '../models/Editor_gig.js'
 import Owner from '../models/owner.model.js'
@@ -205,6 +206,79 @@ export const getAllUpdatedRequests = async (req, res) => {
 		return res.status(500).json({
 			success: false,
 			message: 'Error fetching requests',
+			error: error.message,
+		})
+	}
+}
+
+export const getAdminRequests = async (req, res) => {
+	try {
+		// Find admin users
+		const adminUsers = await Admin.find({ role: 'admin' })
+		const adminIds = adminUsers.map((admin) => admin._id)
+
+		// Fetch all requests with populated video data where to_id is an admin
+		const requests = await Request.find({ to_id: { $in: adminIds } }).populate({
+			path: 'video_id',
+			select: 'url metaData',
+		})
+
+		const processedRequests = []
+
+		// Process each request
+		for (const request of requests) {
+			// Find owner (from_id)
+			let from
+			let fromUser
+			fromUser = await Owner.findById(request.from_id)
+			from = 'Owner'
+			if (!fromUser) {
+				continue
+			}
+
+			// Find admin (to_id)
+			const toUser = await Admin.findById(request.to_id)
+			if (!toUser) {
+				continue
+			}
+
+			// Skip if neither owner nor admin is found
+			if (!fromUser && !toUser) continue
+
+			// Construct response object
+			const processedRequest = {
+				request_id: request._id,
+				from: {
+					id: request.from_id,
+					name: from === 'Owner' ? fromUser.username : fromUser.name,
+				},
+				to: {
+					id: request.to_id,
+					name: toUser.username,
+				},
+				video: {
+					url: request.video_id?.url || '',
+					title: request.video_id?.metaData?.title || '',
+				},
+				description: request.description,
+				price: request.price,
+				status: request.status,
+				createdAt: request.createdAt,
+				updatedAt: request.updatedAt,
+			}
+
+			processedRequests.push(processedRequest)
+		}
+
+		return res.status(200).json({
+			success: true,
+			requests: processedRequests,
+		})
+	} catch (error) {
+		console.error('Error in getAdminRequests:', error)
+		return res.status(500).json({
+			success: false,
+			message: 'Error fetching admin requests',
 			error: error.message,
 		})
 	}

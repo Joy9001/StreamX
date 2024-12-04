@@ -4,6 +4,7 @@ import {
 	deleteRequest,
 	getAllRequests,
 	getAllUpdatedRequests,
+	getAdminRequests,
 	getRequestsByFromId,
 	getRequestsByToId,
 	updateRequestStatus,
@@ -24,6 +25,9 @@ router.get('/to-id/:to_id', getRequestsByToId)
 
 // Get requests by editor ID
 router.get('/from-id/:from_id', getRequestsByFromId)
+
+// Get admin requests
+router.get('/admin', getAdminRequests)
 
 // Update request status
 router.patch('/:id/status', updateRequestStatus)
