@@ -1,20 +1,24 @@
 import Editor from '../models/editor.models.js'
 
 const GetEditorByEmail = async (req, res) => {
-	const { email } = req.params
+    const { email } = req.params
+    console.log('Received request for editor with email:', email)
 
-	try {
-		// Find editor by email
-		const editor = await Editor.findOne({ email })
+    try {
+        const editor = await Editor.findOne({ email })
+        console.log('Database query result:', editor)
 
-		if (!editor) {
-			return res.status(404).json({ message: 'Editor not found' })
-		}
+        if (!editor) {
+            console.log('No editor found for email:', email)
+            return res.status(404).json({ message: 'Editor not found' })
+        }
 
-		res.status(200).json(editor)
-	} catch (err) {
-		console.error('Error fetching editor data:', err)
-		res.status(500).json({ message: 'Server error' })
-	}
+        console.log('Sending editor data:', editor)
+        res.status(200).json(editor)
+    } catch (err) {
+        console.error('Error in GetEditorByEmail:', err)
+        res.status(500).json({ message: 'Server error', error: err.message })
+    }
 }
+
 export default GetEditorByEmail

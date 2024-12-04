@@ -4,6 +4,7 @@ import {
 	downloadController,
 	getAllController,
 	getVideoNameById,
+	getVideosByEditorId,
 	recentController,
 	updateEditor,
 	updateOwner,
@@ -27,6 +28,7 @@ const logRequest = (req, res, next) => {
 
 router.get('/all/:role/:userId', getAllController)
 router.get('/recent/:role/:userId', recentController)
+router.get('/editor/:editorId', getVideosByEditorId)  
 router.post('/upload/:role/:userId', upload.single('file'), uploadController)
 router.delete('/delete/:role', deleteController)
 router.get('/download/:id', downloadController)
