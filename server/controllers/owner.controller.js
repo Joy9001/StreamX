@@ -137,6 +137,7 @@ export const getHiredEditors = async (req, res) => {
 		const { ownerId } = req.params
 
 		const findVideos = await Video.find({ ownerId: ownerId })
+		console.log('findVideos in getHiredEditors', findVideos)
 
 		if (!findVideos) {
 			return res.status(404).json({ message: 'Videos not found' })
@@ -159,4 +160,19 @@ export const getHiredEditors = async (req, res) => {
 		console.error('Error fetching hired editors:', error)
 		res.status(500).json({ message: 'Error fetching hired editors', error: error.message })
 	}
+}
+
+export const getOwnerNameById = async (req, res) => {
+  try {
+    const { id } = req.params
+    const owner = await Owner.findById(id)
+
+    if (!owner) {
+      return res.status(404).json({ message: 'Owner not found' })
+    }
+
+    res.status(200).json({ name: owner.username })
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching owner name', error })
+  }
 }

@@ -7,6 +7,7 @@ function ContentTable() {
   const [requests, setRequests] = useState([])
   const [videoNames, setVideoNames] = useState({})
   const [editorNames, setEditorNames] = useState({})
+  const [ownerNames, setOwnerNames] = useState({})
   const userData = useSelector((state) => state.user.userData)
   const { getAccessTokenSilently } = useAuth0()
   const [accessToken, setAccessToken] = useState(null)
@@ -102,6 +103,29 @@ function ContentTable() {
             })
           )
           setEditorNames(editorNamesMap)
+        } else {
+          // Fetch owner names for all requests when user is not owner
+          const ownerNamesMap = {}
+          await Promise.all(
+            res.data.map(async (request) => {
+              if (!request.from_id) return
+              try {
+                const ownerRes = await axios.get(
+                  `${import.meta.env.VITE_BACKEND_URL}/api/owner/name/${request.to_id}`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${accessToken}`,
+                    },
+                  }
+                )
+                ownerNamesMap[request.to_id] = ownerRes.data.name
+              } catch (error) {
+                console.error('Error fetching owner name:', error)
+                ownerNamesMap[request.to_id] = 'Unknown Owner'
+              }
+            })
+          )
+          setOwnerNames(ownerNamesMap)
         }
       } catch (error) {
         console.error('Error fetching requests:', error)
@@ -124,7 +148,7 @@ function ContentTable() {
           <thead>
             <tr>
               <th>Video Name</th>
-              {userRole === 'Owner' ? <th>Editor Name</th> : <th>From ID</th>}
+              {userRole === 'Owner' ? <th>Editor Name</th> : <th>Owner Name</th>}
               <th>Description</th>
               <th>Price</th>
               <th>Status</th>
@@ -136,9 +160,8 @@ function ContentTable() {
                 <td>{videoNames[request.video_id] || 'Loading...'}</td>
                 <td>
                   {userRole === 'Owner'
-                    ? editorNames[request.to_id] || 'Loading...' // Show editor name for owner
-                    : request.from_id}{' '}
-                  {/* Show from_id for editor */}
+                    ? editorNames[request.to_id] || 'Loading...'
+                    : ownerNames[request.to_id] || 'Loading...'}
                 </td>
                 <td>{request.description}</td>
                 <td>${request.price}</td>

@@ -1,106 +1,142 @@
-export default function OurPortofolio() {
+import { motion, useAnimation } from 'framer-motion'
+import { Award, Check, Zap } from 'lucide-react'
+import { useEffect } from 'react'
+import { useInView } from 'react-intersection-observer'
+
+export default function OurPricing() {
+  const { ref: sectionRef, inView: sectionInView } = useInView({
+    threshold: 0.5,
+    triggerOnce: false,
+  })
+
+  const sectionControls = useAnimation()
+
+  useEffect(() => {
+    if (sectionInView) {
+      sectionControls.start('visible')
+    } else {
+      sectionControls.start('hidden')
+    }
+  }, [sectionInView, sectionControls])
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0 },
+  }
+
+  const plans = [
+    {
+      title: 'Bronze Plan',
+      price: '$9.99',
+      features: [
+        '5 Video Uploads',
+        'Basic Video Editing',
+        '1 GB Cloud Storage',
+      ],
+      icon: <Award color='#CD7F32' size={48} />,
+      color: {
+        from: '#F5DEB3',
+        to: '#D2691E',
+      },
+      recommend: false,
+    },
+    {
+      title: 'Silver Plan',
+      price: '$19.99',
+      features: [
+        '20 Video Uploads',
+        'Advanced Video Editing',
+        '10 GB Cloud Storage',
+      ],
+      icon: <Zap color='#C0C0C0' size={48} />,
+      color: {
+        from: '#E6E6FA',
+        to: '#4169E1',
+      },
+      recommend: true,
+    },
+    {
+      title: 'Gold Plan',
+      price: '$49.99',
+      features: [
+        'Unlimited Video Uploads',
+        'Professional Video Editing',
+        '100 GB Cloud Storage',
+      ],
+      icon: <Zap color='#FFD700' size={48} />,
+      color: {
+        from: '#FFE4B5',
+        to: '#DAA520',
+      },
+      recommend: false,
+    },
+  ]
+
   return (
-    <section id='projects'>
-      <h2 className='font-quicksand pt-16 text-center text-[36px] font-semibold text-sky-600'>
-        Our Pricing
-      </h2>
-      <div
-  style={{
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '2rem',
-    flexWrap: 'wrap',
-    marginTop: '2rem',
-  }}
->
-  {/* Basic Plan */}
-  <div
-    style={{
-      background: 'linear-gradient(135deg, #f9fafb, #ffffff)',
-      borderRadius: '1.5rem',
-      padding: '2rem',
-      boxShadow: '0 8px 12px rgba(0, 0, 0, 0.1)',
-      width: '320px',
-      textAlign: 'center',
-      transition: 'transform 0.3s, box-shadow 0.3s',
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'scale(1.05)';
-      e.currentTarget.style.boxShadow = '0 12px 20px rgba(0, 0, 0, 0.2)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'scale(1)';
-      e.currentTarget.style.boxShadow = '0 8px 12px rgba(0, 0, 0, 0.1)';
-    }}
-  >
-    <h3 style={{ fontSize: '1.75rem', fontWeight: '700', marginBottom: '1rem' }}>Basic Plan</h3>
-    <p style={{ fontSize: '1.125rem', color: '#4B5563', marginBottom: '1.5rem' }}>$9.99/month</p>
-    <ul style={{ listStyleType: 'none', padding: '0', marginBottom: '2rem' }}>
-      <li style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>5 Video Uploads</li>
-      <li style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>Basic Video Editing</li>
-      <li style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>1 GB Cloud Storage</li>
-    </ul>
-  </div>
+    <section id='projects' ref={sectionRef} className='bg-violet-25 py-16'>
+      <motion.h2
+        initial='hidden'
+        animate={sectionControls}
+        variants={cardVariants}
+        transition={{ duration: 1.2, ease: 'easeInOut' }}
+        className='mb-12 text-center text-4xl font-bold text-gray-800'>
+        Choose Your Perfect Plan
+      </motion.h2>
 
-  {/* Repeat for Standard Plan */}
-  <div
-    style={{
-      background: 'linear-gradient(135deg, #edf2f7, #ffffff)',
-      borderRadius: '1.5rem',
-      padding: '2rem',
-      boxShadow: '0 8px 12px rgba(0, 0, 0, 0.1)',
-      width: '320px',
-      textAlign: 'center',
-      transition: 'transform 0.3s, box-shadow 0.3s',
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'scale(1.05)';
-      e.currentTarget.style.boxShadow = '0 12px 20px rgba(0, 0, 0, 0.2)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'scale(1)';
-      e.currentTarget.style.boxShadow = '0 8px 12px rgba(0, 0, 0, 0.1)';
-    }}
-  >
-    <h3 style={{ fontSize: '1.75rem', fontWeight: '700', marginBottom: '1rem' }}>Standard Plan</h3>
-    <p style={{ fontSize: '1.125rem', color: '#4B5563', marginBottom: '1.5rem' }}>$19.99/month</p>
-    <ul style={{ listStyleType: 'none', padding: '0', marginBottom: '2rem' }}>
-      <li style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>20 Video Uploads</li>
-      <li style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>Advanced Video Editing</li>
-      <li style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>10 GB Cloud Storage</li>
-    </ul>
-  </div>
+      <motion.div
+        initial='hidden'
+        animate={sectionControls}
+        variants={cardVariants}
+        transition={{ duration: 1.2, ease: 'easeInOut', delay: 0.2 }}
+        className='flex flex-wrap items-center justify-center gap-8 px-4'>
+        {plans.map((plan, index) => (
+          <motion.div
+            key={index}
+            initial='hidden'
+            animate={sectionControls}
+            variants={cardVariants}
+            transition={{
+              duration: 1.2,
+              ease: 'easeInOut',
+              delay: index * 0.2,
+            }}
+            className={`hover:shadow-3xl relative w-[350px] overflow-hidden rounded-2xl p-6 text-center shadow-2xl transition-all duration-300 hover:scale-105 ${plan.recommend ? 'border-4 border-blue-500' : ''} `}
+            style={{
+              background: `linear-gradient(135deg, ${plan.color.from}, ${plan.color.to})`,
+              backgroundClip: 'border-box',
+              color: 'white',
+            }}
+            whileHover={{
+              scale: 1.05,
+              boxShadow:
+                '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            }}>
+            {plan.recommend && (
+              <div className='absolute right-0 top-0 rounded-bl-lg bg-blue-500 px-3 py-1 text-white'>
+                Recommended
+              </div>
+            )}
 
-  {/* Premium Plan */}
-  <div
-    style={{
-      background: 'linear-gradient(135deg, #f7fafc, #ffffff)',
-      borderRadius: '1.5rem',
-      padding: '2rem',
-      boxShadow: '0 8px 12px rgba(0, 0, 0, 0.1)',
-      width: '320px',
-      textAlign: 'center',
-      transition: 'transform 0.3s, box-shadow 0.3s',
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'scale(1.05)';
-      e.currentTarget.style.boxShadow = '0 12px 20px rgba(0, 0, 0, 0.2)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'scale(1)';
-      e.currentTarget.style.boxShadow = '0 8px 12px rgba(0, 0, 0, 0.1)';
-    }}
-  >
-    <h3 style={{ fontSize: '1.75rem', fontWeight: '700', marginBottom: '1rem' }}>Premium Plan</h3>
-    <p style={{ fontSize: '1.125rem', color: '#4B5563', marginBottom: '1.5rem' }}>$49.99/month</p>
-    <ul style={{ listStyleType: 'none', padding: '0', marginBottom: '2rem' }}>
-      <li style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>Unlimited Video Uploads</li>
-      <li style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>Professional Video Editing</li>
-      <li style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>100 GB Cloud Storage</li>
-    </ul>
-  </div>
-</div>
+            <div className='mb-6 flex justify-center'>{plan.icon}</div>
 
+            <h3 className='mb-4 text-2xl font-bold'>{plan.title}</h3>
+
+            <div className='mb-6 text-4xl font-extrabold'>
+              {plan.price}
+              <span className='text-base'>/month</span>
+            </div>
+
+            <ul className='mb-8 space-y-3'>
+              {plan.features.map((feature, i) => (
+                <li key={i} className='flex items-center justify-center gap-2'>
+                  <Check size={20} className='text-white' />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        ))}
+      </motion.div>
     </section>
   )
 }

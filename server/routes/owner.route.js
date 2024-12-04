@@ -7,6 +7,7 @@ import {
 	getOwnerByEmail,
 	getOwnerProfile,
 	updateOwner,
+	getOwnerNameById,
 } from '../controllers/owner.controller.js'
 import { createOwnerProfile, updateOwnerProfile, updateBasicProfile } from '../controllers/profileSetting.controller.js'
 import { upload } from '../middlewares/multer.middleware.js'
@@ -29,4 +30,6 @@ router.put('/owner/profile/settings/:id', upload.single('file'), updateOwnerProf
 router.patch('/owner/profile/basic/:id', upload.single('file'), updateBasicProfile)
 
 router.get('/hired-editors/:ownerId', getHiredEditors)
+router.get('/owner/name/:id', getOwnerNameById)
+
 export default router

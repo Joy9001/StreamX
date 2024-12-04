@@ -1,18 +1,19 @@
-import EditorGig from '../models/Editor_gig.js'
 import Owner from '../models/owner.model.js'
 import Video from '../models/video.model.js'
+import Editor_Gig from '../models/Editor_gig.js'
+import Editor from '../models/editor.models.js'
 
 export const createEditorProfile = async (req, res) => {
 	const { name, email, phone, location, image, software, specializations } = req.body
 
 	try {
-		const existingEditor = await EditorGig.findOne({ email })
+		const existingEditor = await Editor_Gig.findOne({ email })
 		console.log('existingEditor:', existingEditor)
 		if (existingEditor) {
 			return res.status(400).json({ message: 'Editor with this email already exists.' })
 		}
 
-		const newEditor = new EditorGig({
+		const newEditor = new Editor_Gig({
 			name,
 			email,
 			phone,
@@ -37,12 +38,13 @@ export const getEditorNameById = async (req, res) => {
 		const { editorId } = req.params
 		console.log('Looking for editor ID:', editorId)
 
-		// Get all editors
-		const editors = await EditorGig.find({})
+		// Get all editors	
+		const editors = await Editor_Gig.find({})
 		console.log('Found editors:', editors.length)
 
-		// Log all editor IDs for comparison
+		// // Log all editor IDs for comparison
 		editors.forEach((ed) => {
+			console.log('Searching for editor ID:', editorId)
 			console.log('Editor in DB:', {
 				id: ed._id.toString(),
 				name: ed.name,
@@ -50,12 +52,15 @@ export const getEditorNameById = async (req, res) => {
 			})
 		})
 
-		// Try to find the editor by comparing string versions of IDs
-		const editor = editors.find((ed) => ed._id.toString() === editorId)
+		// // Try to find the editor by comparing string versions of IDs
+		let editor = editors.find((ed) => ed._id.toString() === editorId)
 
 		if (!editor) {
-			console.log('No matching editor found')
-			return res.status(404).json({ message: 'Editor not found' })
+			editor = await Editor.findById(editorId)
+
+			if (!editor) {
+				return res.status(404).json({ message: 'Editor not found' })
+			}
 		}
 
 		// If name is not available, use email as fallback
