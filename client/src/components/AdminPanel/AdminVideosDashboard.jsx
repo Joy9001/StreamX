@@ -76,31 +76,31 @@ export function Dashboard() {
             <img src={logoX} alt='StreamX Logo' className='h-12 w-auto' />
             <span className='text-3xl font-bold text-black'>StreamX</span>
           </div>
-          <Link to='/AdminPanel'>
+          <Link to='/admin-panel'>
             <Button variant='ghost' className='w-full justify-start gap-2'>
               <Home className='h-4 w-4' />
               Dashboard
             </Button>
           </Link>
-          <Link to='/AdminPanel/videos'>
+          <Link to='/admin-panel/videos'>
             <Button variant='ghost' className='w-full justify-start gap-2'>
               <Video className='h-4 w-4' />
               Videos
             </Button>
           </Link>
-          <Link to='/AdminPanel/requests'>
+          <Link to='/admin-panel/requests'>
             <Button variant='ghost' className='w-full justify-start gap-2'>
               <Package2 className='h-4 w-4' />
               Requests
             </Button>
           </Link>
-          <Link to='/AdminPanel/owners'>
+          <Link to='/admin-panel/owners'>
             <Button variant='ghost' className='w-full justify-start gap-2'>
               <Settings className='h-4 w-4' />
               Owners
             </Button>
           </Link>
-          <Link to='/AdminPanel/editors'>
+          <Link to='/admin-panel/editors'>
             <Button variant='ghost' className='w-full justify-start gap-2'>
               <ListFilter className='h-4 w-4' />
               Editors
@@ -117,31 +117,31 @@ export function Dashboard() {
               <img src={logoX} alt='StreamX Logo' className='h-12 w-auto' />
               <span className='text-xl font-bold text-black'>StreamX</span>
             </div>
-            <Link to='/AdminPanel'>
+            <Link to='/admin-panel'>
               <Button variant='ghost' className='w-full justify-start gap-2'>
                 <Home className='h-4 w-4' />
                 Dashboard
               </Button>
             </Link>
-            <Link to='/AdminPanel/videos'>
+            <Link to='/admin-panel/videos'>
               <Button variant='ghost' className='w-full justify-start gap-2'>
                 <Video className='h-4 w-4' />
                 Videos
               </Button>
             </Link>
-            <Link to='/AdminPanel/requests'>
+            <Link to='/admin-panel/requests'>
               <Button variant='ghost' className='w-full justify-start gap-2'>
                 <Package2 className='h-4 w-4' />
                 Requests
               </Button>
             </Link>
-            <Link to='/AdminPanel/owners'>
+            <Link to='/admin-panel/owners'>
               <Button variant='ghost' className='w-full justify-start gap-2'>
                 <Settings className='h-4 w-4' />
                 Owners
               </Button>
             </Link>
-            <Link to='/AdminPanel/editors'>
+            <Link to='/admin-panel/editors'>
               <Button variant='ghost' className='w-full justify-start gap-2'>
                 <ListFilter className='h-4 w-4' />
                 Editors
