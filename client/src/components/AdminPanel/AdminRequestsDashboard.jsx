@@ -127,6 +127,50 @@ export function AdminRequestsDashboard() {
     }
   }
 
+  const renderYouTubeUploadButton = (request) => {
+    console.log('Request:', request)
+    const status = request.video?.ytUploadStatus || 'None'
+    console.log('Status:', status)
+
+    const statusIcons = {
+      None: (
+        <Button
+          variant='outline'
+          size='sm'
+          onClick={() => handleUploadToYoutube(request)}
+          className='flex items-center gap-2'>
+          <Youtube className='h-4 w-4' /> Upload to YouTube
+        </Button>
+      ),
+      Pending: (
+        <div className='flex items-center gap-2 text-yellow-500'>
+          <Clock className='h-4 w-4' />
+          <span>YouTube Upload Pending</span>
+        </div>
+      ),
+      Uploading: (
+        <div className='flex items-center gap-2 text-blue-500'>
+          <Clock className='h-4 w-4' />
+          <span>Uploading to YouTube</span>
+        </div>
+      ),
+      Uploaded: (
+        <div className='flex items-center gap-2 text-green-500'>
+          <CheckCircle className='h-4 w-4' />
+          <span>Uploaded to YouTube</span>
+        </div>
+      ),
+      Failed: (
+        <div className='flex items-center gap-2 text-red-500'>
+          <XCircle className='h-4 w-4' />
+          <span>YouTube Upload Failed</span>
+        </div>
+      ),
+    }
+
+    return statusIcons[status] || statusIcons['None']
+  }
+
   const filteredRequests = requestData.filter((request) => {
     const searchTerm = searchQuery.toLowerCase()
     const matchesSearch =
@@ -374,17 +418,7 @@ export function AdminRequestsDashboard() {
                                   className='text-red-500 hover:bg-red-50 hover:text-red-700'>
                                   <Trash2 className='h-4 w-4' />
                                 </Button>
-                                <Button
-                                  variant='ghost'
-                                  size='icon'
-                                  onClick={() => handleUploadToYoutube(request)}
-                                  className='text-red-600 hover:bg-red-50 hover:text-red-700'
-                                  title='Upload to YouTube'
-                                  disabled={
-                                    request.video?.ytUploadStatus === 'Uploaded'
-                                  }>
-                                  <Youtube className='h-4 w-4' />
-                                </Button>
+                                {renderYouTubeUploadButton(request)}
                               </div>
                             </TableCell>
                           </TableRow>
