@@ -11,6 +11,7 @@ import {
 	updateOwner,
 	uploadController,
 } from '../controllers/video.controller.js'
+import { getAllVideos } from '../controllers/getAllVideos.controller.js'
 import { upload } from '../middlewares/multer.middleware.js'
 
 const router = Router()
@@ -26,6 +27,9 @@ const logRequest = (req, res, next) => {
 	})
 	next()
 }
+
+// Route to get all videos for admin dashboard
+router.get('/all-videos', getAllVideos)
 
 router.get('/all/:role/:userId', getAllController)
 router.get('/recent/:role/:userId', recentController)

@@ -243,7 +243,7 @@ function Card({ editor, userData }) {
                           alt='Available'
                           className='mr-2 h-4 w-4'
                         />
-                        <span className='text-green-600'>Available</span>
+                        <span className='text-green-600'>{skill}</span>
                       </>
                     ) : (
                       <>
