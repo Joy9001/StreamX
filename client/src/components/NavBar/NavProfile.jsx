@@ -1,10 +1,14 @@
 import { HelpCircle, LogOut, MoreVertical, User } from 'lucide-react'
 import PropTypes from 'prop-types'
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 function NavProfile({ logout, user }) {
   const popupRef = useRef(null)
   const [showPopup, setShowPopup] = useState(false)
+  const navigate = useNavigate()
+  const userData = useSelector((state) => state.user.userData)
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -18,6 +22,16 @@ function NavProfile({ logout, user }) {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  const handleProfileClick = () => {
+    const userRole = userData?.user_metadata?.role
+    if (userRole === 'Owner') {
+      navigate('/profile/owner')
+    } else if (userRole === 'Editor') {
+      navigate('/profile/editor')
+    }
+    setShowPopup(false)
+  }
 
   return (
     <>
@@ -38,13 +52,11 @@ function NavProfile({ logout, user }) {
               My Account
             </div>
             <ul>
-              <li className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
+              <li 
+                onClick={handleProfileClick}
+                className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
                 <User className='mr-2 h-4 w-4' />
                 Profile
-              </li>
-              <li className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
-                <HelpCircle className='mr-2 h-4 w-4' />
-                Support
               </li>
               <li
                 onClick={() =>
