@@ -19,12 +19,15 @@ import {
 } from '@/components/ui/table'
 import axios from 'axios'
 import {
+  Eye,
   Home,
   ListFilter,
   Package2,
   PanelLeft,
   Settings,
+  Trash2,
   Video,
+  Youtube,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -378,13 +381,17 @@ export function Dashboard() {
                         </span>
                       </TableCell>
                       <TableCell className='text-right'>
-                        <div className='flex space-x-2'>
-                          <button
+                        <div className='flex justify-end space-x-2'>
+                          <Button
+                            variant='ghost'
+                            size='sm'
                             onClick={() => window.open(video.url, '_blank')}
                             className='text-blue-600 hover:text-blue-800'>
-                            View
-                          </button>
-                          <button
+                            <Eye className='h-4 w-4' />
+                          </Button>
+                          <Button
+                            variant='ghost'
+                            size='sm'
                             onClick={() => {
                               if (
                                 window.confirm(
@@ -417,8 +424,19 @@ export function Dashboard() {
                               }
                             }}
                             className='text-red-600 hover:text-red-800'>
-                            Delete
-                          </button>
+                            <Trash2 className='h-4 w-4' />
+                          </Button>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => {
+                              // Handle YouTube upload here
+                              console.log('Upload to YouTube:', video)
+                            }}
+                            className='text-gray-600 hover:text-gray-800'
+                            disabled={video.ytUploadStatus === 'Uploaded'}>
+                            <Youtube className='h-4 w-4' />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
