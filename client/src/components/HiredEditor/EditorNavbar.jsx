@@ -37,7 +37,7 @@ function EditorNavbar() {
         <ul className="menu menu-horizontal px-1 flex justify-center items-center gap-2">
           <NavItem icon={<Home />} text="Storage" onClick={() => navigate('/storage')} />
           <NavItem icon={<User />} text="Profile" onClick={() => navigate('/profile/owner')} />
-          <NavItem icon={<FileText />} text="Request Section" onClick={() => navigate('/raas')} />
+          <NavItem icon={<FileText />} text="Request Section" onClick={() => navigate('/req-n-approve')} />
         </ul>
       </div>
 
@@ -49,7 +49,7 @@ function EditorNavbar() {
           <ul tabIndex={0} className="menu dropdown-content rounded-box menu-sm z-[1] mt-3 w-52 bg-base-100 p-2 shadow">
             <li><a onClick={() => navigate('/storage')}>Storage</a></li>
             <li><a onClick={() => navigate('/profile/owner')}>Profile</a></li>
-            <li><a onClick={() => navigate('/raas')}>Request Section</a></li>
+            <li><a onClick={() => navigate('/req-n-approve')}>Request Section</a></li>
           </ul>
         </div>
       </div>
