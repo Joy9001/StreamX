@@ -55,7 +55,7 @@ app.get('/', (req, res) => {
 
 app.use('/requests', requestRoutes)
 app.use('/auth0', authCheck, auth0Router)
-app.use('/api/videos', authCheck, VideoRouter)
+app.use('/api/videos', VideoRouter)
 app.use('/api/yt', YTRouter)
 app.use('/api', OwnerRouter)
 app.use('/editor_gig', editor_gig_route)
