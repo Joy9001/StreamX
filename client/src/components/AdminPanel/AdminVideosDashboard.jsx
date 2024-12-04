@@ -35,6 +35,20 @@ export function Dashboard() {
   const [videoData, setVideoData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [uploadFilters, setUploadFilters] = useState({
+    Uploaded: false,
+    Uploading: false,
+    Failed: false,
+    Pending: false,
+    None: false,
+  })
+  const [approvalFilters, setApprovalFilters] = useState({
+    Approved: false,
+    Pending: false,
+    Rejected: false,
+    None: false,
+  })
   const userData = useSelector((state) => state.user.userData)
 
   useEffect(() => {
@@ -53,7 +67,37 @@ export function Dashboard() {
     }
 
     fetchVideoData()
-  }, [])
+  }, [userData._id])
+
+  const filteredVideos = videoData.filter((video) => {
+    const searchTerm = searchQuery.toLowerCase()
+    const matchesSearch =
+      video.metaData?.name?.toLowerCase().includes(searchTerm) ||
+      video.ownerId?.toLowerCase().includes(searchTerm) ||
+      video.editorId?.toLowerCase().includes(searchTerm) ||
+      video.ytUploadStatus?.toLowerCase().includes(searchTerm) ||
+      video.approvalStatus?.toLowerCase().includes(searchTerm)
+
+    // Check if any upload filters are active
+    const uploadFiltersActive = Object.values(uploadFilters).some(
+      (value) => value
+    )
+    const matchesUploadFilter = uploadFiltersActive
+      ? uploadFilters[video.ytUploadStatus] ||
+        (uploadFilters.None && !video.ytUploadStatus)
+      : true
+
+    // Check if any approval filters are active
+    const approvalFiltersActive = Object.values(approvalFilters).some(
+      (value) => value
+    )
+    const matchesApprovalFilter = approvalFiltersActive
+      ? approvalFilters[video.approvalStatus] ||
+        (approvalFilters.None && !video.approvalStatus)
+      : true
+
+    return matchesSearch && matchesUploadFilter && matchesApprovalFilter
+  })
 
   if (loading) {
     return (
@@ -174,6 +218,8 @@ export function Dashboard() {
                   <Input
                     placeholder='Search videos...'
                     className='h-8 w-[150px] lg:w-[250px]'
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
                 <DropdownMenu>
@@ -185,20 +231,96 @@ export function Dashboard() {
                   <DropdownMenuContent align='end' className='w-[150px]'>
                     <DropdownMenuLabel>Filter by status</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={uploadFilters.None}
+                      onCheckedChange={(checked) =>
+                        setUploadFilters((prev) => ({
+                          ...prev,
+                          None: checked,
+                        }))
+                      }>
+                      None
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={uploadFilters.Pending}
+                      onCheckedChange={(checked) =>
+                        setUploadFilters((prev) => ({
+                          ...prev,
+                          Pending: checked,
+                        }))
+                      }>
+                      Pending
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={uploadFilters.Uploaded}
+                      onCheckedChange={(checked) =>
+                        setUploadFilters((prev) => ({
+                          ...prev,
+                          Uploaded: checked,
+                        }))
+                      }>
                       Uploaded
                     </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={uploadFilters.Uploading}
+                      onCheckedChange={(checked) =>
+                        setUploadFilters((prev) => ({
+                          ...prev,
+                          Uploading: checked,
+                        }))
+                      }>
                       Uploading
                     </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>Failed</DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={uploadFilters.Failed}
+                      onCheckedChange={(checked) =>
+                        setUploadFilters((prev) => ({
+                          ...prev,
+                          Failed: checked,
+                        }))
+                      }>
+                      Failed
+                    </DropdownMenuCheckboxItem>
                     <DropdownMenuLabel>Filter by approval</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={approvalFilters.None}
+                      onCheckedChange={(checked) =>
+                        setApprovalFilters((prev) => ({
+                          ...prev,
+                          None: checked,
+                        }))
+                      }>
+                      None
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={approvalFilters.Approved}
+                      onCheckedChange={(checked) =>
+                        setApprovalFilters((prev) => ({
+                          ...prev,
+                          Approved: checked,
+                        }))
+                      }>
                       Approved
                     </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>Pending</DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={approvalFilters.Pending}
+                      onCheckedChange={(checked) =>
+                        setApprovalFilters((prev) => ({
+                          ...prev,
+                          Pending: checked,
+                        }))
+                      }>
+                      Pending
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={approvalFilters.Rejected}
+                      onCheckedChange={(checked) =>
+                        setApprovalFilters((prev) => ({
+                          ...prev,
+                          Rejected: checked,
+                        }))
+                      }>
                       Rejected
                     </DropdownMenuCheckboxItem>
                   </DropdownMenuContent>
@@ -218,7 +340,7 @@ export function Dashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {videoData.map((video) => (
+                  {filteredVideos.map((video) => (
                     <TableRow key={video._id}>
                       <TableCell className='font-medium'>
                         {video.metaData?.name || 'Untitled'}
@@ -234,7 +356,9 @@ export function Dashboard() {
                                 ? 'bg-red-100 text-red-800'
                                 : video.ytUploadStatus === 'Uploading'
                                   ? 'bg-blue-100 text-blue-800'
-                                  : 'bg-gray-100 text-gray-800'
+                                  : video.ytUploadStatus === 'Pending'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-gray-100 text-gray-800'
                           }`}>
                           {video.ytUploadStatus}
                         </span>
