@@ -11,12 +11,19 @@ import Video from '../models/video.model.js'
 
 const uploadController = async (req, res) => {
 	try {
-		// Your code here
-		const { role, userId, id } = req.params
+		console.log('Received request with params:', req.params)
+		console.log('Received request with body:', req.body)
+
+		let { role, userId, id } = req.params
+
+		console.log('Role:', role)
+		console.log('User ID:', userId)
+		console.log('Video ID:', id)
 
 		let videoData
 		if (role === 'Owner') {
 			videoData = req.body
+			console.log('Video data for Owner role:', videoData)
 		} else if (role === 'Admin') {
 			const findVideo = await Video.findOne({ _id: id }).lean()
 			if (!findVideo) {
@@ -34,8 +41,10 @@ const uploadController = async (req, res) => {
 				location: findVideo.ytData.location,
 				selectedCategory: findVideo.ytData.selectedCategory,
 			}
+			console.log('Video data for Admin role:', videoData)
 
 			const findOwner = await Owner.findOne({ _id: findVideo.ownerId }).lean()
+			console.log('Owner found:', findOwner)
 
 			if (!findOwner) {
 				return res.status(StatusCodes.NOT_FOUND).json({ error: 'Owner not found' })
@@ -43,6 +52,8 @@ const uploadController = async (req, res) => {
 
 			videoData['gAccessToken'] = findOwner.gTokens.accessToken
 			videoData['gRefreshToken'] = findOwner.gTokens.refreshToken
+			console.log('Google Access Token:', videoData.gAccessToken)
+			console.log('Google Refresh Token:', videoData.gRefreshToken)
 		} else {
 			return res.status(StatusCodes.FORBIDDEN).json({ error: 'Invalid role' })
 		}
@@ -64,18 +75,29 @@ const uploadController = async (req, res) => {
 
 		console.log('videoData in yt uploadController', videoData)
 
-		const user = await Owner.findOne({ _id: userId })
-		if (!user) {
-			return res.status(StatusCodes.NOT_FOUND).json({ error: 'Owner not found' })
-		}
-
 		let findVideo = await Video.findOne({ _id: id })
 
 		if (!findVideo) {
 			return res.status(StatusCodes.NOT_FOUND).json({ error: 'Video not found' })
 		}
 
+		if (role === 'Admin') {
+			const findOwner = await Owner.findOne({ _id: findVideo.ownerId })
+			if (!findOwner) {
+				return res.status(StatusCodes.NOT_FOUND).json({ error: 'Owner not found' })
+			}
+			userId = findOwner._id
+		}
+
+		const user = await Owner.findOne({ _id: userId })
+		console.log('User found:', user)
+
+		if (!user) {
+			return res.status(StatusCodes.NOT_FOUND).json({ error: 'Owner not found' })
+		}
+
 		if (findVideo.ytUploadStatus === 'Uploaded') {
+			console.log('Video already uploaded status:', findVideo.ytUploadStatus)
 			return res.status(StatusCodes.OK).json({ message: 'Video already uploaded to YouTube' })
 		}
 
@@ -86,18 +108,19 @@ const uploadController = async (req, res) => {
 		const videoStream = new Readable()
 		videoStream.push(Buffer.from(videoBytes))
 		videoStream.push(null)
-
-		// console.log('videoStream', videoStream)
+		console.log('Video stream created')
 
 		OAuth2Client.setCredentials({
 			access_token: gAccessToken,
 			refresh_token: gRefreshToken,
 		})
+		console.log('OAuth2Client credentials set')
 
 		const youtube = google.youtube({
 			version: 'v3',
 			auth: OAuth2Client,
 		})
+		console.log('YouTube API initialized')
 
 		let channelId
 		if (user.ytChannelId === '') {
@@ -105,8 +128,7 @@ const uploadController = async (req, res) => {
 		} else {
 			channelId = user.ytChannelId
 		}
-
-		console.log('channelId in yt uploadController', channelId)
+		console.log('Channel ID:', channelId)
 
 		const response = await youtube.videos.insert({
 			part: 'snippet,status,recordingDetails',
@@ -136,8 +158,7 @@ const uploadController = async (req, res) => {
 				body: videoStream,
 			},
 		})
-
-		console.log('yt response', response)
+		console.log('YouTube video insert response:', response)
 
 		findVideo.ytUploadStatus = 'Uploaded'
 		findVideo.ytData = response.data
@@ -156,6 +177,7 @@ const uploadController = async (req, res) => {
 		}
 
 		let updatedVideo = await findVideo.save()
+		console.log('Updated video data:', updatedVideo)
 
 		res.status(StatusCodes.OK).json({ response, message: 'Video uploaded to YouTube', updatedVideo })
 	} catch (error) {
