@@ -1,17 +1,22 @@
 import { Button } from '@/components/ui/button'
+import { useAuth0 } from '@auth0/auth0-react'
 import {
   Home,
   ListFilter,
+  LogOut,
   Package2,
   PanelLeft,
   Settings,
   Video,
 } from 'lucide-react'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import logoX from '../../assets/logoX.png'
 
 export function AdminNav({ activePage }) {
+  const navigate = useNavigate()
+  const { logout } = useAuth0()
+
   const navItems = [
     { title: 'Dashboard', icon: Home, route: '/admin-panel' },
     { title: 'Videos', icon: Video, route: '/admin-panel/videos' },
@@ -23,6 +28,15 @@ export function AdminNav({ activePage }) {
   const currentPath = navItems.find((item) => item.title === activePage)?.route
   const isActive = (route) => {
     return currentPath === route
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      navigate('/login')
+    } catch (error) {
+      console.error('Logout failed', error)
+    }
   }
 
   return (
@@ -56,6 +70,13 @@ export function AdminNav({ activePage }) {
               </Button>
             </Link>
           ))}
+          <Button
+            variant='ghost'
+            className='w-full justify-start gap-2 text-red-500 hover:text-red-700'
+            onClick={handleLogout}>
+            <LogOut className='h-4 w-4' />
+            Logout
+          </Button>
         </nav>
       </div>
 
@@ -81,6 +102,13 @@ export function AdminNav({ activePage }) {
                 </Button>
               </Link>
             ))}
+            <Button
+              variant='ghost'
+              className='w-full justify-start gap-2 text-red-500 hover:text-red-700'
+              onClick={handleLogout}>
+              <LogOut className='h-4 w-4' />
+              Logout
+            </Button>
           </nav>
         </div>
       </div>

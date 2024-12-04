@@ -1,18 +1,8 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import OwnerModal from './OwnerModal'
 
-import {
-  Home,
-  ListFilter,
-  Package2,
-  PanelLeft,
-  PlusCircle,
-  Search,
-  Settings,
-  Video,
-} from 'lucide-react'
+import { ListFilter, PlusCircle, Search } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -25,7 +15,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import {
   Table,
   TableBody,
@@ -35,7 +24,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import logoX from '../../assets/logoX.png'
+import AdminNav from './AdminNav'
 
 export function Dashboard() {
   const [ownerData, setOwnerData] = useState([])
@@ -146,99 +135,7 @@ export function Dashboard() {
 
   return (
     <div className='flex h-screen bg-gray-100'>
-      {/* Sidebar - Mobile */}
-      <div className='md:hidden'>
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button
-              variant='outline'
-              size='icon'
-              className='fixed left-4 top-4 z-40'>
-              <PanelLeft className='h-4 w-4' />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side='left' className='w-64 p-0'>
-            <nav className='flex h-full flex-col gap-2 bg-white p-4'>
-              <div className='mb-6 flex justify-center gap-1'>
-                <img src={logoX} alt='StreamX Logo' className='h-12 w-auto' />
-                <span className='text-3xl font-bold text-black'>StreamX</span>
-              </div>
-              <Link to='/admin-panel'>
-                <Button variant='ghost' className='w-full justify-start gap-2'>
-                  <Home className='h-4 w-4' />
-                  Dashboard
-                </Button>
-              </Link>
-              <Link to='/admin-panel/videos'>
-                <Button variant='ghost' className='w-full justify-start gap-2'>
-                  <Video className='h-4 w-4' />
-                  Videos
-                </Button>
-              </Link>
-              <Link to='/admin-panel/requests'>
-                <Button variant='ghost' className='w-full justify-start gap-2'>
-                  <Package2 className='h-4 w-4' />
-                  Requests
-                </Button>
-              </Link>
-              <Link to='/admin-panel/owners'>
-                <Button variant='ghost' className='w-full justify-start gap-2'>
-                  <Settings className='h-4 w-4' />
-                  Owners
-                </Button>
-              </Link>
-              <Link to='/admin-panel/editors'>
-                <Button variant='ghost' className='w-full justify-start gap-2'>
-                  <ListFilter className='h-4 w-4' />
-                  Editors
-                </Button>
-              </Link>
-            </nav>
-          </SheetContent>
-        </Sheet>
-      </div>
-
-      {/* Sidebar - Desktop */}
-      <div className='hidden md:flex'>
-        <div className='fixed h-full w-64 bg-white shadow-sm'>
-          <nav className='flex h-full flex-col gap-2 p-4'>
-            <div className='mb-6 flex justify-center gap-1'>
-              <img src={logoX} alt='StreamX Logo' className='h-12 w-auto' />
-              <span className='text-xl font-bold text-black'>StreamX</span>
-            </div>
-            <Link to='/admin-panel'>
-              <Button variant='ghost' className='w-full justify-start gap-2'>
-                <Home className='h-4 w-4' />
-                Dashboard
-              </Button>
-            </Link>
-            <Link to='/admin-panel/videos'>
-              <Button variant='ghost' className='w-full justify-start gap-2'>
-                <Video className='h-4 w-4' />
-                Videos
-              </Button>
-            </Link>
-            <Link to='/admin-panel/requests'>
-              <Button variant='ghost' className='w-full justify-start gap-2'>
-                <Package2 className='h-4 w-4' />
-                Requests
-              </Button>
-            </Link>
-            <Link to='/admin-panel/owners'>
-              <Button variant='ghost' className='w-full justify-start gap-2'>
-                <Settings className='h-4 w-4' />
-                Owners
-              </Button>
-            </Link>
-            <Link to='/admin-panel/editors'>
-              <Button variant='ghost' className='w-full justify-start gap-2'>
-                <ListFilter className='h-4 w-4' />
-                Editors
-              </Button>
-            </Link>
-          </nav>
-        </div>
-      </div>
+      <AdminNav activePage='Owners' />
 
       {/* Main Content */}
       <div className='flex-1 overflow-auto md:ml-64'>
