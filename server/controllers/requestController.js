@@ -220,13 +220,14 @@ export const getAdminRequests = async (req, res) => {
 		// Fetch all requests with populated video data where to_id is an admin
 		const requests = await Request.find({ to_id: { $in: adminIds } }).populate({
 			path: 'video_id',
-			select: 'url metaData',
+			select: 'url metaData ytUploadStatus',
 		})
 
 		const processedRequests = []
 
 		// Process each request
 		for (const request of requests) {
+			console.log('Processing request in getAdminRequests:', request)
 			// Find owner (from_id)
 			let from
 			let fromUser
@@ -260,6 +261,7 @@ export const getAdminRequests = async (req, res) => {
 					id: request.video_id?._id,
 					url: request.video_id?.url || '',
 					title: request.video_id?.metaData?.title || '',
+					ytUploadStatus: request.video_id?.ytUploadStatus || '',
 				},
 				description: request.description,
 				price: request.price,
