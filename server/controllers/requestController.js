@@ -257,6 +257,7 @@ export const getAdminRequests = async (req, res) => {
 					name: toUser.username,
 				},
 				video: {
+					id: request.video_id?._id,
 					url: request.video_id?.url || '',
 					title: request.video_id?.metaData?.title || '',
 				},
