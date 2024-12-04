@@ -55,7 +55,7 @@ function EditorContentTableApprove() {
         if (!accessToken || !userData?._id) return
 
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/requests/approvals/${userData._id}`,
+          `${import.meta.env.VITE_BACKEND_URL}/requests/to-id/${userData._id}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
