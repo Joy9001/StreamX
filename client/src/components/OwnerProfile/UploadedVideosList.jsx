@@ -1,6 +1,32 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import { useSelector } from 'react-redux'
 
-function UploadedVideosList({ videos }) {
+function UploadedVideosList() {
+  const [videos, setVideos] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const userData = useSelector((state) => state.user.userData)
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/all/${userData.user_metadata.role}/${userData._id}`
+        )
+        setVideos(response.data.videos)
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to fetch videos')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (userData?._id) {
+      fetchVideos()
+    }
+  }, [userData])
+
   const getStatusStyle = (status) => {
     switch (status) {
       case 'Uploaded':
@@ -27,6 +53,31 @@ function UploadedVideosList({ videos }) {
     })
   }
 
+  const formatFileSize = (bytes) => {
+    if (!bytes) return 'N/A'
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(1024))
+    return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`
+  }
+
+  if (loading) {
+    return (
+      <div className='h-full rounded-lg bg-white p-6'>
+        <div className='flex items-center justify-center'>
+          <div className='h-8 w-8 animate-spin rounded-full border-4 border-pink-300 border-t-transparent'></div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className='h-full rounded-lg bg-white p-6'>
+        <p className='text-center text-red-500'>Error: {error}</p>
+      </div>
+    )
+  }
+
   return (
     <div className='h-full rounded-lg bg-white p-6'>
       <div className='mb-6 flex items-center justify-between'>
@@ -34,34 +85,49 @@ function UploadedVideosList({ videos }) {
           List Of Videos
         </h3>
       </div>
-      <ul className='space-y-4'>
-        {videos?.map((video, index) => (
-          <li
-            key={index}
-            className='flex items-center justify-between border-b pb-2'>
-            <div className='flex items-center gap-4'>
-              <span className='min-w-[30px] text-gray-500'>{index + 1}.</span>
-              <span className='font-medium text-gray-800'>{video.title}</span>
-            </div>
-            <div className='flex items-center gap-4'>
-              <span
-                className={`rounded-full border px-3 py-1 text-sm font-medium ${getStatusStyle(video.ytUploadStatus)}`}>
-                {video.ytUploadStatus}
-              </span>
-              <div className='flex items-center gap-1'>
-                <span className='font-medium text-gray-600'>Upload Time:</span>
-                <span className='text-gray-500'>
-                  {formatDate(video.uploadTime)}
+      {videos.length === 0 ? (
+        <p className='text-center text-gray-500'>No videos uploaded yet.</p>
+      ) : (
+        <ul className='space-y-4'>
+          {videos.map((video, index) => (
+            <li
+              key={video._id || index}
+              className='flex items-center justify-between border-b pb-2'>
+              <div className='flex items-center gap-4'>
+                <span className='min-w-[30px] text-gray-500'>{index + 1}.</span>
+                <div className='flex flex-col'>
+                  <span className='font-medium text-gray-800'>{video.title}</span>
+                  {video.editor && (
+                    <span className='text-sm text-gray-500'>
+                      Editor: {video.editor}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className='flex items-center gap-4'>
+                <span
+                  className={`rounded-full border px-3 py-1 text-sm font-medium ${getStatusStyle(
+                    video.ytUploadStatus
+                  )}`}>
+                  {video.ytUploadStatus}
                 </span>
+                <div className='flex items-center gap-1'>
+                  <span className='font-medium text-gray-600'>Upload Time:</span>
+                  <span className='text-gray-500'>
+                    {formatDate(video.uploadTime || video.createdAt)}
+                  </span>
+                </div>
+                <div className='flex items-center gap-1'>
+                  <span className='font-medium text-gray-600'>File Size:</span>
+                  <span className='text-gray-500'>
+                    {formatFileSize(video.fileSize)}
+                  </span>
+                </div>
               </div>
-              <div className='flex items-center gap-1'>
-                <span className='font-medium text-gray-600'>File Size:</span>
-                <span className='text-gray-500'>{video.fileSize || 'N/A'}</span>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }
