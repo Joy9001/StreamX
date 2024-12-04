@@ -36,7 +36,10 @@ function EditorProfileCard({ onEditProfile }) {
         <div className='text-center'>
           <div className='avatar mb-4'>
             <div className='w-24 rounded-full ring ring-primary ring-offset-2 ring-offset-base-100'>
-              <img src={userData?.profilephoto || 'https://via.placeholder.com/150'} alt='profile' />
+              <img 
+                src="https://imgix.ranker.com/list_img_v2/1360/2681360/original/the-best-ichigo-quotes?auto=format&q=50&fit=crop&fm=pjpg&dpr=2&crop=faces&h=185.86387434554973&w=355" 
+                alt='profile' 
+              />
             </div>
           </div>
           <h4 className='text-xl font-bold text-gray-800'>{userData?.name || 'Anonymous'}</h4>
