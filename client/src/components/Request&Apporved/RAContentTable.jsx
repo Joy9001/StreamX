@@ -39,16 +39,7 @@ function ContentTable() {
       try {
         if (!userRole || !userData?._id) return
 
-        let endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests`
-
-        // If user is owner, get requests by from_id
-        if (userRole === 'Owner') {
-          endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/from-id/${userData._id}`
-        }
-        // If user is editor, get requests by to_id
-        else if (userRole === 'Editor') {
-          endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/from-id/${userData._id}`
-        }
+        let endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/from-id/${userData._id}`
 
         const res = await axios.get(endpoint, {
           headers: {
@@ -57,76 +48,8 @@ function ContentTable() {
           },
           withCredentials: true,
         })
+        console.log('res in ContentTable', res.data)
         setRequests(res.data)
-
-        // Fetch video names for all requests
-        const videoNamesMap = {}
-        await Promise.all(
-          res.data.map(async (request) => {
-            if (!request.video_id) return
-            try {
-              const videoRes = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/videos/name/${request.video_id}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                  },
-                }
-              )
-              videoNamesMap[request.video_id] = videoRes.data.name
-            } catch (error) {
-              console.error('Error fetching video name:', error)
-              videoNamesMap[request.video_id] = 'Unknown Video'
-            }
-          })
-        )
-        setVideoNames(videoNamesMap)
-
-        // Fetch editor names for all requests (if user is owner)
-        if (userRole === 'Owner') {
-          const editorNamesMap = {}
-          await Promise.all(
-            res.data.map(async (request) => {
-              if (!request.to_id) return
-              try {
-                const editorRes = await axios.get(
-                  `${import.meta.env.VITE_BACKEND_URL}/editorProfile/name/${request.to_id}`,
-                  {
-                    withCredentials: true,
-                  }
-                )
-                editorNamesMap[request.to_id] = editorRes.data.name
-              } catch (error) {
-                console.error('Error fetching editor name:', error)
-                editorNamesMap[request.to_id] = 'Unknown Editor'
-              }
-            })
-          )
-          setEditorNames(editorNamesMap)
-        } else {
-          // Fetch owner names for all requests when user is not owner
-          const ownerNamesMap = {}
-          await Promise.all(
-            res.data.map(async (request) => {
-              if (!request.from_id) return
-              try {
-                const ownerRes = await axios.get(
-                  `${import.meta.env.VITE_BACKEND_URL}/api/owner/name/${request.to_id}`,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${accessToken}`,
-                    },
-                  }
-                )
-                ownerNamesMap[request.to_id] = ownerRes.data.name
-              } catch (error) {
-                console.error('Error fetching owner name:', error)
-                ownerNamesMap[request.to_id] = 'Unknown Owner'
-              }
-            })
-          )
-          setOwnerNames(ownerNamesMap)
-        }
       } catch (error) {
         console.error('Error fetching requests:', error)
       }
@@ -157,11 +80,9 @@ function ContentTable() {
           <tbody>
             {requests.map((request) => (
               <tr key={request._id}>
-                <td>{videoNames[request.video_id] || 'Loading...'}</td>
+                <td>{request.video.title || 'Loading...'}</td>
                 <td>
-                  {userRole === 'Owner'
-                    ? editorNames[request.to_id] || 'Loading...'
-                    : ownerNames[request.to_id] || 'Loading...'}
+                  {request.from.name}
                 </td>
                 <td>{request.description}</td>
                 <td>${request.price}</td>

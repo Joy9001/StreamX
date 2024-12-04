@@ -174,9 +174,103 @@ export const getRequestsByToId = async (req, res) => {
 // Get requests by editor ID
 export const getRequestsByFromId = async (req, res) => {
 	try {
+		console.log('Received request params:', req.params)
 		const { from_id } = req.params
-		const requests = await Request.find({ from_id })
-		res.status(200).json(requests)
+		console.log('Searching for requests with from_id:', from_id)
+
+		let requests = await Request.find({ from_id }).populate({
+			path: 'video_id',
+			select: 'url metaData _id',
+		})
+		console.log('Initial requests found:', requests.length)
+
+		if (!requests || requests.length === 0) {
+			return res.status(404).json({ message: 'Requests not found' })
+		}
+
+		let processedRequests = []
+		for (const request of requests) {
+			console.log('Processing request:', request._id)
+
+			// Find owner (from_id)
+			let from
+			let fromUser
+			fromUser = await Owner.findById(request.from_id)
+			from = 'Owner'
+			if (!fromUser) {
+				fromUser = await Editor_Gig.findById(request.from_id)
+				from = 'Editor'
+			}
+			if (!fromUser) {
+				fromUser = await Editor.findById(request.from_id)
+				from = 'Editor'
+			}
+			console.log(
+				'From user found:',
+				fromUser ? `${from}: ${fromUser.name || fromUser.username}` : 'No from user found'
+			)
+
+			if (!fromUser) {
+				console.log('Skipping request due to no from user')
+				continue
+			}
+
+			// Find editor (to_id)
+			let toUser
+			let to
+			toUser = await Editor_Gig.findById(request.to_id)
+			to = 'Editor'
+			if (!toUser) {
+				toUser = await Editor.findById(request.to_id)
+				to = 'Editor'
+			}
+			if (!toUser) {
+				toUser = await Owner.findById(request.to_id)
+				to = 'Owner'
+			}
+			console.log('To user found:', toUser ? `${to}: ${toUser.name || toUser.username}` : 'No to user found')
+
+			if (!toUser) {
+				console.log('Skipping request due to no to user')
+				continue
+			}
+
+			// Skip if neither owner nor editor is found
+			if (!fromUser && !toUser) {
+				console.log('Skipping request - no from or to user')
+				continue
+			}
+
+			// Construct response object
+			const processedRequest = {
+				_id: request._id,
+				request_id: request._id,
+				from: {
+					id: request.from_id,
+					name: from === 'Owner' ? fromUser.username : fromUser.name,
+				},
+				to: {
+					id: request.to_id,
+					name: to === 'Owner' ? toUser.username : toUser.name,
+				},
+				video: {
+					url: request.video_id?.url || '',
+					title: request.video_id?.metaData?.name || '',
+					_id: request.video_id?._id,
+				},
+				description: request.description,
+				price: request.price,
+				status: request.status,
+				createdAt: request.createdAt,
+				updatedAt: request.updatedAt,
+			}
+
+			console.log('Processed request:', processedRequest)
+			processedRequests.push(processedRequest)
+		}
+
+		console.log('Total processed requests:', processedRequests.length)
+		res.status(200).json(processedRequests)
 	} catch (error) {
 		console.error('Error fetching editor requests:', error)
 		res.status(500).json({ message: 'Error fetching editor requests', error: error.message })
