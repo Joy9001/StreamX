@@ -18,8 +18,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import axios from 'axios'
-import { CheckCircle, Clock, ListFilter, Trash2, XCircle } from 'lucide-react'
+import { CheckCircle, Clock, ListFilter, Trash2, XCircle, Youtube } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 // import { useSelector } from 'react-redux'
 import AdminNav from './AdminNav'
 
@@ -67,6 +68,45 @@ export function AdminRequestsDashboard() {
     } catch (err) {
       console.error('Error deleting request:', err)
       // You might want to show an error message to the user here
+    }
+  }
+
+  const handleUploadToYoutube = async (request) => {
+    try {
+      if (!request.video?.url) {
+        alert('No video URL available')
+        return
+      }
+
+      // Show loading state
+      const loadingToast = toast.loading('Uploading to YouTube...')
+
+      const response = await axios.post(`http://localhost:3000/requests/${request.request_id}/upload-youtube`, {
+        videoUrl: request.video.url,
+        title: request.video.title || 'Uploaded Video',
+        description: request.description || 'Video uploaded through admin dashboard'
+      })
+
+      // Remove loading toast and show success/error
+      toast.dismiss(loadingToast)
+      
+      if (response.data.success) {
+        toast.success('Successfully uploaded to YouTube!')
+        
+        // Update the request data to reflect the upload
+        setAdminRequestData(prevData => 
+          prevData.map(req => 
+            req.request_id === request.request_id 
+              ? { ...req, youtubeUrl: response.data.youtubeUrl }
+              : req
+          )
+        )
+      } else {
+        toast.error('Failed to upload to YouTube')
+      }
+    } catch (error) {
+      console.error('Error uploading to YouTube:', error)
+      toast.error(error.response?.data?.message || 'Error uploading to YouTube')
     }
   }
 
@@ -300,18 +340,29 @@ export function AdminRequestsDashboard() {
                               {new Date(request.createdAt).toLocaleDateString()}
                             </TableCell>
                             <TableCell>
-                              <Button 
-                                variant='ghost' 
-                                size='icon'
-                                onClick={() => {
-                                  if (window.confirm('Are you sure you want to delete this request?')) {
-                                    handleDelete(request.request_id)
-                                  }
-                                }}
-                                className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                              >
-                                <Trash2 className='h-4 w-4' />
-                              </Button>
+                              <div className="flex gap-2">
+                                <Button 
+                                  variant='ghost' 
+                                  size='icon'
+                                  onClick={() => {
+                                    if (window.confirm('Are you sure you want to delete this request?')) {
+                                      handleDelete(request.request_id)
+                                    }
+                                  }}
+                                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                >
+                                  <Trash2 className='h-4 w-4' />
+                                </Button>
+                                <Button
+                                  variant='ghost'
+                                  size='icon'
+                                  onClick={() => handleUploadToYoutube(request)}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  title="Upload to YouTube"
+                                >
+                                  <Youtube className='h-4 w-4' />
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
