@@ -225,7 +225,7 @@ const reqAdminController = async (req, res) => {
 		}
 
 		findVideo.approvalStatus = 'Pending'
-		findVideo.ytUploadStatus = 'Pending'
+		// findVideo.ytUploadStatus = 'None'
 		await findVideo.save()
 
 		const findAdmin = await Admin.findOne({ role: 'admin' }).lean()
