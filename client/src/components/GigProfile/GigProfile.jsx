@@ -116,10 +116,8 @@ function GigProfile() {
                   <div className='flex flex-col items-center space-y-6'>
                     <div className='relative'>
                       <img
-                        src={
-                          editorData.image || 'https://via.placeholder.com/150'
-                        }
-                        alt={editorData.name}
+                        src="https://imgix.ranker.com/list_img_v2/1360/2681360/original/the-best-ichigo-quotes?auto=format&q=50&fit=crop&fm=pjpg&dpr=2&crop=faces&h=185.86387434554973&w=355"
+                        alt="Profile"
                         className='h-36 w-36 rounded-full border-4 border-white object-cover shadow-lg'
                       />
                       <div className='absolute -bottom-2 -right-2 rounded-full bg-pink-100 p-2 shadow-md'>
