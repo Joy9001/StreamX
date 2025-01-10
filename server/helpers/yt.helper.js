@@ -1,6 +1,16 @@
+import { config } from 'dotenv'
+import fs from 'fs'
 import { google } from 'googleapis'
-import OAuth2Data from '../.secrets/client_secret_723604024986-f3cg8j1688kgtm0sq16uqomvtgfl87j3.apps.googleusercontent.com.json' with { type: 'json' }
-import Owner from '../models/owner.model.js'
+import { dirname, join } from 'path'
+import { fileURLToPath } from 'url'
+
+config()
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+const secretPath = join(__dirname, '..', process.env.GOOGLE_CLIENT_SECRET_PATH)
+const OAuth2Data = JSON.parse(fs.readFileSync(secretPath, 'utf8'))
+console.log('OAuth2Data', OAuth2Data)
 
 const CLIENT_ID = OAuth2Data.web.client_id
 const CLIENT_SECRET = OAuth2Data.web.client_secret
@@ -18,38 +28,37 @@ const getChanelIds = async (authClient, ownerId) => {
 			auth: authClient,
 		})
 
-    const response = await youtube.channels.list({
-      auth: authClient,
-      part: 'snippet',
-      forHandle: '@GoogleDevelopers'
-    })
+		const response = await youtube.channels.list({
+			auth: authClient,
+			part: 'snippet',
+			forHandle: '@GoogleDevelopers',
+		})
 
-    console.log('res in getChanelIds', response.data)
+		console.log('res in getChanelIds', response.data)
 
-    const channels = response.data.items
+		const channels = response.data.items
 
-    if (channels && channels.length > 0) {
-      const channelId = channels[0].id
-      const channelName = channels[0].snippet.title
+		if (channels && channels.length > 0) {
+			const channelId = channels[0].id
+			const channelName = channels[0].snippet.title
 
-      const owner = await Owner.findOne({ _id: ownerId })
-      if (!owner) {
-        return null
-      }
-      owner.ytChannelId = channelId
-      owner.ytChannelname = channelName
-      await owner.save()
-      console.log('owner in getChanelIds', owner)
+			const owner = await Owner.findOne({ _id: ownerId })
+			if (!owner) {
+				return null
+			}
+			owner.ytChannelId = channelId
+			owner.ytChannelname = channelName
+			await owner.save()
+			console.log('owner in getChanelIds', owner)
 
-      return channelId
-    } else {
-      return null
-    }
+			return channelId
+		} else {
+			return null
+		}
 	} catch (error) {
 		console.log('Error in getChanelIds:', error)
-    return null
+		return null
 	}
 }
 
 export { getChanelIds, OAuth2Client, scopes }
-
