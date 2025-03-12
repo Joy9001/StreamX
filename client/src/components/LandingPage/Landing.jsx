@@ -1,19 +1,29 @@
-import './assets/styles/tailwind.css'
-import Container from './components/MainContainer'
-import Navbar from './components/Navbar'
-import ActiveTabContextProvider from './contexts/ActiveTabContext'
-import Home from './pages/Home'
-import Footer from './pages/Home/components/Footer'
+import ButtonGradient from './assets/svg/ButtonGradient'
+import Benefits from './components/Benefits'
+import Collaboration from './components/Collaboration'
+import Footer from './components/Footer'
+import Header from './components/Header'
+import Hero from './components/Hero'
+import Pricing from './components/Pricing'
+import Roadmap from './components/Roadmap'
+// import Services from "./components/Services";
 
 const Landing = () => {
   return (
-    <ActiveTabContextProvider>
-      <Navbar />
-      <Container>
-        <Home />
-      </Container>
-      <Footer />
-    </ActiveTabContextProvider>
+    <>
+      <div className='overflow-hidden pt-[4.75rem] lg:pt-[5.25rem]'>
+        <Header />
+        <Hero />
+        <Benefits />
+        <Collaboration />
+        {/* <Services /> */}
+        <Pricing />
+        <Roadmap />
+        <Footer />
+      </div>
+
+      <ButtonGradient />
+    </>
   )
 }
 
