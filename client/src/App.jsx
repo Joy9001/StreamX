@@ -1,4 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import { Dashboard as EditorDashboard } from './components/AdminPanel/AdminEditorDashboard.jsx'
@@ -15,9 +16,17 @@ import RequestApprove from './components/Request&Apporved/raas.jsx'
 import Storage from './components/Storage/Storage.jsx'
 
 function App() {
-  const { isAuthenticated } = useAuth0()
+  const { isAuthenticated, isLoading } = useAuth0()
   const userData = useSelector((state) => state.user.userData)
   const isAdmin = userData?.user_metadata?.role === 'Admin'
+  const [isReady, setIsReady] = useState(false)
+
+  // Wait for authentication to complete before rendering routes
+  useEffect(() => {
+    if (!isLoading) {
+      setIsReady(true)
+    }
+  }, [isLoading])
 
   const router = createBrowserRouter([
     {
@@ -41,7 +50,7 @@ function App() {
           <Profile />
         )
       ) : (
-        <Landing />
+        <Navigate to='/' replace />
       ),
     },
     {
@@ -53,7 +62,7 @@ function App() {
           <EditorUi />
         )
       ) : (
-        <Landing />
+        <Navigate to='/' replace />
       ),
     },
     {
@@ -65,7 +74,7 @@ function App() {
           <GigProfile />
         )
       ) : (
-        <Landing />
+        <Navigate to='/' replace />
       ),
     },
     {
@@ -77,7 +86,7 @@ function App() {
           <Storage />
         )
       ) : (
-        <Landing />
+        <Navigate to='/' replace />
       ),
     },
     {
@@ -89,7 +98,7 @@ function App() {
           <RequestApprove />
         )
       ) : (
-        <Landing />
+        <Navigate to='/' replace />
       ),
     },
     {
@@ -101,7 +110,7 @@ function App() {
           <HiredEditor />
         )
       ) : (
-        <Landing />
+        <Navigate to='/' replace />
       ),
     },
     {
@@ -110,10 +119,10 @@ function App() {
         isAdmin ? (
           <AdminPanel />
         ) : (
-          <Landing />
+          <Navigate to='/' replace />
         )
       ) : (
-        <Landing />
+        <Navigate to='/' replace />
       ),
     },
     {
@@ -122,10 +131,10 @@ function App() {
         isAdmin ? (
           <OwnerDashboard />
         ) : (
-          <Landing />
+          <Navigate to='/' replace />
         )
       ) : (
-        <Landing />
+        <Navigate to='/' replace />
       ),
     },
     {
@@ -134,10 +143,10 @@ function App() {
         isAdmin ? (
           <EditorDashboard />
         ) : (
-          <Landing />
+          <Navigate to='/' replace />
         )
       ) : (
-        <Landing />
+        <Navigate to='/' replace />
       ),
     },
     {
@@ -146,10 +155,10 @@ function App() {
         isAdmin ? (
           <VideosDashboard />
         ) : (
-          <Landing />
+          <Navigate to='/' replace />
         )
       ) : (
-        <Landing />
+        <Navigate to='/' replace />
       ),
     },
     {
@@ -158,13 +167,19 @@ function App() {
         isAdmin ? (
           <AdminRequestsDashboard />
         ) : (
-          <Landing />
+          <Navigate to='/' replace />
         )
       ) : (
-        <Landing />
+        <Navigate to='/' replace />
       ),
     },
   ])
+
+  // Show loading state while authentication is being determined
+  if (!isReady) {
+    return <div>Loading...</div>
+  }
+
   return (
     <>
       <RouterProvider router={router} />

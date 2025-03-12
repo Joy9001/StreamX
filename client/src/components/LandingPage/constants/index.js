@@ -39,16 +39,19 @@ export const navigation = [
     id: '0',
     title: 'Services',
     url: '#features',
+    isLandingPageSection: true,
   },
   {
     id: '1',
     title: 'Pricing',
     url: '#pricing',
+    isLandingPageSection: true,
   },
   {
     id: '2',
     title: 'How to use',
     url: '#how-to-use',
+    isLandingPageSection: true,
   },
   // {
   //   id: "3",
