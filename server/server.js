@@ -7,6 +7,7 @@ import session from 'express-session'
 import morgan from 'morgan'
 import connectMongo from './db/connectMongo.db.js'
 import { authCheck } from './middlewares/auth0.middleware.js'
+import AdminRouter from './routes/admin.route.js'
 import auth0Router from './routes/auth0.router.js'
 import editor_gig_route from './routes/editor_gig_router.js'
 import editorProfileRoute from './routes/editorProfileRoute.js'
@@ -63,6 +64,7 @@ app.use('/auth0', authCheck, auth0Router)
 app.use('/api/videos', VideoRouter)
 app.use('/api/yt', YTRouter)
 app.use('/api', OwnerRouter)
+app.use('/api/admin', AdminRouter)
 app.use('/editor_gig', editor_gig_route)
 app.use('/editorProfile', editorProfileRoute)
 app.use('/user', UserRoute)
