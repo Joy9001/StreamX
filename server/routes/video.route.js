@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { getAllVideos } from '../controllers/getAllVideos.controller.js'
 import {
 	deleteController,
 	downloadController,
@@ -11,7 +12,6 @@ import {
 	updateOwner,
 	uploadController,
 } from '../controllers/video.controller.js'
-import { getAllVideos } from '../controllers/getAllVideos.controller.js'
 import { upload } from '../middlewares/multer.middleware.js'
 
 const router = Router()
@@ -38,13 +38,12 @@ router.post('/upload/:role/:userId', upload.single('file'), uploadController)
 router.delete('/delete/:role', deleteController)
 router.get('/download/:id', downloadController)
 router.get('/name/:videoId', getVideoNameById)
+router.get('/storage-usages/:role/:userId', storageUsageController)
 
-// Update video editor (place this before owner route to prevent conflicts)
-router.patch('/:videoId/editor', logRequest, updateEditor)
-
-// Update video owner
+router.patch('/:videoId/editor', updateEditor)
 router.patch('/:videoId/owner', updateOwner)
 
-router.get('/storage-usages/:role/:userId', storageUsageController)
+//? Router-level middleware
+router.use(logRequest)
 
 export default router

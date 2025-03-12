@@ -22,6 +22,7 @@ const PORT = process.env.PORT || 3000
 
 const app = express()
 
+//? Third-party middleware
 app.use(morgan('dev'))
 app.use(cookieParser())
 app.use(
@@ -31,6 +32,8 @@ app.use(
 		credentials: true,
 	})
 )
+
+//? Built-in middleware
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
@@ -47,6 +50,8 @@ const sessionMiddleware = session({
 		collectionName: 'sessions',
 	}),
 })
+
+//? Application-level middleware
 app.use(sessionMiddleware)
 
 app.get('/', (req, res) => {
@@ -61,6 +66,28 @@ app.use('/api', OwnerRouter)
 app.use('/editor_gig', editor_gig_route)
 app.use('/editorProfile', editorProfileRoute)
 app.use('/user', UserRoute)
+
+//? Error handling middleware
+app.use((req, res, next) => {
+	const error = new Error(`Not Found - ${req.originalUrl}`)
+	error.status = 404
+	next(error)
+})
+
+app.use((err, req, res, next) => {
+	const statusCode = err.status || 500
+	const message = err.message || 'Internal Server Error'
+
+	console.error(`Error ${statusCode}: ${message}`)
+	console.error(err.stack)
+
+	res.status(statusCode).json({
+		status: 'error',
+		statusCode,
+		message,
+		stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+	})
+})
 
 app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`)
