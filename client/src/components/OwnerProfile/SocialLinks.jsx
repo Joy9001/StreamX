@@ -1,5 +1,4 @@
-import React from 'react'
-import { Globe, Github, Twitter, Instagram, Facebook } from 'lucide-react'
+import { Facebook, Github, Globe, Instagram, Twitter } from 'lucide-react'
 
 function SocialLinks() {
   return (

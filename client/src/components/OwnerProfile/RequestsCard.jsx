@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
 import axios from 'axios'
+import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 function RequestsCard() {
   const userData = useSelector((state) => state.user.userData)
@@ -8,7 +8,7 @@ function RequestsCard() {
     totalRequests: 0,
     approvedRequests: 0,
     rejectedRequests: 0,
-    pendingRequests: 0
+    pendingRequests: 0,
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -21,12 +21,12 @@ function RequestsCard() {
           `${import.meta.env.VITE_BACKEND_URL}/requests/aggregate/${userData._id}`
         )
         console.log('Request Stats Response:', response.data)
-        
+
         setRequestStats({
           totalRequests: response.data.totalRequests || 0,
           approvedRequests: response.data.approvedRequests || 0,
           rejectedRequests: response.data.rejectedRequests || 0,
-          pendingRequests: response.data.pendingRequests || 0
+          pendingRequests: response.data.pendingRequests || 0,
         })
         setError(null)
       } catch (err) {

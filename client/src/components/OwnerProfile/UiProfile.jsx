@@ -1,15 +1,15 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import profileData from '../../data/profileData.json'
-import UploadedVideosList from './UploadedVideosList'
+import HiredEditorsCard from './HiredEditorsCard'
+import ProfileCard from './ProfileCard'
+import ProfileForm from './ProfileForm'
+import RequestsCard from './RequestsCard'
 import SocialLinks from './SocialLinks'
 import StorageCard from './StorageCard'
-import HiredEditorsCard from './HiredEditorsCard'
-import RequestsCard from './RequestsCard'
-import ProfileForm from './ProfileForm'
-import ProfileCard from './ProfileCard'
+import UploadedVideosList from './UploadedVideosList'
 
 function UiProfile() {
-  const [currentProfileIndex, setCurrentProfileIndex] = useState(1)
+  const [currentProfileIndex] = useState(1)
   const [showProfileForm, setShowProfileForm] = useState(false)
   const currentProfile = profileData.profiles[currentProfileIndex]
 
@@ -18,8 +18,8 @@ function UiProfile() {
       <div id='webcrumbs' className='no-scrollbar overflow-auto'>
         <div className='w-full rounded-lg bg-white p-8'>
           <div className='flex gap-8'>
-            <ProfileCard 
-              profile={currentProfile} 
+            <ProfileCard
+              profile={currentProfile}
               onEditProfile={() => setShowProfileForm(true)}
             />
 

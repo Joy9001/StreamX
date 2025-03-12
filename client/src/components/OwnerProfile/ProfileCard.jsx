@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
+import PropTypes from 'prop-types'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 const membershipStyles = {
@@ -21,15 +21,22 @@ function ProfileCard({ onEditProfile }) {
     const fetchOwnerData = async () => {
       try {
         const ownerId = userData._id
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/owner/profile/${ownerId}`)
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/owner/profile/${ownerId}`
+        )
         console.log('Fetched owner data:', response.data)
         setOwnerData({
           username: response.data.username,
           ytChannelname: response.data.YTchannelname,
           bio: response.data.bio || 'No bio added yet',
-          membership: response.data.storageLimit <= 10240 ? 'Free' : 
-                     response.data.storageLimit <= 102400 ? 'Bronze' : 
-                     response.data.storageLimit <= 512000 ? 'Silver' : 'Gold'
+          membership:
+            response.data.storageLimit <= 10240
+              ? 'Free'
+              : response.data.storageLimit <= 102400
+                ? 'Bronze'
+                : response.data.storageLimit <= 512000
+                  ? 'Silver'
+                  : 'Gold',
         })
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch owner data')
@@ -64,25 +71,21 @@ function ProfileCard({ onEditProfile }) {
   return (
     <div className='w-[300px] rounded-lg bg-white p-6 shadow-lg transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl'>
       <img
-        src="https://imgix.ranker.com/list_img_v2/1360/2681360/original/the-best-ichigo-quotes?auto=format&q=50&fit=crop&fm=pjpg&dpr=2&crop=faces&h=185.86387434554973&w=355"
-        alt="Profile"
+        src='https://imgix.ranker.com/list_img_v2/1360/2681360/original/the-best-ichigo-quotes?auto=format&q=50&fit=crop&fm=pjpg&dpr=2&crop=faces&h=185.86387434554973&w=355'
+        alt='Profile'
         className='border-primary-100 mx-auto block h-[100px] w-[100px] rounded-full border-4 object-cover shadow-md'
       />
       <h2 className='mt-4 text-center text-xl font-bold text-gray-800'>
         {ownerData?.username}
       </h2>
-      <p className='text-center text-gray-600'>
-        {ownerData?.ytChannelname}
-      </p>
+      <p className='text-center text-gray-600'>{ownerData?.ytChannelname}</p>
       <div className='mt-2 flex justify-center'>
         <span
           className={`rounded-full px-3 py-1 text-sm font-medium ${membershipStyles[ownerData?.membership]}`}>
           {ownerData?.membership}
         </span>
       </div>
-      <p className='mt-4 text-center text-sm text-gray-500'>
-        {ownerData?.bio}
-      </p>
+      <p className='mt-4 text-center text-sm text-gray-500'>{ownerData?.bio}</p>
       <div className='mt-6'>
         <button
           onClick={onEditProfile}
@@ -92,6 +95,10 @@ function ProfileCard({ onEditProfile }) {
       </div>
     </div>
   )
+}
+
+ProfileCard.propTypes = {
+  onEditProfile: PropTypes.func.isRequired,
 }
 
 export default ProfileCard

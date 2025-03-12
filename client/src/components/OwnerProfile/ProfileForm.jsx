@@ -1,8 +1,8 @@
-import { Camera } from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
-import { useSelector } from 'react-redux'
 import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
+import { Camera } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 export default function ProfileForm() {
   const fileInputRef = useRef(null)
@@ -14,7 +14,7 @@ export default function ProfileForm() {
   const [formData, setFormData] = useState({
     username: '',
     bio: '',
-    profilephoto: ''
+    profilephoto: '',
   })
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function ProfileForm() {
           setFormData({
             username: ownerData.username || '',
             bio: ownerData.bio || '',
-            profilephoto: ownerData.profilephoto || ''
+            profilephoto: ownerData.profilephoto || '',
           })
         } catch (err) {
           console.error('Error fetching owner data:', err)
@@ -48,7 +48,7 @@ export default function ProfileForm() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleFileUpload = (e) => {
@@ -56,7 +56,7 @@ export default function ProfileForm() {
     if (file) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, profilephoto: reader.result }))
+        setFormData((prev) => ({ ...prev, profilephoto: reader.result }))
       }
       reader.readAsDataURL(file)
     }
@@ -76,7 +76,9 @@ export default function ProfileForm() {
       if (formData.profilephoto && formData.profilephoto.startsWith('data:')) {
         const response = await fetch(formData.profilephoto)
         const blob = await response.blob()
-        const file = new File([blob], 'profile-photo.jpg', { type: 'image/jpeg' })
+        const file = new File([blob], 'profile-photo.jpg', {
+          type: 'image/jpeg',
+        })
         formDataToSend.append('file', file)
       }
 
@@ -95,7 +97,7 @@ export default function ProfileForm() {
         setFormData({
           username: response.data.owner.username || '',
           bio: response.data.owner.bio || '',
-          profilephoto: response.data.owner.profilephoto || ''
+          profilephoto: response.data.owner.profilephoto || '',
         })
       }
       console.log('Profile updated:', response.data)
@@ -113,10 +115,7 @@ export default function ProfileForm() {
         <h2 className='bg-gradient-to-r from-pink-300 to-pink-500 bg-clip-text text-2xl font-bold text-transparent'>
           Edit Profile
         </h2>
-        <button 
-          onClick={handleEditProfile} 
-          className='btn btn-primary btn-sm'
-        >
+        <button onClick={handleEditProfile} className='btn btn-primary btn-sm'>
           {loading ? (
             <span className='loading loading-spinner'></span>
           ) : (
@@ -173,11 +172,7 @@ export default function ProfileForm() {
           />
         </div>
 
-        {error && (
-          <div className='mt-4 text-error'>
-            {error}
-          </div>
-        )}
+        {error && <div className='mt-4 text-error'>{error}</div>}
       </div>
     </div>
   )

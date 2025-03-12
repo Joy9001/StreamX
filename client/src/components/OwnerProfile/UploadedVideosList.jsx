@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 function UploadedVideosList() {
@@ -89,44 +89,56 @@ function UploadedVideosList() {
         <p className='text-center text-gray-500'>No videos uploaded yet.</p>
       ) : (
         <ul className='space-y-4'>
-          {videos.map((video, index) => (
-            console.log('video', video),
-            <li
-              key={video._id || index}
-              className='flex items-center justify-between border-b pb-2'>
-              <div className='flex items-center gap-4'>
-                <span className='min-w-[30px] text-gray-500'>{index + 1}.</span>
-                <div className='flex flex-col'>
-                  <span className='font-medium text-gray-800'>{video.metaData.name}</span>
-                  {video.editor && (
-                    <span className='text-sm text-gray-500'>
-                      Editor: {video.editor}
+          {videos.map(
+            (video, index) => (
+              console.log('video', video),
+              (
+                <li
+                  key={video._id || index}
+                  className='flex items-center justify-between border-b pb-2'>
+                  <div className='flex items-center gap-4'>
+                    <span className='min-w-[30px] text-gray-500'>
+                      {index + 1}.
                     </span>
-                  )}
-                </div>
-              </div>
-              <div className='flex items-center gap-4'>
-                <span
-                  className={`rounded-full border px-3 py-1 text-sm font-medium ${getStatusStyle(
-                    video.ytUploadStatus
-                  )}`}>
-                  {video.ytUploadStatus}
-                </span>
-                <div className='flex items-center gap-1'>
-                  <span className='font-medium text-gray-600'>Upload Time:</span>
-                  <span className='text-gray-500'>
-                    {formatDate(video.uploadTime || video.createdAt)}
-                  </span>
-                </div>
-                <div className='flex items-center gap-1'>
-                  <span className='font-medium text-gray-600'>File Size:</span>
-                  <span className='text-gray-500'>
-                    {formatFileSize(video.metaData.size)}
-                  </span>
-                </div>
-              </div>
-            </li>
-          ))}
+                    <div className='flex flex-col'>
+                      <span className='font-medium text-gray-800'>
+                        {video.metaData.name}
+                      </span>
+                      {video.editor && (
+                        <span className='text-sm text-gray-500'>
+                          Editor: {video.editor}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className='flex items-center gap-4'>
+                    <span
+                      className={`rounded-full border px-3 py-1 text-sm font-medium ${getStatusStyle(
+                        video.ytUploadStatus
+                      )}`}>
+                      {video.ytUploadStatus}
+                    </span>
+                    <div className='flex items-center gap-1'>
+                      <span className='font-medium text-gray-600'>
+                        Upload Time:
+                      </span>
+                      <span className='text-gray-500'>
+                        {formatDate(video.uploadTime || video.createdAt)}
+                      </span>
+                    </div>
+                    <div className='flex items-center gap-1'>
+                      <span className='font-medium text-gray-600'>
+                        File Size:
+                      </span>
+                      <span className='text-gray-500'>
+                        {formatFileSize(video.metaData.size)}
+                      </span>
+                    </div>
+                  </div>
+                </li>
+              )
+            )
+          )}
         </ul>
       )}
     </div>
