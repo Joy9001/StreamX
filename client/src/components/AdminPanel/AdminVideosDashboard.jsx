@@ -116,6 +116,11 @@ export function Dashboard() {
     return editor ? editor.name : 'Unknown Editor'
   }
 
+  // Helper function to get avatar URL
+  const getAvatarUrl = (name) => {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff`
+  }
+
   const formatDate = (dateString) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', {
@@ -131,6 +136,9 @@ export function Dashboard() {
   const calculateStats = () => {
     const ownerStats = {}
     const editorStats = {}
+    const tagStats = {}
+    const visibilityStats = {}
+    const audienceStats = {}
 
     videoData.forEach((video) => {
       // Count by owner
@@ -148,11 +156,40 @@ export function Dashboard() {
         editorStats[editorId] = { name: editorName, count: 0 }
       }
       editorStats[editorId].count++
+
+      // Count by tags
+      if (video.ytData?.tags) {
+        video.ytData.tags.forEach((tag) => {
+          if (!tagStats[tag]) {
+            tagStats[tag] = { name: tag, count: 0 }
+          }
+          tagStats[tag].count++
+        })
+      }
+
+      // Count by visibility
+      const visibility = video.ytData?.visibility || 'Not Set'
+      if (!visibilityStats[visibility]) {
+        visibilityStats[visibility] = { name: visibility, count: 0 }
+      }
+      visibilityStats[visibility].count++
+
+      // Count by audience
+      const audience = video.ytData?.audience || 'Not Set'
+      if (!audienceStats[audience]) {
+        audienceStats[audience] = { name: audience, count: 0 }
+      }
+      audienceStats[audience].count++
     })
 
     return {
       owners: Object.values(ownerStats).sort((a, b) => b.count - a.count),
       editors: Object.values(editorStats).sort((a, b) => b.count - a.count),
+      tags: Object.values(tagStats).sort((a, b) => b.count - a.count),
+      visibility: Object.values(visibilityStats).sort(
+        (a, b) => b.count - a.count
+      ),
+      audience: Object.values(audienceStats).sort((a, b) => b.count - a.count),
     }
   }
 
@@ -241,7 +278,7 @@ export function Dashboard() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                   <div>
                     <h3 className='mb-2 text-lg font-medium'>
                       Videos by Owner
@@ -271,6 +308,59 @@ export function Dashboard() {
                           <span>{editor.name}</span>
                           <span className='font-semibold'>
                             {editor.count} videos
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className='mb-2 text-lg font-medium'>Popular Tags</h3>
+                    <div className='space-y-2'>
+                      {stats.tags.slice(0, 10).map((tag, index) => (
+                        <div
+                          key={index}
+                          className='flex items-center justify-between'>
+                          <span>{tag.name}</span>
+                          <span className='font-semibold'>
+                            {tag.count} videos
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className='mb-2 text-lg font-medium'>
+                      Videos by Visibility
+                    </h3>
+                    <div className='space-y-2'>
+                      {stats.visibility.map((item, index) => (
+                        <div
+                          key={index}
+                          className='flex items-center justify-between'>
+                          <span className='capitalize'>{item.name}</span>
+                          <span className='font-semibold'>
+                            {item.count} videos
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className='mb-2 text-lg font-medium'>
+                      Videos by Audience
+                    </h3>
+                    <div className='space-y-2'>
+                      {stats.audience.map((item, index) => (
+                        <div
+                          key={index}
+                          className='flex items-center justify-between'>
+                          <span className='capitalize'>
+                            {item.name === 'madeForKids'
+                              ? 'Made for Kids'
+                              : item.name}
+                          </span>
+                          <span className='font-semibold'>
+                            {item.count} videos
                           </span>
                         </div>
                       ))}
@@ -506,6 +596,8 @@ export function Dashboard() {
                     <TableHead className='w-[200px]'>Title</TableHead>
                     <TableHead>Owner</TableHead>
                     <TableHead>Editor</TableHead>
+                    <TableHead>Size</TableHead>
+                    <TableHead>YouTube Info</TableHead>
                     <TableHead>Upload Status</TableHead>
                     <TableHead>Approval Status</TableHead>
                     <TableHead>Created At</TableHead>
@@ -515,7 +607,7 @@ export function Dashboard() {
                 <TableBody>
                   {filteredVideos.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className='py-4 text-center'>
+                      <TableCell colSpan={9} className='py-4 text-center'>
                         No videos match the current filters
                       </TableCell>
                     </TableRow>
@@ -525,8 +617,88 @@ export function Dashboard() {
                         <TableCell className='font-medium'>
                           {video.metaData?.name || 'Untitled'}
                         </TableCell>
-                        <TableCell>{getOwnerInfo(video.ownerId)}</TableCell>
-                        <TableCell>{getEditorInfo(video.editorId)}</TableCell>
+                        <TableCell>
+                          <div className='flex items-center space-x-2'>
+                            {video.ownerPic ? (
+                              <img
+                                src={video.ownerPic}
+                                alt={getOwnerInfo(video.ownerId)}
+                                className='h-6 w-6 rounded-full object-cover'
+                              />
+                            ) : (
+                              <img
+                                src={getAvatarUrl(getOwnerInfo(video.ownerId))}
+                                alt={getOwnerInfo(video.ownerId)}
+                                className='h-6 w-6 rounded-full object-cover'
+                              />
+                            )}
+                            <span>{getOwnerInfo(video.ownerId)}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className='flex items-center space-x-2'>
+                            {video.editorPic ? (
+                              <img
+                                src={video.editorPic}
+                                alt={getEditorInfo(video.editorId)}
+                                className='h-6 w-6 rounded-full object-cover'
+                              />
+                            ) : (
+                              <img
+                                src={getAvatarUrl(
+                                  getEditorInfo(video.editorId)
+                                )}
+                                alt={getEditorInfo(video.editorId)}
+                                className='h-6 w-6 rounded-full object-cover'
+                              />
+                            )}
+                            <span>{getEditorInfo(video.editorId)}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {video.metaData?.size
+                            ? `${(video.metaData.size / (1024 * 1024)).toFixed(2)} MB`
+                            : 'Unknown'}
+                        </TableCell>
+                        <TableCell>
+                          {video.ytData ? (
+                            <div className='text-xs'>
+                              <div>
+                                <span className='font-semibold'>
+                                  Visibility:
+                                </span>{' '}
+                                {video.ytData.visibility}
+                              </div>
+                              <div>
+                                <span className='font-semibold'>Audience:</span>{' '}
+                                {video.ytData.audience === 'madeForKids'
+                                  ? 'Kids'
+                                  : video.ytData.audience}
+                              </div>
+                              {video.ytData.tags &&
+                                video.ytData.tags.length > 0 && (
+                                  <div className='mt-1 flex flex-wrap gap-1'>
+                                    {video.ytData.tags
+                                      .slice(0, 3)
+                                      .map((tag, idx) => (
+                                        <span
+                                          key={idx}
+                                          className='rounded-full bg-gray-100 px-2 py-0.5 text-xs'>
+                                          {tag}
+                                        </span>
+                                      ))}
+                                    {video.ytData.tags.length > 3 && (
+                                      <span className='text-gray-500'>
+                                        +{video.ytData.tags.length - 3} more
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                            </div>
+                          ) : (
+                            <span className='text-gray-500'>Not set</span>
+                          )}
+                        </TableCell>
                         <TableCell>
                           <span
                             className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
