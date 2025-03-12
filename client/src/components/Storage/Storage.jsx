@@ -12,7 +12,6 @@ import VideoDrawer from './VideoDrawer.jsx'
 
 function Storage() {
   const drawer = useSelector((state) => state.ui.drawerOpen)
-  const navOpen = useSelector((state) => state.ui.navbarOpen)
   const fileInputRef = useRef(null)
   const [uploading, setUploading] = useState(false)
   const recentVideos = useSelector((state) => state.video.recentVideos)
@@ -102,17 +101,14 @@ function Storage() {
 
   return (
     <div className='storage-main flex h-screen'>
-      <div
-        className={`navbar h-full transition-all duration-300 ${
-          navOpen ? 'w-[15%]' : 'w-[5%]'
-        } pl-0`}>
+      <div className='navbar-container h-full flex-shrink-0'>
         <Navbar title='Storage' />
       </div>
 
       {/* Main */}
-      <div className={`storage-container flex flex-grow`}>
+      <div className='storage-container flex flex-grow pl-6'>
         <div
-          className={`storage-main flex-grow p-2 transition-all duration-300 ${
+          className={`storage-main flex-grow p-4 transition-all duration-300 ${
             drawer ? 'mr-4' : 'mr-0'
           }`}>
           {/* Inside Nav */}
@@ -120,7 +116,7 @@ function Storage() {
 
           {/* Main Content */}
           <div className='storage-main-content'>
-            <div className='storage-recent-content my-2'>
+            <div className='storage-recent-content my-4'>
               <div className='storage-recent-header mx-2 flex justify-between'>
                 <div className='flex'>
                   <span className='flex items-center text-lg font-semibold'>
@@ -175,7 +171,7 @@ function Storage() {
                 ))}
               </div>
             </div>
-            <div className='storage-content mt-2'>
+            <div className='storage-content mt-6'>
               <div className='storge-content-header m-2'>
                 <span className='text-xl font-semibold'>My Videos</span>
               </div>
