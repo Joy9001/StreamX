@@ -17,10 +17,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  setEditors,
+  setEditorsError,
+  setEditorsLoading,
+  setOwners,
+  setOwnersError,
+  setOwnersLoading,
+} from '@/store/slices/adminSlice'
 import axios from 'axios'
 import { Eye, ListFilter, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import AdminNav from './AdminNav'
 
 export function Dashboard() {
@@ -41,32 +49,70 @@ export function Dashboard() {
     Rejected: false,
     None: false,
   })
+  const dispatch = useDispatch()
   const userData = useSelector((state) => state.user.userData)
+  const { owners, editors } = useSelector((state) => state.admin)
 
+  // Fetch videos, owners and editors data
   useEffect(() => {
-    const fetchVideoData = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
+        setLoading(true)
+
+        // Fetch videos
+        const videosResponse = await axios.get(
           `http://localhost:3000/api/videos/all/Admin/${userData._id}`
         )
-        setVideoData(response.data.videos)
+        setVideoData(videosResponse.data.videos)
+
+        // Fetch owners
+        dispatch(setOwnersLoading(true))
+        const ownersResponse = await axios.get(
+          'http://localhost:3000/api/admin/owners'
+        )
+        dispatch(setOwners(ownersResponse.data.owners))
+        dispatch(setOwnersLoading(false))
+
+        // Fetch editors
+        dispatch(setEditorsLoading(true))
+        const editorsResponse = await axios.get(
+          'http://localhost:3000/api/admin/editors'
+        )
+        dispatch(setEditors(editorsResponse.data.editors))
+        dispatch(setEditorsLoading(false))
+
         setLoading(false)
       } catch (err) {
-        console.error('Error fetching video data:', err)
+        console.error('Error fetching data:', err)
         setError(err.message)
+        dispatch(setOwnersError(err.message))
+        dispatch(setEditorsError(err.message))
         setLoading(false)
       }
     }
 
-    fetchVideoData()
-  }, [userData._id])
+    fetchData()
+  }, [userData._id, dispatch])
+
+  // Helper functions to get owner and editor info
+  const getOwnerInfo = (ownerId) => {
+    if (!ownerId) return 'Not Assigned'
+    const owner = owners[ownerId]
+    return owner ? owner.username : 'Unknown Owner'
+  }
+
+  const getEditorInfo = (editorId) => {
+    if (!editorId) return 'Not Assigned'
+    const editor = editors[editorId]
+    return editor ? editor.name : 'Unknown Editor'
+  }
 
   const filteredVideos = videoData.filter((video) => {
     const searchTerm = searchQuery.toLowerCase()
     const matchesSearch =
       video.metaData?.name?.toLowerCase().includes(searchTerm) ||
-      video.ownerId?.toLowerCase().includes(searchTerm) ||
-      video.editorId?.toLowerCase().includes(searchTerm) ||
+      getOwnerInfo(video.ownerId)?.toLowerCase().includes(searchTerm) ||
+      getEditorInfo(video.editorId)?.toLowerCase().includes(searchTerm) ||
       video.ytUploadStatus?.toLowerCase().includes(searchTerm) ||
       video.approvalStatus?.toLowerCase().includes(searchTerm)
 
@@ -248,8 +294,8 @@ export function Dashboard() {
                       <TableCell className='font-medium'>
                         {video.metaData?.name || 'Untitled'}
                       </TableCell>
-                      <TableCell>{video.ownerId || 'Not Assigned'}</TableCell>
-                      <TableCell>{video.editorId || 'Not Assigned'}</TableCell>
+                      <TableCell>{getOwnerInfo(video.ownerId)}</TableCell>
+                      <TableCell>{getEditorInfo(video.editorId)}</TableCell>
                       <TableCell>
                         <span
                           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
