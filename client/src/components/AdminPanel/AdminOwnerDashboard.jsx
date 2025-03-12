@@ -28,6 +28,7 @@ import AdminNav from './AdminNav'
 
 export function Dashboard() {
   const [ownerData, setOwnerData] = useState([])
+  const [videosData, setVideosData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -36,23 +37,68 @@ export function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
-    const fetchOwnerData = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
+        setLoading(true)
+
+        // Fetch owners data
+        const ownersResponse = await axios.get(
           'http://localhost:3000/api/ownerProfile'
         )
-        console.log('ownerData', response.data)
-        setOwnerData(response.data)
+        console.log('ownerData', ownersResponse.data)
+
+        // Fetch all videos data
+        const videosResponse = await axios.get(
+          'http://localhost:3000/api/videos/all-videos'
+        )
+        console.log('videosData', videosResponse.data)
+
+        setOwnerData(ownersResponse.data)
+        setVideosData(videosResponse.data || [])
         setLoading(false)
       } catch (err) {
-        console.error('Error fetching owner data:', err)
+        console.error('Error fetching data:', err)
         setError(err.message)
         setLoading(false)
       }
     }
 
-    fetchOwnerData()
+    fetchData()
   }, [])
+
+  // Calculate videos count for each owner
+  const getOwnerVideosCount = (ownerId) => {
+    if (!ownerId || !videosData || videosData.length === 0) return 0
+
+    return videosData.filter((video) => {
+      // Check if video.ownerId exists and has _id property
+      if (!video.ownerId || !video.ownerId._id) return false
+
+      // Compare as strings to ensure proper comparison
+      return video.ownerId._id.toString() === ownerId.toString()
+    }).length
+  }
+
+  // Calculate storage usage for each owner based on their videos
+  const getOwnerStorageUsage = (ownerId) => {
+    if (!ownerId || !videosData || videosData.length === 0) return 0
+
+    return videosData
+      .filter((video) => {
+        // Check if video.ownerId exists and has _id property
+        if (!video.ownerId || !video.ownerId._id) return false
+
+        // Compare as strings to ensure proper comparison
+        return video.ownerId._id.toString() === ownerId.toString()
+      })
+      .reduce((total, video) => {
+        // Get video size from metaData if available
+        const videoSize = video.metaData?.size || 0
+
+        // Convert bytes to KB (1 KB = 1024 bytes)
+        return total + videoSize / 1024
+      }, 0)
+  }
 
   const handleEditClick = async (owner) => {
     try {
@@ -135,7 +181,7 @@ export function Dashboard() {
   // Format storage size to human-readable format
   const formatStorage = (sizeInKB) => {
     if (sizeInKB < 1024) {
-      return `${sizeInKB} KB`
+      return `${sizeInKB.toFixed(2)} KB`
     } else if (sizeInKB < 1024 * 1024) {
       return `${(sizeInKB / 1024).toFixed(2)} MB`
     } else {
@@ -205,8 +251,11 @@ export function Dashboard() {
             </Card>
           ) : (
             <Card>
-              <CardHeader>
+              <CardHeader className='flex flex-row items-center justify-between'>
                 <CardTitle>Owners ({filteredOwners.length})</CardTitle>
+                <div className='text-sm text-muted-foreground'>
+                  Total Videos: {videosData.length}
+                </div>
               </CardHeader>
               <CardContent>
                 <div className='relative w-full overflow-auto'>
@@ -229,143 +278,147 @@ export function Dashboard() {
                           </TableCell>
                         </TableRow>
                       ) : (
-                        filteredOwners.map((owner) => (
-                          <TableRow key={owner.email}>
-                            <TableCell>
-                              <div className='flex items-center space-x-3'>
-                                <div className='h-10 w-10 flex-shrink-0 overflow-hidden rounded-full'>
-                                  <img
-                                    src={
-                                      owner.profilephoto ||
-                                      getAvatarUrl(owner.username)
-                                    }
-                                    alt={owner.username}
-                                    className='h-full w-full object-cover'
-                                  />
-                                </div>
-                                <div>
-                                  <div className='font-medium'>
-                                    {owner.username}
+                        filteredOwners.map((owner) => {
+                          // Calculate storage usage for this owner
+                          const usedStorage = getOwnerStorageUsage(owner._id)
+
+                          return (
+                            <TableRow key={owner.email}>
+                              <TableCell>
+                                <div className='flex items-center space-x-3'>
+                                  <div className='h-10 w-10 flex-shrink-0 overflow-hidden rounded-full'>
+                                    <img
+                                      src={
+                                        owner.profilephoto ||
+                                        getAvatarUrl(owner.username)
+                                      }
+                                      alt={owner.username}
+                                      className='h-full w-full object-cover'
+                                    />
                                   </div>
-                                  {owner.bio && (
-                                    <div className='text-xs text-muted-foreground'>
-                                      {owner.bio}
+                                  <div>
+                                    <div className='font-medium'>
+                                      {owner.username}
                                     </div>
-                                  )}
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>{owner.email}</TableCell>
-                            <TableCell>
-                              {owner.membership ? (
-                                <Badge
-                                  className={`${getMembershipColor(owner.membership)} text-white`}>
-                                  {owner.membership.toUpperCase()}
-                                </Badge>
-                              ) : (
-                                <Badge variant='outline'>None</Badge>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <div className='space-y-1'>
-                                      <div className='flex items-center justify-between text-xs'>
-                                        <span>
-                                          {formatStorage(
-                                            owner.usedStorage || 0
-                                          )}
-                                        </span>
-                                        <span>
-                                          {formatStorage(
-                                            owner.storageLimit || 10240
-                                          )}
-                                        </span>
+                                    {owner.bio && (
+                                      <div className='text-xs text-muted-foreground'>
+                                        {owner.bio}
                                       </div>
-                                      <Progress
-                                        value={
-                                          ((owner.usedStorage || 0) /
+                                    )}
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell>{owner.email}</TableCell>
+                              <TableCell>
+                                {owner.membership ? (
+                                  <Badge
+                                    className={`${getMembershipColor(owner.membership)} text-white`}>
+                                    {owner.membership.toUpperCase()}
+                                  </Badge>
+                                ) : (
+                                  <Badge variant='outline'>None</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div className='space-y-1'>
+                                        <div className='flex items-center justify-between text-xs'>
+                                          <span>
+                                            {formatStorage(usedStorage)}
+                                          </span>
+                                          <span>
+                                            {formatStorage(
+                                              owner.storageLimit || 10240
+                                            )}
+                                          </span>
+                                        </div>
+                                        <Progress
+                                          value={
+                                            (usedStorage /
+                                              (owner.storageLimit || 10240)) *
+                                            100
+                                          }
+                                          className='h-2'
+                                        />
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>
+                                        {formatStorage(usedStorage)} used of{' '}
+                                        {formatStorage(
+                                          owner.storageLimit || 10240
+                                        )}{' '}
+                                        (
+                                        {(
+                                          (usedStorage /
                                             (owner.storageLimit || 10240)) *
                                           100
-                                        }
-                                        className='h-2'
-                                      />
-                                    </div>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>
-                                      {formatStorage(owner.usedStorage || 0)}{' '}
-                                      used of{' '}
-                                      {formatStorage(
-                                        owner.storageLimit || 10240
-                                      )}{' '}
-                                      (
-                                      {(
-                                        ((owner.usedStorage || 0) /
-                                          (owner.storageLimit || 10240)) *
-                                        100
-                                      ).toFixed(1)}
-                                      %)
-                                    </p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant='outline'>
-                                {owner.videoIds?.length || 0} videos
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <div className='flex items-center justify-end gap-2'>
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant='ghost'
-                                        size='icon'
-                                        onClick={() => handleEditClick(owner)}
-                                        className='h-8 w-8 text-slate-600 hover:text-slate-900'>
-                                        <Pencil className='h-4 w-4' />
-                                        <span className='sr-only'>Edit</span>
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent side='left'>
-                                      <p>Edit owner</p>
+                                        ).toFixed(1)}
+                                        %)
+                                      </p>
                                     </TooltipContent>
                                   </Tooltip>
                                 </TooltipProvider>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant='outline'>
+                                  {getOwnerVideosCount(owner._id)} videos
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <div className='flex items-center justify-end gap-2'>
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant='ghost'
+                                          size='icon'
+                                          onClick={() => handleEditClick(owner)}
+                                          className='h-8 w-8 text-slate-600 hover:text-slate-900'>
+                                          <Pencil className='h-4 w-4' />
+                                          <span className='sr-only'>Edit</span>
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent side='left'>
+                                        <p>Edit owner</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
 
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant='ghost'
-                                        size='icon'
-                                        onClick={() => {
-                                          if (
-                                            window.confirm(
-                                              'Are you sure you want to delete this owner?'
-                                            )
-                                          ) {
-                                            deleteOwner(owner.email)
-                                          }
-                                        }}
-                                        className='h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600'>
-                                        <Trash className='h-4 w-4' />
-                                        <span className='sr-only'>Delete</span>
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent side='left'>
-                                      <p>Delete owner</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant='ghost'
+                                          size='icon'
+                                          onClick={() => {
+                                            if (
+                                              window.confirm(
+                                                'Are you sure you want to delete this owner?'
+                                              )
+                                            ) {
+                                              deleteOwner(owner.email)
+                                            }
+                                          }}
+                                          className='h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600'>
+                                          <Trash className='h-4 w-4' />
+                                          <span className='sr-only'>
+                                            Delete
+                                          </span>
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent side='left'>
+                                        <p>Delete owner</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })
                       )}
                     </TableBody>
                   </Table>
