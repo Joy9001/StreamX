@@ -105,36 +105,36 @@ function ContentTable() {
   }
 
   return (
-    <div className='rounded-lg border border-gray-200 bg-white'>
+    <div className='rounded-lg border border-gray-200 bg-white shadow-sm'>
       <div className='overflow-x-auto'>
         <table className='w-full divide-y divide-gray-200'>
-          <thead className='bg-gray-50'>
+          <thead className='bg-gradient-to-r from-teal-50 to-blue-50'>
             <tr>
-              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <Film className='mr-2 h-4 w-4 text-gray-400' />
+                  <Film className='mr-2 h-4 w-4 text-teal-500' />
                   Video
                 </div>
               </th>
-              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <User className='mr-2 h-4 w-4 text-gray-400' />
+                  <User className='mr-2 h-4 w-4 text-teal-500' />
                   {userRole === 'Owner' ? 'Editor' : 'Owner'}
                 </div>
               </th>
-              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <FileText className='mr-2 h-4 w-4 text-gray-400' />
+                  <FileText className='mr-2 h-4 w-4 text-teal-500' />
                   Description
                 </div>
               </th>
-              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <DollarSign className='mr-2 h-4 w-4 text-gray-400' />
+                  <DollarSign className='mr-2 h-4 w-4 text-teal-500' />
                   Price
                 </div>
               </th>
-              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 Status
               </th>
             </tr>
@@ -147,8 +147,8 @@ function ContentTable() {
                   className='transition-colors duration-150 hover:bg-gray-50'>
                   <td className='whitespace-nowrap px-6 py-4'>
                     <div className='flex items-center'>
-                      <div className='flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gray-200'>
-                        <Film className='h-5 w-5 text-gray-500' />
+                      <div className='flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-teal-100'>
+                        <Film className='h-5 w-5 text-teal-600' />
                       </div>
                       <div className='ml-4'>
                         <div className='text-sm font-medium text-gray-900'>
@@ -158,18 +158,34 @@ function ContentTable() {
                     </div>
                   </td>
                   <td className='whitespace-nowrap px-6 py-4'>
-                    <div className='text-sm text-gray-900'>
-                      {request.from.name}
+                    <div className='flex items-center'>
+                      <div className='h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-gray-200'>
+                        <img
+                          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            request.from.name || 'User'
+                          )}&background=random&color=fff`}
+                          alt={request.from.name}
+                          className='h-full w-full object-cover'
+                        />
+                      </div>
+                      <div className='ml-3'>
+                        <div className='text-sm font-medium text-gray-900'>
+                          {request.from.name}
+                        </div>
+                      </div>
                     </div>
                   </td>
                   <td className='px-6 py-4'>
-                    <div className='max-w-xs truncate text-sm text-gray-900'>
+                    <div className='max-w-xs text-sm text-gray-900'>
                       {request.description}
                     </div>
                   </td>
                   <td className='whitespace-nowrap px-6 py-4'>
                     <div className='text-sm font-medium text-gray-900'>
-                      ${request.price}
+                      <span className='flex items-center rounded-full bg-green-50 px-2.5 py-1 text-green-700'>
+                        <DollarSign className='mr-1 h-3.5 w-3.5' />
+                        {request.price}
+                      </span>
                     </div>
                   </td>
                   <td className='whitespace-nowrap px-6 py-4'>
@@ -191,7 +207,7 @@ function ContentTable() {
                   className='px-6 py-10 text-center text-sm text-gray-500'>
                   <div className='flex flex-col items-center justify-center'>
                     <FileText className='mb-2 h-10 w-10 text-gray-400' />
-                    <p>No requests found</p>
+                    <p className='font-medium'>No requests found</p>
                     <p className='mt-1 text-xs text-gray-400'>
                       When you make requests, they will appear here
                     </p>
