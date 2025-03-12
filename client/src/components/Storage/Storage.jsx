@@ -1,4 +1,5 @@
 // import { loginState } from '@/states/loginState.js'
+import { Button } from '@/components/ui/button.jsx'
 import { setAllVideos, setRecentVideos } from '@/store/slices/videoSlice.js'
 import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
@@ -124,9 +125,11 @@ function Storage() {
                   </span>
                 </div>
                 <div className='storage-new-btn'>
-                  <button
-                    className={`btn ${uploading ? 'btn-disabled' : 'btn-secondary'}`}
-                    onClick={handleNewBtnClick}>
+                  <Button
+                    variant='default'
+                    disabled={uploading}
+                    onClick={handleNewBtnClick}
+                    className='flex items-center gap-2'>
                     {uploading ? (
                       <span className='loading loading-spinner loading-sm'></span>
                     ) : (
@@ -144,16 +147,15 @@ function Storage() {
                           {' '}
                           <path
                             d='M6 12H18M12 6V18'
-                            stroke='#000000'
+                            stroke='currentColor'
                             strokeWidth='2'
                             strokeLinecap='round'
                             strokeLinejoin='round'></path>{' '}
                         </g>
                       </svg>
                     )}
-
                     {uploading ? 'Uploading...' : 'New'}
-                  </button>
+                  </Button>
                   <input
                     type='file'
                     accept='video/*'
