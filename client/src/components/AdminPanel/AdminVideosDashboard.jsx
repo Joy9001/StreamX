@@ -51,7 +51,10 @@ export function Dashboard() {
   })
   const dispatch = useDispatch()
   const userData = useSelector((state) => state.user.userData)
-  const { owners, editors } = useSelector((state) => state.admin)
+  const { owners, editors } = useSelector((state) => ({
+    owners: state.admin.owners,
+    editors: state.admin.editors,
+  }))
 
   // Fetch videos, owners and editors data
   useEffect(() => {
@@ -63,6 +66,7 @@ export function Dashboard() {
         const videosResponse = await axios.get(
           `http://localhost:3000/api/videos/all/Admin/${userData._id}`
         )
+        console.log('Videos:', videosResponse.data.videos)
         setVideoData(videosResponse.data.videos)
 
         // Fetch owners
@@ -94,25 +98,39 @@ export function Dashboard() {
     fetchData()
   }, [userData._id, dispatch])
 
-  // Helper functions to get owner and editor info
+  // Helper functions to get owner and editor info by ID
   const getOwnerInfo = (ownerId) => {
     if (!ownerId) return 'Not Assigned'
-    const owner = owners[ownerId]
+    const owner = owners.find((o) => o._id === ownerId)
     return owner ? owner.username : 'Unknown Owner'
   }
 
   const getEditorInfo = (editorId) => {
     if (!editorId) return 'Not Assigned'
-    const editor = editors[editorId]
+    const editor = editors.find((e) => e._id === editorId)
     return editor ? editor.name : 'Unknown Editor'
+  }
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
   }
 
   const filteredVideos = videoData.filter((video) => {
     const searchTerm = searchQuery.toLowerCase()
+    const ownerName = getOwnerInfo(video.ownerId).toLowerCase()
+    const editorName = getEditorInfo(video.editorId).toLowerCase()
+
     const matchesSearch =
       video.metaData?.name?.toLowerCase().includes(searchTerm) ||
-      getOwnerInfo(video.ownerId)?.toLowerCase().includes(searchTerm) ||
-      getEditorInfo(video.editorId)?.toLowerCase().includes(searchTerm) ||
+      ownerName.includes(searchTerm) ||
+      editorName.includes(searchTerm) ||
       video.ytUploadStatus?.toLowerCase().includes(searchTerm) ||
       video.approvalStatus?.toLowerCase().includes(searchTerm)
 
@@ -285,6 +303,7 @@ export function Dashboard() {
                     <TableHead>Editor</TableHead>
                     <TableHead>Upload Status</TableHead>
                     <TableHead>Approval Status</TableHead>
+                    <TableHead>Created At</TableHead>
                     <TableHead className='text-right'>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -326,6 +345,7 @@ export function Dashboard() {
                           {video.approvalStatus}
                         </span>
                       </TableCell>
+                      <TableCell>{formatDate(video.createdAt)}</TableCell>
                       <TableCell className='text-right'>
                         <div className='flex justify-end space-x-2'>
                           <Button
