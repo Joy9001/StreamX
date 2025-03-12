@@ -142,32 +142,32 @@ export function AdminRequestsDashboard() {
           variant='outline'
           size='sm'
           onClick={() => handleUploadToYoutube(request)}
-          className='flex items-center gap-2'>
+          className='flex items-center gap-2 bg-gradient-to-r from-red-50 to-red-100 text-red-600 hover:from-red-100 hover:to-red-200 hover:text-red-700'>
           <Youtube className='h-4 w-4' /> Upload to YouTube
         </Button>
       ),
       Pending: (
-        <div className='flex items-center gap-2 text-yellow-500'>
-          <Clock className='h-4 w-4' />
-          <span>YouTube Upload Pending</span>
+        <div className='flex items-center gap-2 rounded-md bg-yellow-50 px-3 py-1.5 text-yellow-600'>
+          <Clock className='h-4 w-4 animate-pulse' />
+          <span className='text-sm font-medium'>YouTube Upload Pending</span>
         </div>
       ),
       Uploading: (
-        <div className='flex items-center gap-2 text-blue-500'>
-          <Clock className='h-4 w-4' />
-          <span>Uploading to YouTube</span>
+        <div className='flex items-center gap-2 rounded-md bg-blue-50 px-3 py-1.5 text-blue-600'>
+          <Clock className='h-4 w-4 animate-spin' />
+          <span className='text-sm font-medium'>Uploading to YouTube</span>
         </div>
       ),
       Uploaded: (
-        <div className='flex items-center gap-2 text-green-500'>
+        <div className='flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 text-green-600'>
           <CheckCircle className='h-4 w-4' />
-          <span>Uploaded to YouTube</span>
+          <span className='text-sm font-medium'>Uploaded to YouTube</span>
         </div>
       ),
       Failed: (
-        <div className='flex items-center gap-2 text-red-500'>
+        <div className='flex items-center gap-2 rounded-md bg-red-50 px-3 py-1.5 text-red-600'>
           <XCircle className='h-4 w-4' />
-          <span>YouTube Upload Failed</span>
+          <span className='text-sm font-medium'>YouTube Upload Failed</span>
         </div>
       ),
     }
@@ -418,7 +418,7 @@ export function AdminRequestsDashboard() {
                         Request Statistics by User
                       </CardTitle>
                       <p className='mt-1 text-sm text-blue-600'>
-                        Showing results for "{specificUserSearch}"
+                        Showing results for &quot;{specificUserSearch}&quot;
                       </p>
                     </CardHeader>
                     <CardContent className='pt-4'>
@@ -527,16 +527,29 @@ export function AdminRequestsDashboard() {
                           <TableCell>
                             <div className='flex items-center'>
                               {request.status === 'pending' && (
-                                <Clock className='mr-2 h-4 w-4 text-yellow-500' />
+                                <div className='flex items-center gap-1.5 rounded-full bg-yellow-100 px-2.5 py-1 text-yellow-700'>
+                                  <Clock className='h-3.5 w-3.5' />
+                                  <span className='text-xs font-medium'>
+                                    Pending
+                                  </span>
+                                </div>
                               )}
                               {request.status === 'approved' && (
-                                <CheckCircle className='mr-2 h-4 w-4 text-green-500' />
+                                <div className='flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-green-700'>
+                                  <CheckCircle className='h-3.5 w-3.5' />
+                                  <span className='text-xs font-medium'>
+                                    Approved
+                                  </span>
+                                </div>
                               )}
                               {request.status === 'rejected' && (
-                                <XCircle className='mr-2 h-4 w-4 text-red-500' />
+                                <div className='flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-1 text-red-700'>
+                                  <XCircle className='h-3.5 w-3.5' />
+                                  <span className='text-xs font-medium'>
+                                    Rejected
+                                  </span>
+                                </div>
                               )}
-                              {request.status.charAt(0).toUpperCase() +
-                                request.status.slice(1)}
                             </div>
                           </TableCell>
                           <TableCell>
@@ -555,7 +568,7 @@ export function AdminRequestsDashboard() {
                                   handleDelete(request.request_id)
                                 }
                               }}
-                              className='text-red-500 hover:bg-red-50 hover:text-red-700'>
+                              className='rounded-full bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700'>
                               <Trash2 className='h-4 w-4' />
                             </Button>
                           </TableCell>
@@ -615,16 +628,29 @@ export function AdminRequestsDashboard() {
                             <TableCell>
                               <div className='flex items-center'>
                                 {request.status === 'pending' && (
-                                  <Clock className='mr-2 h-4 w-4 text-yellow-500' />
+                                  <div className='flex items-center gap-1.5 rounded-full bg-yellow-100 px-2.5 py-1 text-yellow-700'>
+                                    <Clock className='h-3.5 w-3.5' />
+                                    <span className='text-xs font-medium'>
+                                      Pending
+                                    </span>
+                                  </div>
                                 )}
                                 {request.status === 'approved' && (
-                                  <CheckCircle className='mr-2 h-4 w-4 text-green-500' />
+                                  <div className='flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-green-700'>
+                                    <CheckCircle className='h-3.5 w-3.5' />
+                                    <span className='text-xs font-medium'>
+                                      Approved
+                                    </span>
+                                  </div>
                                 )}
                                 {request.status === 'rejected' && (
-                                  <XCircle className='mr-2 h-4 w-4 text-red-500' />
+                                  <div className='flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-1 text-red-700'>
+                                    <XCircle className='h-3.5 w-3.5' />
+                                    <span className='text-xs font-medium'>
+                                      Rejected
+                                    </span>
+                                  </div>
                                 )}
-                                {request.status.charAt(0).toUpperCase() +
-                                  request.status.slice(1)}
                               </div>
                             </TableCell>
                             <TableCell>
@@ -644,7 +670,7 @@ export function AdminRequestsDashboard() {
                                       handleDelete(request.request_id)
                                     }
                                   }}
-                                  className='text-red-500 hover:bg-red-50 hover:text-red-700'>
+                                  className='rounded-full bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700'>
                                   <Trash2 className='h-4 w-4' />
                                 </Button>
                                 {renderYouTubeUploadButton(request)}
