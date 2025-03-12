@@ -30,7 +30,6 @@ function Cards() {
     fetchAccessToken()
   }, [getAccessTokenSilently])
 
-
   useEffect(() => {
     const fetchData = async () => {
       console.log('Fetching data...')
@@ -78,7 +77,7 @@ function Cards() {
         return {
           ...editor,
           plans,
-          videos: ownerVideos // Pass the videos to each editor
+          videos: ownerVideos, // Pass the videos to each editor
         }
       })
       setCombinedData(combined)
