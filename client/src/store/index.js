@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
+import adminReducer from './slices/adminSlice'
 import uiReducer from './slices/uiSlice'
 import userReducer from './slices/userSlice'
 import videoReducer from './slices/videoSlice'
@@ -10,5 +11,6 @@ export const store = configureStore({
     ui: uiReducer,
     user: userReducer,
     ytForm: ytFormReducer,
+    admin: adminReducer,
   },
 })
