@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300&display=swap');
+
+/* Landing page specific styles */
+.landing-page {
+  --font-sora: 'Sora', sans-serif;
+  --font-code: 'Source Code Pro', monospace;
+  --font-grotesk: 'Space Grotesk', sans-serif;
+  color-scheme: dark;
+}
+
+/* Apply dark mode styles only to the landing page */
+.landing-page {
+  @apply bg-n-8 text-n-1;
+}
+
+/* Ensure smooth scrolling only for the landing page */
+.landing-page * {
+  scroll-behavior: smooth;
+}
+
+/* Apply base styles only to elements within the landing page */
+.landing-page {
+  @apply font-sans;
+}
+
+/* Rotation utility classes */
+.landing-page .rotate-45 {
+  @apply rotate-[45deg];
+}
+
+.landing-page .rotate-90 {
+  @apply rotate-[90deg];
+}
+
+.landing-page .rotate-135 {
+  @apply rotate-[135deg];
+}
+
+.landing-page .rotate-180 {
+  @apply rotate-[180deg];
+}
+
+.landing-page .rotate-225 {
+  @apply rotate-[225deg];
+}
+
+.landing-page .rotate-270 {
+  @apply rotate-[270deg];
+}
+
+.landing-page .rotate-315 {
+  @apply rotate-[315deg];
+}
+
+.landing-page .rotate-360 {
+  @apply rotate-[360deg];
+}
+
+.landing-page .-rotate-45 {
+  @apply rotate-[-45deg];
+}
+
+.landing-page .-rotate-90 {
+  @apply rotate-[-90deg];
+}
+
+.landing-page .-rotate-135 {
+  @apply rotate-[-135deg];
+}
+
+.landing-page .-rotate-180 {
+  @apply rotate-[-180deg];
+}
+
+.landing-page .-rotate-225 {
+  @apply rotate-[-225deg];
+}
+
+.landing-page .-rotate-270 {
+  @apply rotate-[-270deg];
+}
+
+.landing-page .-rotate-315 {
+  @apply rotate-[-315deg];
+}
+
+.landing-page .-rotate-360 {
+  @apply rotate-[-360deg];
+}
