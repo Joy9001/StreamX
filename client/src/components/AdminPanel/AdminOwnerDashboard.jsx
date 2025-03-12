@@ -2,19 +2,13 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import OwnerModal from './OwnerModal'
 
-import { ListFilter, PlusCircle, Search } from 'lucide-react'
+import { Pencil, PlusCircle, Search, Trash } from 'lucide-react'
 
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
 import {
   Table,
   TableBody,
@@ -23,6 +17,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 import AdminNav from './AdminNav'
 
@@ -33,6 +33,7 @@ export function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentOwner, setCurrentOwner] = useState(null)
   const [isCreating, setIsCreating] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     const fetchOwnerData = async () => {
@@ -40,6 +41,7 @@ export function Dashboard() {
         const response = await axios.get(
           'http://localhost:3000/api/ownerProfile'
         )
+        console.log('ownerData', response.data)
         setOwnerData(response.data)
         setLoading(false)
       } catch (err) {
@@ -113,25 +115,57 @@ export function Dashboard() {
 
   const deleteOwner = async (email) => {
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/ownerProfile/${email}`,
-        {
-          method: 'DELETE',
-        }
-      )
-
-      if (!response.ok) {
-        throw new Error('Failed to delete owner')
-      }
-
+      await axios.delete(`http://localhost:3000/api/ownerProfile/${email}`)
       console.log(`Owner with email ${email} deleted successfully.`)
       setOwnerData((prevData) =>
         prevData.filter((owner) => owner.email !== email)
       )
+      alert('Owner deleted successfully.')
     } catch (error) {
       console.error('Error deleting owner:', error)
+      alert('Error deleting owner. Please try again.')
     }
   }
+
+  // Helper function to get avatar URL if profile photo is not available
+  const getAvatarUrl = (name) => {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff`
+  }
+
+  // Format storage size to human-readable format
+  const formatStorage = (sizeInKB) => {
+    if (sizeInKB < 1024) {
+      return `${sizeInKB} KB`
+    } else if (sizeInKB < 1024 * 1024) {
+      return `${(sizeInKB / 1024).toFixed(2)} MB`
+    } else {
+      return `${(sizeInKB / (1024 * 1024)).toFixed(2)} GB`
+    }
+  }
+
+  // Get membership badge color
+  const getMembershipColor = (membership) => {
+    switch (membership?.toLowerCase()) {
+      case 'bronze':
+        return 'bg-amber-700'
+      case 'silver':
+        return 'bg-slate-400'
+      case 'gold':
+        return 'bg-amber-400'
+      case 'platinum':
+        return 'bg-cyan-400'
+      default:
+        return 'bg-slate-600'
+    }
+  }
+
+  // Filter owners based on search query
+  const filteredOwners = ownerData.filter(
+    (owner) =>
+      owner.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      owner.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      owner.membership?.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   return (
     <div className='flex h-screen bg-gray-100'>
@@ -147,24 +181,10 @@ export function Dashboard() {
                 type='search'
                 placeholder='Search owners...'
                 className='pl-8'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant='outline' size='icon'>
-                  <ListFilter className='h-4 w-4' />
-                  <span className='sr-only'>Toggle filters</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end'>
-                <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem checked>
-                  Active
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Inactive</DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
             <Button onClick={handleAddOwnerClick}>
               <PlusCircle className='mr-2 h-4 w-4' />
               Add Owner
@@ -174,55 +194,179 @@ export function Dashboard() {
 
         <main className='grid gap-4 p-4'>
           {loading ? (
-            <p>Loading...</p>
+            <div className='flex h-64 items-center justify-center'>
+              <div className='h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-primary'></div>
+            </div>
           ) : error ? (
-            <p>Error: {error}</p>
+            <Card className='bg-red-50'>
+              <CardContent className='pt-6'>
+                <p className='text-red-600'>Error: {error}</p>
+              </CardContent>
+            </Card>
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>Owners</CardTitle>
+                <CardTitle>Owners ({filteredOwners.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className='relative w-full overflow-auto'>
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Name</TableHead>
+                        <TableHead>Owner</TableHead>
                         <TableHead>Email</TableHead>
-                        <TableHead>YT Channel</TableHead>
-                        <TableHead>Storage Limit</TableHead>
+                        <TableHead>Membership</TableHead>
+                        <TableHead>Storage Usage</TableHead>
+                        <TableHead>Videos</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {ownerData.map((owner) => (
-                        <TableRow key={owner.email}>
-                          <TableCell>{owner.username}</TableCell>
-                          <TableCell>{owner.email}</TableCell>
-                          <TableCell>{owner.YTchannelname || 'N/A'}</TableCell>
-                          <TableCell>
-                            {owner.storageLimit
-                              ? `${owner.storageLimit / 1024}GB`
-                              : '10GB'}
-                          </TableCell>
-                          <TableCell>
-                            <div className='flex gap-2'>
-                              <Button
-                                variant='outline'
-                                size='sm'
-                                onClick={() => handleEditClick(owner)}>
-                                Edit
-                              </Button>
-                              <Button
-                                variant='destructive'
-                                size='sm'
-                                onClick={() => deleteOwner(owner.email)}>
-                                Delete
-                              </Button>
-                            </div>
+                      {filteredOwners.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={6} className='py-4 text-center'>
+                            No owners found matching your search
                           </TableCell>
                         </TableRow>
-                      ))}
+                      ) : (
+                        filteredOwners.map((owner) => (
+                          <TableRow key={owner.email}>
+                            <TableCell>
+                              <div className='flex items-center space-x-3'>
+                                <div className='h-10 w-10 flex-shrink-0 overflow-hidden rounded-full'>
+                                  <img
+                                    src={
+                                      owner.profilephoto ||
+                                      getAvatarUrl(owner.username)
+                                    }
+                                    alt={owner.username}
+                                    className='h-full w-full object-cover'
+                                  />
+                                </div>
+                                <div>
+                                  <div className='font-medium'>
+                                    {owner.username}
+                                  </div>
+                                  {owner.bio && (
+                                    <div className='text-xs text-muted-foreground'>
+                                      {owner.bio}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>{owner.email}</TableCell>
+                            <TableCell>
+                              {owner.membership ? (
+                                <Badge
+                                  className={`${getMembershipColor(owner.membership)} text-white`}>
+                                  {owner.membership.toUpperCase()}
+                                </Badge>
+                              ) : (
+                                <Badge variant='outline'>None</Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className='space-y-1'>
+                                      <div className='flex items-center justify-between text-xs'>
+                                        <span>
+                                          {formatStorage(
+                                            owner.usedStorage || 0
+                                          )}
+                                        </span>
+                                        <span>
+                                          {formatStorage(
+                                            owner.storageLimit || 10240
+                                          )}
+                                        </span>
+                                      </div>
+                                      <Progress
+                                        value={
+                                          ((owner.usedStorage || 0) /
+                                            (owner.storageLimit || 10240)) *
+                                          100
+                                        }
+                                        className='h-2'
+                                      />
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>
+                                      {formatStorage(owner.usedStorage || 0)}{' '}
+                                      used of{' '}
+                                      {formatStorage(
+                                        owner.storageLimit || 10240
+                                      )}{' '}
+                                      (
+                                      {(
+                                        ((owner.usedStorage || 0) /
+                                          (owner.storageLimit || 10240)) *
+                                        100
+                                      ).toFixed(1)}
+                                      %)
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant='outline'>
+                                {owner.videoIds?.length || 0} videos
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className='flex items-center justify-end gap-2'>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant='ghost'
+                                        size='icon'
+                                        onClick={() => handleEditClick(owner)}
+                                        className='h-8 w-8 text-slate-600 hover:text-slate-900'>
+                                        <Pencil className='h-4 w-4' />
+                                        <span className='sr-only'>Edit</span>
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side='left'>
+                                      <p>Edit owner</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant='ghost'
+                                        size='icon'
+                                        onClick={() => {
+                                          if (
+                                            window.confirm(
+                                              'Are you sure you want to delete this owner?'
+                                            )
+                                          ) {
+                                            deleteOwner(owner.email)
+                                          }
+                                        }}
+                                        className='h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600'>
+                                        <Trash className='h-4 w-4' />
+                                        <span className='sr-only'>Delete</span>
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side='left'>
+                                      <p>Delete owner</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
                     </TableBody>
                   </Table>
                 </div>
