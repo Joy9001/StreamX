@@ -42,14 +42,17 @@ function Card({ editor, userData }) {
             `http://localhost:3000/api/videos/all/Owner/${userData._id}`,
             {
               headers: {
-                Authorization: `Bearer ${accessToken}`
-              }
+                Authorization: `Bearer ${accessToken}`,
+              },
             }
           )
           console.log('Full API Response:', response)
           console.log('Response Data:', response.data)
-          console.log('Videos Structure:', JSON.stringify(response.data, null, 2))
-          
+          console.log(
+            'Videos Structure:',
+            JSON.stringify(response.data, null, 2)
+          )
+
           if (response.data && response.data.videos) {
             setOwnerVideos(response.data.videos || [])
           }
@@ -165,7 +168,8 @@ function Card({ editor, userData }) {
               </div>
               <div className='description mt-6 text-gray-800'>
                 <p>
-                  {editor.bio}... <span className='text-blue-700'>Read More</span>
+                  {editor.bio}...{' '}
+                  <span className='text-blue-700'>Read More</span>
                 </p>
               </div>
             </div>
@@ -339,7 +343,9 @@ function Card({ editor, userData }) {
                     <div
                       key={video._id}
                       className={`relative flex cursor-pointer border-b border-gray-200 p-4 last:border-b-0 hover:bg-gray-50 ${
-                        selectedVideo === video ? 'bg-blue-50 hover:bg-blue-50' : ''
+                        selectedVideo === video
+                          ? 'bg-blue-50 hover:bg-blue-50'
+                          : ''
                       }`}
                       onClick={() => setSelectedVideo(video)}>
                       <div className='flex-grow'>
@@ -348,12 +354,26 @@ function Card({ editor, userData }) {
                         </h3>
                         <div className='mt-2 flex flex-col space-y-2 text-sm text-gray-500'>
                           <div className='flex items-center space-x-4'>
-                            <span>Size: {(video.metaData.size / (1024 * 1024)).toFixed(2)} MB</span>
+                            <span>
+                              Size:{' '}
+                              {(video.metaData.size / (1024 * 1024)).toFixed(2)}{' '}
+                              MB
+                            </span>
                             <span>Type: {video.metaData.contentType}</span>
                           </div>
                           <div className='flex items-center space-x-4'>
-                            <span>Created: {new Date(video.metaData.timeCreated).toLocaleDateString()}</span>
-                            <span>Updated: {new Date(video.metaData.updated).toLocaleDateString()}</span>
+                            <span>
+                              Created:{' '}
+                              {new Date(
+                                video.metaData.timeCreated
+                              ).toLocaleDateString()}
+                            </span>
+                            <span>
+                              Updated:{' '}
+                              {new Date(
+                                video.metaData.updated
+                              ).toLocaleDateString()}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -472,7 +492,7 @@ function Card({ editor, userData }) {
                     <input
                       type='number'
                       value={editor.customPrice}
-                      onChange={(e) => editor.customPrice = e.target.value}
+                      onChange={(e) => (editor.customPrice = e.target.value)}
                       className='block w-full rounded-lg border-gray-300 py-3 pl-7 focus:border-blue-500 focus:ring-blue-500'
                       placeholder='0.00'
                     />
@@ -540,19 +560,19 @@ function Card({ editor, userData }) {
                       from_id: userData._id,
                       description: description.trim(),
                       price: price,
-                      status: 'pending'
+                      status: 'pending',
                     }
 
                     console.log('Sending request with data:', requestData)
-                    
+
                     const response = await axios.post(
                       'http://localhost:3000/requests/create',
                       requestData,
                       {
                         headers: {
-                          'Authorization': `Bearer ${accessToken}`,
-                          'Content-Type': 'application/json'
-                        }
+                          Authorization: `Bearer ${accessToken}`,
+                          'Content-Type': 'application/json',
+                        },
                       }
                     )
 
@@ -568,10 +588,15 @@ function Card({ editor, userData }) {
                     console.error('Error sending request:', error)
                     if (error.response) {
                       console.error('Error response:', error.response.data)
-                      const errorMessage = error.response.data.error || error.response.data.message || 'Please try again.'
+                      const errorMessage =
+                        error.response.data.error ||
+                        error.response.data.message ||
+                        'Please try again.'
                       alert(`Failed to send request: ${errorMessage}`)
                     } else if (error.request) {
-                      alert('Failed to send request. Please check your connection and try again.')
+                      alert(
+                        'Failed to send request. Please check your connection and try again.'
+                      )
                     } else {
                       alert('Failed to send request. Please try again.')
                     }

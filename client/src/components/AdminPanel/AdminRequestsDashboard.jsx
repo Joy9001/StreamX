@@ -25,6 +25,8 @@ import {
   Trash2,
   XCircle,
   Youtube,
+  User,
+  Users,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -43,6 +45,8 @@ export function AdminRequestsDashboard() {
     approved: false,
     rejected: false,
   })
+  const [userTypeFilter, setUserTypeFilter] = useState('all') // 'all', 'owner', 'editor'
+  const [specificUserSearch, setSpecificUserSearch] = useState('')
   // const userData = useSelector((state) => state.user.userData)
 
   useEffect(() => {
@@ -187,7 +191,33 @@ export function AdminRequestsDashboard() {
       ? statusFilters[request.status]
       : true
 
-    return matchesSearch && matchesStatusFilter
+    // Check user type filter
+    let matchesUserTypeFilter = true
+    if (userTypeFilter !== 'all') {
+      if (userTypeFilter === 'owner') {
+        // Filter based on "from" field for owners
+        matchesUserTypeFilter = true // Since we don't have role field, we'll keep all
+      } else if (userTypeFilter === 'editor') {
+        // Filter based on "to" field for editors
+        matchesUserTypeFilter = true // Since we don't have role field, we'll keep all
+      }
+    }
+
+    // Check specific user search - only search in the "from" field (owner)
+    let matchesSpecificUser = true
+    if (specificUserSearch) {
+      const specificSearchTerm = specificUserSearch.toLowerCase()
+      matchesSpecificUser = request.from?.name
+        ?.toLowerCase()
+        .includes(specificSearchTerm)
+    }
+
+    return (
+      matchesSearch &&
+      matchesStatusFilter &&
+      matchesUserTypeFilter &&
+      matchesSpecificUser
+    )
   })
 
   const filteredAdminRequests = adminRequestData.filter((request) => {
@@ -206,8 +236,80 @@ export function AdminRequestsDashboard() {
       ? statusFilters[request.status]
       : true
 
-    return matchesSearch && matchesStatusFilter
+    // Check user type filter
+    let matchesUserTypeFilter = true
+    if (userTypeFilter !== 'all') {
+      if (userTypeFilter === 'owner') {
+        // Filter based on "from" field for owners
+        matchesUserTypeFilter = true // Since we don't have role field, we'll keep all
+      } else if (userTypeFilter === 'editor') {
+        // Filter based on "to" field for editors
+        matchesUserTypeFilter = true // Since we don't have role field, we'll keep all
+      }
+    }
+
+    // Check specific user search - only search in the "from" field (owner)
+    let matchesSpecificUser = true
+    if (specificUserSearch) {
+      const specificSearchTerm = specificUserSearch.toLowerCase()
+      matchesSpecificUser = request.from?.name
+        ?.toLowerCase()
+        .includes(specificSearchTerm)
+    }
+
+    return (
+      matchesSearch &&
+      matchesStatusFilter &&
+      matchesUserTypeFilter &&
+      matchesSpecificUser
+    )
   })
+
+  // Calculate request counts for specific user search
+  const getRequestCountsByUser = () => {
+    if (!specificUserSearch) return null
+
+    // Get all requests that match the specific user search
+    const matchingRequests = [...requestData, ...adminRequestData].filter(
+      (request) => {
+        const specificSearchTerm = specificUserSearch.toLowerCase()
+        return request.from?.name?.toLowerCase().includes(specificSearchTerm)
+      }
+    )
+
+    // Count requests by user and status
+    const userCounts = {}
+    matchingRequests.forEach((request) => {
+      const userName = request.from?.name || 'Unknown'
+      if (!userCounts[userName]) {
+        userCounts[userName] = {
+          total: 1,
+          pending: request.status === 'pending' ? 1 : 0,
+          approved: request.status === 'approved' ? 1 : 0,
+          rejected: request.status === 'rejected' ? 1 : 0,
+          latestRequest: request.createdAt || null,
+        }
+      } else {
+        userCounts[userName].total++
+        if (request.status === 'pending') userCounts[userName].pending++
+        if (request.status === 'approved') userCounts[userName].approved++
+        if (request.status === 'rejected') userCounts[userName].rejected++
+
+        // Track the latest request date
+        if (
+          !userCounts[userName].latestRequest ||
+          new Date(request.createdAt) >
+            new Date(userCounts[userName].latestRequest)
+        ) {
+          userCounts[userName].latestRequest = request.createdAt
+        }
+      }
+    })
+
+    return userCounts
+  }
+
+  const userRequestCounts = getRequestCountsByUser()
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>Error: {error}</div>
@@ -224,8 +326,8 @@ export function AdminRequestsDashboard() {
               </h2>
             </div>
             <div className='space-y-4'>
-              <div className='flex items-center gap-2'>
-                <div className='flex-1'>
+              <div className='mb-4 flex flex-wrap items-center gap-3'>
+                <div className='min-w-[250px] flex-1'>
                   <Input
                     placeholder='Search all requests...'
                     value={searchQuery}
@@ -233,11 +335,13 @@ export function AdminRequestsDashboard() {
                     className='max-w-[400px]'
                   />
                 </div>
+
+                {/* Status Filter */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant='outline' size='sm' className='ml-auto'>
+                    <Button variant='outline' size='sm'>
                       <ListFilter className='mr-2 h-4 w-4' />
-                      Filter
+                      Status Filter
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align='end' className='w-[200px]'>
@@ -258,7 +362,132 @@ export function AdminRequestsDashboard() {
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
+
+                {/* User Type Filter */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant='outline' size='sm'>
+                      <Users className='mr-2 h-4 w-4' />
+                      User Type:{' '}
+                      {userTypeFilter.charAt(0).toUpperCase() +
+                        userTypeFilter.slice(1)}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align='end' className='w-[200px]'>
+                    <DropdownMenuLabel>Filter by User Type</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuCheckboxItem
+                      checked={userTypeFilter === 'all'}
+                      onCheckedChange={() => setUserTypeFilter('all')}>
+                      All Users
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={userTypeFilter === 'owner'}
+                      onCheckedChange={() => setUserTypeFilter('owner')}>
+                      Owners
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={userTypeFilter === 'editor'}
+                      onCheckedChange={() => setUserTypeFilter('editor')}>
+                      Editors
+                    </DropdownMenuCheckboxItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* Specific Owner Search */}
+                <div className='flex min-w-[250px] items-center gap-2'>
+                  <Input
+                    placeholder='Search by owner name...'
+                    value={specificUserSearch}
+                    onChange={(e) => setSpecificUserSearch(e.target.value)}
+                    className='flex-1'
+                  />
+                  <Button variant='ghost' size='icon' className='text-gray-500'>
+                    <User className='h-4 w-4' />
+                  </Button>
+                </div>
               </div>
+
+              {/* Request Count by User Section */}
+              {userRequestCounts &&
+                Object.keys(userRequestCounts).length > 0 && (
+                  <Card className='mb-4 border-blue-200 shadow-md'>
+                    <CardHeader className='bg-gradient-to-r from-blue-50 to-blue-100 pb-2'>
+                      <CardTitle className='flex items-center text-xl text-blue-800'>
+                        <Users className='mr-2 h-5 w-5' />
+                        Request Statistics by User
+                      </CardTitle>
+                      <p className='mt-1 text-sm text-blue-600'>
+                        Showing results for "{specificUserSearch}"
+                      </p>
+                    </CardHeader>
+                    <CardContent className='pt-4'>
+                      <div className='space-y-4'>
+                        {Object.entries(userRequestCounts).map(
+                          ([userName, stats]) => (
+                            <div
+                              key={userName}
+                              className='rounded-lg border border-gray-200 p-4 transition-colors hover:border-blue-300 hover:bg-blue-50'>
+                              <div className='mb-3 flex flex-col justify-between md:flex-row md:items-center'>
+                                <div className='flex items-center text-lg font-medium'>
+                                  <User className='mr-2 h-4 w-4 text-blue-600' />
+                                  {userName}
+                                </div>
+                                <div className='rounded-full bg-blue-600 px-4 py-1 text-sm font-semibold text-white'>
+                                  {stats.total}{' '}
+                                  {stats.total === 1 ? 'request' : 'requests'}
+                                </div>
+                              </div>
+
+                              <div className='mb-3 grid grid-cols-1 gap-3 md:grid-cols-3'>
+                                <div className='flex items-center'>
+                                  <div className='mr-2 h-3 w-3 rounded-full bg-yellow-400'></div>
+                                  <span className='text-sm text-gray-600'>
+                                    Pending:{' '}
+                                  </span>
+                                  <span className='ml-1 font-semibold'>
+                                    {stats.pending}
+                                  </span>
+                                </div>
+                                <div className='flex items-center'>
+                                  <div className='mr-2 h-3 w-3 rounded-full bg-green-400'></div>
+                                  <span className='text-sm text-gray-600'>
+                                    Approved:{' '}
+                                  </span>
+                                  <span className='ml-1 font-semibold'>
+                                    {stats.approved}
+                                  </span>
+                                </div>
+                                <div className='flex items-center'>
+                                  <div className='mr-2 h-3 w-3 rounded-full bg-red-400'></div>
+                                  <span className='text-sm text-gray-600'>
+                                    Rejected:{' '}
+                                  </span>
+                                  <span className='ml-1 font-semibold'>
+                                    {stats.rejected}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {stats.latestRequest && (
+                                <div className='flex items-center text-xs text-gray-500'>
+                                  <Clock className='mr-1 h-3 w-3' />
+                                  Latest request:{' '}
+                                  {new Date(
+                                    stats.latestRequest
+                                  ).toLocaleDateString()}{' '}
+                                  {new Date(
+                                    stats.latestRequest
+                                  ).toLocaleTimeString()}
+                                </div>
+                              )}
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
 
               {/* All Requests Table */}
               <Card>
@@ -339,8 +568,8 @@ export function AdminRequestsDashboard() {
 
               {/* Admin Requests Table */}
               <div className='mt-8'>
-                <div className='mb-4 flex items-center gap-2'>
-                  <div className='flex-1'>
+                <div className='mb-4 flex flex-wrap items-center gap-3'>
+                  <div className='min-w-[250px] flex-1'>
                     <Input
                       placeholder='Search admin requests...'
                       value={adminSearchQuery}
