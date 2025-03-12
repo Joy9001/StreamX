@@ -15,6 +15,12 @@ function ContentTableRowOptions({ video }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [hiredEditors, setHiredEditors] = useState([])
   const [hiredByOwners, setHiredByOwners] = useState([])
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [requestForm, setRequestForm] = useState({
+    description: '',
+    price: 0,
+  })
+  const [showRequestForm, setShowRequestForm] = useState(false)
   const { getAccessTokenSilently } = useAuth0()
 
   useEffect(() => {
@@ -77,6 +83,7 @@ function ContentTableRowOptions({ video }) {
       console.log('Fetched hired editors:', response)
       setHiredEditors(response.data)
       setIsModalOpen(true)
+      setShowRequestForm(false)
     } catch (error) {
       console.error('Error fetching hired editors:', error)
     }
@@ -96,6 +103,7 @@ function ContentTableRowOptions({ video }) {
       console.log('Fetched hired-by owners:', response)
       setHiredByOwners(response.data)
       setIsModalOpen(true)
+      setShowRequestForm(false)
     } catch (error) {
       console.error('Error fetching hired-by owners:', error)
     }
@@ -105,16 +113,36 @@ function ContentTableRowOptions({ video }) {
 
   // async function handleRevokeEditor() {}
 
-  async function handleCreateRequest(user) {
+  function handleSelectUser(user) {
+    setSelectedUser(user)
+    setShowRequestForm(true)
+    setRequestForm({
+      description: `${userData.user_metadata.role === 'Owner' ? 'Request to edit video' : 'Request for ownership of video'} ${video.metaData.name}`,
+      price: 0,
+    })
+  }
+
+  function handleRequestFormChange(e) {
+    const { name, value } = e.target
+    setRequestForm({
+      ...requestForm,
+      [name]: name === 'price' ? parseFloat(value) : value,
+    })
+  }
+
+  async function handleSubmitRequest(e) {
+    e.preventDefault()
+    if (!selectedUser) return
+
     try {
       await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/requests/create`,
         {
-          to_id: user._id,
+          to_id: selectedUser._id,
           video_id: video._id,
           from_id: userData._id,
-          description: `${userData.user_metadata.role == 'Owner' ? 'Request to edit video' : 'Request for ownership of video'}${video.metaData.name}`,
-          price: 0,
+          description: requestForm.description,
+          price: requestForm.price,
           status: 'pending',
         },
         {
@@ -125,8 +153,12 @@ function ContentTableRowOptions({ video }) {
       )
       console.log('Request created successfully')
       setIsModalOpen(false)
+      setShowRequestForm(false)
+      setSelectedUser(null)
+      alert('Request sent successfully!')
     } catch (error) {
       console.error('Error creating request:', error)
+      alert('Failed to send request: ' + error.message)
     }
   }
 
@@ -202,70 +234,122 @@ function ContentTableRowOptions({ video }) {
         id='hired_editors_modal'
         className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
         <div className='modal-box'>
-          <h3 className='mb-4 text-lg font-bold'>
-            {userData.user_metadata.role === 'Owner'
-              ? 'Assign Editor'
-              : 'View Hired By Owners'}
-          </h3>
-          <div className='overflow-x-auto'>
-            {userData?.user_metadata?.role === 'Owner' ? (
-              hiredEditors.length > 0 ? (
-                <table className='table'>
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {hiredEditors.map((editor) => (
-                      <tr key={editor._id}>
-                        <td>{editor.name}</td>
-                        <td>{editor.email}</td>
-                        <td>
-                          <button
-                            className='btn btn-primary btn-sm'
-                            onClick={() => handleCreateRequest(editor)}>
-                            Assign
-                          </button>
-                        </td>
+          {!showRequestForm ? (
+            <>
+              <h3 className='mb-4 text-lg font-bold'>
+                {userData.user_metadata.role === 'Owner'
+                  ? 'Assign Editor'
+                  : 'View Hired By Owners'}
+              </h3>
+              <div className='overflow-x-auto'>
+                {userData?.user_metadata?.role === 'Owner' ? (
+                  hiredEditors.length > 0 ? (
+                    <table className='table'>
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {hiredEditors.map((editor) => (
+                          <tr key={editor._id}>
+                            <td>{editor.name}</td>
+                            <td>{editor.email}</td>
+                            <td>
+                              <button
+                                className='btn btn-primary btn-sm'
+                                onClick={() => handleSelectUser(editor)}>
+                                Select
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <p className='py-4 text-center'>No hired editors found</p>
+                  )
+                ) : hiredByOwners.length > 0 ? (
+                  <table className='table'>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p className='py-4 text-center'>No hired editors found</p>
-              )
-            ) : hiredByOwners.length > 0 ? (
-              <table className='table'>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {hiredByOwners.map((owner) => (
-                    <tr key={owner._id}>
-                      <td>{owner.username}</td>
-                      <td>{owner.email}</td>
-                      <td>
-                        <button
-                          className='btn btn-primary btn-sm'
-                          onClick={() => handleCreateRequest(owner)}>
-                          Assign
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className='py-4 text-center'>No owners found</p>
-            )}
-          </div>
+                    </thead>
+                    <tbody>
+                      {hiredByOwners.map((owner) => (
+                        <tr key={owner._id}>
+                          <td>{owner.username}</td>
+                          <td>{owner.email}</td>
+                          <td>
+                            <button
+                              className='btn btn-primary btn-sm'
+                              onClick={() => handleSelectUser(owner)}>
+                              Select
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p className='py-4 text-center'>No owners found</p>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <h3 className='mb-4 text-lg font-bold'>
+                Create Request for{' '}
+                {selectedUser?.name || selectedUser?.username}
+              </h3>
+              <form onSubmit={handleSubmitRequest} className='space-y-4'>
+                <div className='form-control'>
+                  <label className='label'>
+                    <span className='label-text'>Description</span>
+                  </label>
+                  <textarea
+                    name='description'
+                    value={requestForm.description}
+                    onChange={handleRequestFormChange}
+                    className='textarea textarea-bordered h-24'
+                    required
+                  />
+                </div>
+
+                <div className='form-control'>
+                  <label className='label'>
+                    <span className='label-text'>Price</span>
+                  </label>
+                  <input
+                    type='number'
+                    name='price'
+                    value={requestForm.price}
+                    onChange={handleRequestFormChange}
+                    className='input input-bordered'
+                    min='0'
+                    step='0.01'
+                    required
+                  />
+                </div>
+
+                <div className='form-control mt-6'>
+                  <button type='submit' className='btn btn-primary'>
+                    Submit Request
+                  </button>
+                </div>
+              </form>
+              <button
+                className='btn btn-ghost mt-4'
+                onClick={() => setShowRequestForm(false)}>
+                Back to List
+              </button>
+            </>
+          )}
           <div className='modal-action'>
             <button className='btn' onClick={() => setIsModalOpen(false)}>
               Close
