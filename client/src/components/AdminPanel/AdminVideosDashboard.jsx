@@ -26,7 +26,16 @@ import {
   setOwnersLoading,
 } from '@/store/slices/adminSlice'
 import axios from 'axios'
-import { BarChart2, Eye, ListFilter, Trash2, Users } from 'lucide-react'
+import {
+  BarChart2,
+  Eye,
+  Globe,
+  ListFilter,
+  PieChart,
+  Tag,
+  Trash2,
+  Users,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import AdminNav from './AdminNav'
@@ -267,9 +276,12 @@ export function Dashboard() {
       <div className='flex-1 overflow-auto md:ml-64'>
         <main className='container p-4'>
           {showStats && (
-            <Card className='mb-4'>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle>Video Statistics</CardTitle>
+            <Card className='mb-4 shadow-md'>
+              <CardHeader className='flex flex-row items-center justify-between space-y-0 border-b pb-4'>
+                <div className='flex items-center'>
+                  <PieChart className='mr-2 h-5 w-5 text-primary' />
+                  <CardTitle>Video Analytics Dashboard</CardTitle>
+                </div>
                 <Button
                   variant='outline'
                   size='sm'
@@ -277,95 +289,291 @@ export function Dashboard() {
                   Hide Stats
                 </Button>
               </CardHeader>
-              <CardContent>
-                <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
-                  <div>
-                    <h3 className='mb-2 text-lg font-medium'>
-                      Videos by Owner
-                    </h3>
-                    <div className='space-y-2'>
-                      {stats.owners.map((owner, index) => (
-                        <div
-                          key={index}
-                          className='flex items-center justify-between'>
-                          <span>{owner.name}</span>
-                          <span className='font-semibold'>
-                            {owner.count} videos
-                          </span>
+              <CardContent className='pt-6'>
+                <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
+                  {/* Contributors Section */}
+                  <Card className='border shadow-sm'>
+                    <CardHeader className='bg-slate-50 pb-2 pt-4'>
+                      <div className='flex items-center'>
+                        <Users className='mr-2 h-4 w-4 text-slate-600' />
+                        <CardTitle className='text-base font-medium'>
+                          Contributors
+                        </CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent className='p-4'>
+                      <div className='space-y-4'>
+                        <div>
+                          <h4 className='mb-2 text-sm font-medium uppercase tracking-wide text-slate-600'>
+                            Top Owners
+                          </h4>
+                          <div className='space-y-2'>
+                            {stats.owners.slice(0, 5).map((owner, index) => (
+                              <div
+                                key={index}
+                                className='flex items-center justify-between'>
+                                <div className='flex items-center'>
+                                  <span className='mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary'>
+                                    {index + 1}
+                                  </span>
+                                  <span className='text-sm'>{owner.name}</span>
+                                </div>
+                                <div className='flex items-center'>
+                                  <div className='mr-2 h-2 w-24 overflow-hidden rounded-full bg-slate-100'>
+                                    <div
+                                      className='h-full rounded-full bg-primary'
+                                      style={{
+                                        width: `${Math.min(100, (owner.count / Math.max(...stats.owners.map((o) => o.count))) * 100)}%`,
+                                      }}
+                                    />
+                                  </div>
+                                  <span className='text-sm font-medium'>
+                                    {owner.count}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className='mb-2 text-lg font-medium'>
-                      Videos by Editor
-                    </h3>
-                    <div className='space-y-2'>
-                      {stats.editors.map((editor, index) => (
-                        <div
-                          key={index}
-                          className='flex items-center justify-between'>
-                          <span>{editor.name}</span>
-                          <span className='font-semibold'>
-                            {editor.count} videos
-                          </span>
+
+                        <div>
+                          <h4 className='mb-2 text-sm font-medium uppercase tracking-wide text-slate-600'>
+                            Top Editors
+                          </h4>
+                          <div className='space-y-2'>
+                            {stats.editors.slice(0, 5).map((editor, index) => (
+                              <div
+                                key={index}
+                                className='flex items-center justify-between'>
+                                <div className='flex items-center'>
+                                  <span className='mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-medium text-indigo-600'>
+                                    {index + 1}
+                                  </span>
+                                  <span className='text-sm'>{editor.name}</span>
+                                </div>
+                                <div className='flex items-center'>
+                                  <div className='mr-2 h-2 w-24 overflow-hidden rounded-full bg-slate-100'>
+                                    <div
+                                      className='h-full rounded-full bg-indigo-500'
+                                      style={{
+                                        width: `${Math.min(100, (editor.count / Math.max(...stats.editors.map((e) => e.count))) * 100)}%`,
+                                      }}
+                                    />
+                                  </div>
+                                  <span className='text-sm font-medium'>
+                                    {editor.count}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className='mb-2 text-lg font-medium'>Popular Tags</h3>
-                    <div className='space-y-2'>
-                      {stats.tags.slice(0, 10).map((tag, index) => (
-                        <div
-                          key={index}
-                          className='flex items-center justify-between'>
-                          <span>{tag.name}</span>
-                          <span className='font-semibold'>
-                            {tag.count} videos
-                          </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Content Metadata Section */}
+                  <Card className='border shadow-sm'>
+                    <CardHeader className='bg-slate-50 pb-2 pt-4'>
+                      <div className='flex items-center'>
+                        <Globe className='mr-2 h-4 w-4 text-slate-600' />
+                        <CardTitle className='text-base font-medium'>
+                          Content Distribution
+                        </CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent className='p-4'>
+                      <div className='space-y-4'>
+                        <div>
+                          <h4 className='mb-2 text-sm font-medium uppercase tracking-wide text-slate-600'>
+                            Visibility
+                          </h4>
+                          <div className='grid grid-cols-2 gap-2'>
+                            {stats.visibility.map((item, index) => (
+                              <div
+                                key={index}
+                                className='rounded-lg bg-slate-50 p-3'>
+                                <div className='mb-1 flex items-center justify-between'>
+                                  <span className='text-sm capitalize'>
+                                    {item.name}
+                                  </span>
+                                  <span className='text-sm font-medium'>
+                                    {item.count}
+                                  </span>
+                                </div>
+                                <div className='h-1.5 w-full overflow-hidden rounded-full bg-slate-200'>
+                                  <div
+                                    className='h-full rounded-full bg-emerald-500'
+                                    style={{
+                                      width: `${Math.min(100, (item.count / videoData.length) * 100)}%`,
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className='mb-2 text-lg font-medium'>
-                      Videos by Visibility
-                    </h3>
-                    <div className='space-y-2'>
-                      {stats.visibility.map((item, index) => (
-                        <div
-                          key={index}
-                          className='flex items-center justify-between'>
-                          <span className='capitalize'>{item.name}</span>
-                          <span className='font-semibold'>
-                            {item.count} videos
-                          </span>
+
+                        <div>
+                          <h4 className='mb-2 text-sm font-medium uppercase tracking-wide text-slate-600'>
+                            Audience
+                          </h4>
+                          <div className='grid grid-cols-2 gap-2'>
+                            {stats.audience.map((item, index) => (
+                              <div
+                                key={index}
+                                className='rounded-lg bg-slate-50 p-3'>
+                                <div className='mb-1 flex items-center justify-between'>
+                                  <span className='text-sm capitalize'>
+                                    {item.name === 'madeForKids'
+                                      ? 'Kids'
+                                      : item.name}
+                                  </span>
+                                  <span className='text-sm font-medium'>
+                                    {item.count}
+                                  </span>
+                                </div>
+                                <div className='h-1.5 w-full overflow-hidden rounded-full bg-slate-200'>
+                                  <div
+                                    className='h-full rounded-full bg-blue-500'
+                                    style={{
+                                      width: `${Math.min(100, (item.count / videoData.length) * 100)}%`,
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className='mb-2 text-lg font-medium'>
-                      Videos by Audience
-                    </h3>
-                    <div className='space-y-2'>
-                      {stats.audience.map((item, index) => (
-                        <div
-                          key={index}
-                          className='flex items-center justify-between'>
-                          <span className='capitalize'>
-                            {item.name === 'madeForKids'
-                              ? 'Made for Kids'
-                              : item.name}
-                          </span>
-                          <span className='font-semibold'>
-                            {item.count} videos
-                          </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Tags Section */}
+                  <Card className='border shadow-sm'>
+                    <CardHeader className='bg-slate-50 pb-2 pt-4'>
+                      <div className='flex items-center'>
+                        <Tag className='mr-2 h-4 w-4 text-slate-600' />
+                        <CardTitle className='text-base font-medium'>
+                          Popular Tags
+                        </CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent className='p-4'>
+                      <div className='flex flex-wrap gap-2'>
+                        {stats.tags.slice(0, 15).map((tag, index) => (
+                          <div
+                            key={index}
+                            className={`rounded-full px-3 py-1 text-xs font-medium ${
+                              index < 3
+                                ? 'bg-primary/10 text-primary'
+                                : index < 7
+                                  ? 'bg-indigo-100 text-indigo-700'
+                                  : 'bg-slate-100 text-slate-700'
+                            }`}
+                            style={{
+                              fontSize: `${Math.max(11, Math.min(14, 11 + (tag.count / Math.max(...stats.tags.slice(0, 15).map((t) => t.count))) * 3))}px`,
+                            }}>
+                            {tag.name}
+                            <span className='ml-1 opacity-70'>{tag.count}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className='mt-4'>
+                        <h4 className='mb-2 text-sm font-medium uppercase tracking-wide text-slate-600'>
+                          Top Tags
+                        </h4>
+                        <div className='space-y-2'>
+                          {stats.tags.slice(0, 5).map((tag, index) => (
+                            <div
+                              key={index}
+                              className='flex items-center justify-between'>
+                              <div className='flex items-center'>
+                                <span className='mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-xs font-medium text-amber-600'>
+                                  {index + 1}
+                                </span>
+                                <span className='text-sm'>{tag.name}</span>
+                              </div>
+                              <div className='flex items-center'>
+                                <div className='mr-2 h-2 w-24 overflow-hidden rounded-full bg-slate-100'>
+                                  <div
+                                    className='h-full rounded-full bg-amber-500'
+                                    style={{
+                                      width: `${Math.min(100, (tag.count / Math.max(...stats.tags.map((t) => t.count))) * 100)}%`,
+                                    }}
+                                  />
+                                </div>
+                                <span className='text-sm font-medium'>
+                                  {tag.count}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Summary Section */}
+                  <Card className='border shadow-sm md:col-span-3'>
+                    <CardHeader className='bg-slate-50 pb-2 pt-4'>
+                      <div className='flex items-center'>
+                        <BarChart2 className='mr-2 h-4 w-4 text-slate-600' />
+                        <CardTitle className='text-base font-medium'>
+                          Summary
+                        </CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent className='p-4'>
+                      <div className='grid grid-cols-2 gap-4 md:grid-cols-4'>
+                        <div className='rounded-lg border bg-card p-3'>
+                          <div className='mb-1 text-sm font-medium text-muted-foreground'>
+                            Total Videos
+                          </div>
+                          <div className='text-2xl font-bold'>
+                            {videoData.length}
+                          </div>
+                        </div>
+                        <div className='rounded-lg border bg-card p-3'>
+                          <div className='mb-1 text-sm font-medium text-muted-foreground'>
+                            Approved
+                          </div>
+                          <div className='text-2xl font-bold text-green-600'>
+                            {
+                              videoData.filter(
+                                (v) => v.approvalStatus === 'Approved'
+                              ).length
+                            }
+                          </div>
+                        </div>
+                        <div className='rounded-lg border bg-card p-3'>
+                          <div className='mb-1 text-sm font-medium text-muted-foreground'>
+                            Pending
+                          </div>
+                          <div className='text-2xl font-bold text-amber-600'>
+                            {
+                              videoData.filter(
+                                (v) => v.approvalStatus === 'Pending'
+                              ).length
+                            }
+                          </div>
+                        </div>
+                        <div className='rounded-lg border bg-card p-3'>
+                          <div className='mb-1 text-sm font-medium text-muted-foreground'>
+                            Uploaded to YT
+                          </div>
+                          <div className='text-2xl font-bold text-blue-600'>
+                            {
+                              videoData.filter(
+                                (v) => v.ytUploadStatus === 'Uploaded'
+                              ).length
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </CardContent>
             </Card>
