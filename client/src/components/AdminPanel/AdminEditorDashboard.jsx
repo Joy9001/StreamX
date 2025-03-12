@@ -311,10 +311,7 @@ export function Dashboard() {
                                           <span>
                                             {formatStorage(usedStorage)}
                                           </span>
-                                          <span>
-                                            {formatStorage(10240)}{' '}
-                                            {/* Default storage limit */}
-                                          </span>
+                                          <span>{formatStorage(10240)}</span>
                                         </div>
                                         <Progress
                                           value={(usedStorage / 10240) * 100}
