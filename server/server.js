@@ -1,9 +1,7 @@
-import MongoStore from 'connect-mongo'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
-import session from 'express-session'
 import morgan from 'morgan'
 import connectMongo from './db/connectMongo.db.js'
 import { authCheck } from './middlewares/auth0.middleware.js'
@@ -38,22 +36,30 @@ app.use(
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
-const sessionMiddleware = session({
-	secret: process.env.SESSION_SECRET,
-	resave: true,
-	saveUninitialized: false,
-	rolling: true,
-	cookie: {
-		maxAge: 1000 * 60 * 60 * 24 * 7,
-	},
-	store: MongoStore.create({
-		mongoUrl: process.env.MONGO_DB_URI,
-		collectionName: 'sessions',
-	}),
-})
+// const sessionMiddleware = session({
+// 	secret: process.env.SESSION_SECRET,
+// 	resave: true,
+// 	saveUninitialized: false,
+// 	rolling: true,
+// 	cookie: {
+// 		maxAge: 1000 * 60 * 60 * 24 * 7,
+// 	},
+// 	store: MongoStore.create({
+// 		mongoUrl: process.env.MONGO_DB_URI,
+// 		collectionName: 'sessions',
+// 	}),
+// })
+
+// app.use(sessionMiddleware)
 
 //? Application-level middleware
-app.use(sessionMiddleware)
+// Request logger middleware
+app.use((req, res, next) => {
+	req.requestTime = new Date().toISOString()
+
+	console.log(`[${req.requestTime}] ${req.method} ${req.originalUrl} from ${req.ip}`)
+	next()
+})
 
 app.get('/', (req, res) => {
 	res.send('Backend is up!')
