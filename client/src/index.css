@@ -32,6 +32,9 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --font-sora: 'Sora', sans-serif;
+    --font-code: 'Source Code Pro', monospace;
+    --font-grotesk: 'Space Grotesk', sans-serif;
   }
 
   .dark {
