@@ -1,5 +1,5 @@
 import express from 'express'
-import deleteEditorByEmail from '../controllers/DeleteEditor.js'
+import deleteEditorByEmail from '../controllers/deleteEditor.controller.js'
 import { createEditorProfile, getEditorNameById, getHiredByOwners } from '../controllers/EditorProfileController.js'
 import updateEditor from '../controllers/EditorProfileEdit.js'
 import { EditorData } from '../controllers/GetEditor.js'
