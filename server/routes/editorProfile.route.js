@@ -2,7 +2,7 @@ import express from 'express'
 import deleteEditorByEmail from '../controllers/deleteEditor.controller.js'
 import { createEditorProfile, getEditorNameById, getHiredByOwners } from '../controllers/editorProfile.controller.js'
 import updateEditor from '../controllers/editorProfileEdit.controller.js'
-import { EditorData } from '../controllers/GetEditor.js'
+import { EditorData } from '../controllers/getEditor.controller.js'
 import GetEditorByEmail from '../controllers/GetEditorUsingMail.js'
 
 const router = express.Router()
