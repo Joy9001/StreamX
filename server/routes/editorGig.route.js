@@ -6,7 +6,7 @@ import {
 	getEditorGigPlansByEmail,
 	updateEditorGigPlansByEmail,
 } from '../controllers/editorPlan.controller.js'
-import { EditorPlansData } from '../controllers/EditorPlans.js'
+import { EditorPlansData } from '../controllers/editorPlans.controller.js'
 
 const router = express.Router()
 
