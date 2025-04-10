@@ -11,7 +11,7 @@ import editor_gig_route from './routes/editorGig.route.js'
 import editorProfileRoute from './routes/editorProfile.route.js'
 import OwnerRouter from './routes/owner.route.js'
 import requestRoutes from './routes/request.route.js'
-import UserRoute from './routes/UserRoute.js'
+import UserRoute from './routes/user.route.js'
 import VideoRouter from './routes/video.route.js'
 import YTRouter from './routes/yt.route.js'
 
