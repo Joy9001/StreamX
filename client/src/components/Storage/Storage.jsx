@@ -107,17 +107,19 @@ function Storage() {
       </div>
 
       {/* Main */}
-      <div className='storage-container flex flex-grow pl-6'>
+      <div className='storage-container flex flex-grow overflow-hidden pl-6'>
         <div
-          className={`storage-main flex-grow p-4 transition-all duration-300 ${
+          className={`storage-main flex h-full flex-grow flex-col transition-all duration-300 ${
             drawer ? 'mr-4' : 'mr-0'
           }`}>
           {/* Inside Nav */}
-          <StorageNav />
+          <div className='flex-shrink-0 p-4 pb-2'>
+            <StorageNav />
+          </div>
 
           {/* Main Content */}
-          <div className='storage-main-content'>
-            <div className='storage-recent-content my-4'>
+          <div className='storage-main-content flex-1 overflow-y-auto p-4 pt-2'>
+            <div className='storage-recent-content mb-4'>
               <div className='storage-recent-header mx-2 flex justify-between'>
                 <div className='flex'>
                   <span className='flex items-center text-lg font-semibold'>
@@ -167,10 +169,12 @@ function Storage() {
                 </div>
               </div>
 
-              <div className='storage-recent-body no-scrollbar m-2 flex w-full overflow-x-scroll'>
-                {recentVideos.map((video) => (
-                  <RecentCard key={video._id} video={video} />
-                ))}
+              <div className='storage-recent-body no-scrollbar m-2 flex w-full overflow-x-auto'>
+                <div className='flex flex-wrap gap-4'>
+                  {recentVideos.map((video) => (
+                    <RecentCard key={video._id} video={video} />
+                  ))}
+                </div>
               </div>
             </div>
             <div className='storage-content mt-6'>
