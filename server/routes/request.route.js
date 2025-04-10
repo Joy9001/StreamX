@@ -9,7 +9,7 @@ import {
 	getRequestsByFromId,
 	getRequestsByToId,
 	updateRequestStatus,
-} from '../controllers/requestController.js'
+} from '../controllers/request.controller.js'
 
 const router = express.Router()
 
