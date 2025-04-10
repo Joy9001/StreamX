@@ -1,4 +1,4 @@
-import Editor_plans from '../models/Editor_gig_plans.js'
+import Editor_plans from '../models/editorGigPlans.model.js'
 
 export const EditorPlansData = async (req, res) => {
 	try {
