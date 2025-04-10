@@ -191,7 +191,7 @@ function Storage() {
         {/* Drawer */}
         {drawer && (
           <div
-            className={`storage-drawer no-scrollbar w-[18%] overflow-scroll`}>
+            className={`storage-drawer h-full w-[18%] flex-shrink-0 overflow-hidden`}>
             <VideoDrawer />
           </div>
         )}
