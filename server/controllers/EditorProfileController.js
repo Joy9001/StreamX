@@ -1,7 +1,7 @@
+import Editor from '../models/editor.models.js'
+import Editor_Gig from '../models/editorGig.model.js'
 import Owner from '../models/owner.model.js'
 import Video from '../models/video.model.js'
-import Editor_Gig from '../models/Editor_gig.js'
-import Editor from '../models/editor.models.js'
 
 export const createEditorProfile = async (req, res) => {
 	const { name, email, phone, location, image, software, specializations } = req.body
@@ -38,7 +38,7 @@ export const getEditorNameById = async (req, res) => {
 		const { editorId } = req.params
 		console.log('Looking for editor ID:', editorId)
 
-		// Get all editors	
+		// Get all editors
 		const editors = await Editor_Gig.find({})
 		console.log('Found editors:', editors.length)
 
@@ -77,29 +77,29 @@ export const getEditorNameById = async (req, res) => {
 }
 
 export const getHiredByOwners = async (req, res) => {
-    try {
-        const { editorId } = req.params
+	try {
+		const { editorId } = req.params
 
-        const findVideos = await Video.find({ editorId: editorId })
+		const findVideos = await Video.find({ editorId: editorId })
 
-        if (!findVideos) {
-            return res.status(404).json({ message: 'Videos not found' })
-        }
+		if (!findVideos) {
+			return res.status(404).json({ message: 'Videos not found' })
+		}
 
-        let ownerIds = []
-        for (let i = 0; i < findVideos.length; i++) {
-            ownerIds.push(findVideos[i].ownerId)
-        }
+		let ownerIds = []
+		for (let i = 0; i < findVideos.length; i++) {
+			ownerIds.push(findVideos[i].ownerId)
+		}
 
-        const owners = await Owner.find({ _id: { $in: ownerIds } })
+		const owners = await Owner.find({ _id: { $in: ownerIds } })
 
-        if (!owners) {
-            return res.status(404).json({ message: 'Owners not found' })
-        }
+		if (!owners) {
+			return res.status(404).json({ message: 'Owners not found' })
+		}
 
-        res.status(200).json(owners)
-    } catch (error) {
-        console.error('Error fetching hired editors:', error)
-        res.status(500).json({ message: 'Error fetching hired editors', error: error.message })
-    }
+		res.status(200).json(owners)
+	} catch (error) {
+		console.error('Error fetching hired editors:', error)
+		res.status(500).json({ message: 'Error fetching hired editors', error: error.message })
+	}
 }

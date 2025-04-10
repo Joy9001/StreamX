@@ -1,4 +1,4 @@
-import Editor_Gig from '../models/Editor_gig.js'
+import Editor_Gig from '../models/editorGig.model.js'
 
 export const EditorData = async (req, res) => {
 	try {

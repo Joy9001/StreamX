@@ -1,6 +1,6 @@
 import Admin from '../models/admin.model.js'
 import Editor from '../models/editor.models.js'
-import Editor_Gig from '../models/Editor_gig.js'
+import Editor_Gig from '../models/editorGig.model.js'
 import Owner from '../models/owner.model.js'
 import Request from '../models/Request.js'
 
