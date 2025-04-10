@@ -1,11 +1,11 @@
 import express from 'express'
-import { Editor_gig_cont, getEditorGigByEmail, updateEditorGigByEmail } from '../controllers/editor_gig_controller.js'
 import {
 	Editor_gig_plans,
 	getEditorGigPlansByEmail,
 	updateEditorGigPlansByEmail,
 } from '../controllers/editor_plan_controller.js'
 import { EditorData } from '../controllers/EditorData.js'
+import { Editor_gig_cont, getEditorGigByEmail, updateEditorGigByEmail } from '../controllers/editorGig.controller.js'
 import { EditorPlansData } from '../controllers/EditorPlans.js'
 
 const router = express.Router()
