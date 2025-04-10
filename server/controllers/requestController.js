@@ -2,7 +2,7 @@ import Admin from '../models/admin.model.js'
 import Editor from '../models/editor.models.js'
 import Editor_Gig from '../models/editorGig.model.js'
 import Owner from '../models/owner.model.js'
-import Request from '../models/Request.js'
+import Request from '../models/request.model.js'
 
 // Create a new request
 export const createRequest = async (req, res) => {

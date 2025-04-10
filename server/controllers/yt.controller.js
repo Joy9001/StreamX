@@ -6,7 +6,7 @@ import { storage } from '../helpers/firebase.helper.js'
 import { OAuth2Client, getChanelIds } from '../helpers/yt.helper.js'
 import Admin from '../models/admin.model.js'
 import Owner from '../models/owner.model.js'
-import Request from '../models/Request.js'
+import Request from '../models/request.model.js'
 import Video from '../models/video.model.js'
 
 const uploadController = async (req, res) => {
