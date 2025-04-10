@@ -4,7 +4,7 @@ import {
 	getEditorGigPlansByEmail,
 	updateEditorGigPlansByEmail,
 } from '../controllers/editor_plan_controller.js'
-import { EditorData } from '../controllers/EditorData.js'
+import { EditorData } from '../controllers/editorData.controller.js'
 import { Editor_gig_cont, getEditorGigByEmail, updateEditorGigByEmail } from '../controllers/editorGig.controller.js'
 import { EditorPlansData } from '../controllers/EditorPlans.js'
 
