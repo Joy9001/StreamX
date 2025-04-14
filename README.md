@@ -20,17 +20,23 @@
 ### Frontend
 
 - React.js with Vite
-- Tailwind CSS for styling
-- State Management with Redux
-- Real-time updates with Socket.IO
+- Tailwind CSS with DaisyUI
+- State Management with Redux Toolkit and Recoil
+- UI Components with Radix UI and Material UI
+- Charts with Recharts and React-Chartjs-2
+- Auth0 for authentication
+- Animation with Framer Motion
+- UI enhancement with React Hot Toast, Swiper, and React Slick
 
 ### Backend
 
 - Node.js & Express.js
 - MongoDB for database
-- JWT for authentication
-- AWS S3 for video storage
-- YouTube Data API integration
+- Auth0 & JWT for authentication
+- Firebase for storage
+- Passport for OAuth
+- Google APIs for YouTube integration
+- Express OAuth 2.0 JWT Bearer
 
 ## 📋 Prerequisites
 
