@@ -12,7 +12,7 @@ import GigProfile from './components/GigProfile/GigProfile.jsx'
 import HiredEditor from './components/HiredEditor/HiredEditor.jsx'
 import Landing from './components/LandingPage/Landing.jsx'
 import Profile from './components/OwnerProfile/Profile.jsx'
-import RequestApprove from './components/Request&Apporved/raas.jsx'
+import RequestApprove from './components/Request&Apporved/Raas.jsx'
 import Storage from './components/Storage/Storage.jsx'
 
 function App() {
