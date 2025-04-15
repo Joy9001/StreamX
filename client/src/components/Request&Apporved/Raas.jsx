@@ -5,6 +5,7 @@ import EditorContentTableApprove from './EditorContentTableApprove.jsx'
 import RaasNav from './RaasNav.jsx'
 import ContentTable from './RaContentTable.jsx'
 import RaContentTableApprove from './RaContentTableApprove.jsx'
+import ErrorBoundary from './ErrorBoundary.jsx'
 import { CheckCircle, Send, ArrowRightLeft, Inbox } from 'lucide-react'
 
 const RequestApprove = () => {
@@ -113,7 +114,9 @@ const RequestApprove = () => {
               </h2>
             </div>
             <div className='storage-content-body'>
-              {showApproved ? <ApprovalComponent /> : <ContentTable />}
+              <ErrorBoundary>
+                {showApproved ? <ApprovalComponent /> : <ContentTable />}
+              </ErrorBoundary>
             </div>
           </div>
         </div>

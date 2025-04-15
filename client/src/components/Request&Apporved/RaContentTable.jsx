@@ -1,7 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import axios from 'axios'
-import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   Clock,
   CheckCircle,
@@ -11,70 +10,59 @@ import {
   DollarSign,
   FileText,
 } from 'lucide-react'
+import { fetchRequestsFromUser } from '../../store/slices/requestSlice'
 
 function ContentTable() {
-  const [requests, setRequests] = useState([])
-  const [videoNames, setVideoNames] = useState({})
-  const [editorNames, setEditorNames] = useState({})
-  const [ownerNames, setOwnerNames] = useState({})
-  const userData = useSelector((state) => state.user.userData)
   const { getAccessTokenSilently } = useAuth0()
-  const [accessToken, setAccessToken] = useState(null)
-  const [userRole, setUserRole] = useState(null)
+  const dispatch = useDispatch()
+  const { sentRequests, loading, error } = useSelector((state) => state.requests)
+  const userData = useSelector((state) => state.user.userData)
+  const userRole = userData?.user_metadata?.role
 
   useEffect(() => {
-    // Set user role when userData changes
-    if (userData && userData.user_metadata && userData.user_metadata.role) {
-      setUserRole(userData.user_metadata.role)
-    }
-  }, [userData])
-
-  useEffect(() => {
-    async function fetchAccessToken() {
+    const fetchData = async () => {
+      if (!userData) return
+      
+      // Extract the MongoDB ID - depending on your data structure
+      const userId = userData._id || userData.sub || userData.id
+      
+      if (!userId) {
+        console.error('No valid user ID found in userData:', userData)
+        return
+      }
+      
       try {
-        const token = await getAccessTokenSilently()
-        setAccessToken(token)
+        const accessToken = await getAccessTokenSilently()
+        console.log('Fetching requests with ID:', userId)
+        dispatch(fetchRequestsFromUser({ 
+          id: userId, 
+          accessToken
+        }))
       } catch (error) {
         console.error('Error fetching access token:', error)
       }
     }
-    if (userData && Object.keys(userData).length > 0) {
-      fetchAccessToken()
-    }
-  }, [getAccessTokenSilently, userData])
 
-  useEffect(() => {
-    async function fetchRequests() {
-      try {
-        if (!userRole || !userData?._id) return
+    fetchData()
+  }, [dispatch, getAccessTokenSilently, userData])
 
-        let endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/from-id/${userData._id}`
-
-        const res = await axios.get(endpoint, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-        })
-        console.log('res in ContentTable', res.data)
-        setRequests(res.data)
-      } catch (error) {
-        console.error('Error fetching requests:', error)
-      }
-    }
-
-    if (accessToken && userRole) {
-      fetchRequests()
-    }
-  }, [userData, accessToken, userRole])
-
-  if (!userRole) {
+  if (loading || !userRole) {
     return (
       <div className='flex h-64 items-center justify-center'>
         <div className='flex items-center rounded-lg bg-blue-50 p-4 text-blue-800'>
           <Clock className='mr-2 h-5 w-5 animate-spin text-blue-600' />
           <span className='font-medium'>Loading request data...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className='flex h-64 items-center justify-center'>
+        <div className='flex items-center rounded-lg bg-red-50 p-4 text-red-800'>
+          <XCircle className='mr-2 h-5 w-5 text-red-600' />
+          <span className='font-medium'>Error loading requests: {typeof error === 'object' ? (error.message || 'Unknown error') : error}</span>
         </div>
       </div>
     )
@@ -140,8 +128,8 @@ function ContentTable() {
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-200 bg-white'>
-            {requests.length > 0 ? (
-              requests.map((request) => (
+            {sentRequests.length > 0 ? (
+              sentRequests.map((request) => (
                 <tr
                   key={request._id}
                   className='transition-colors duration-150 hover:bg-gray-50'>
