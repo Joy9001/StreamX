@@ -6,6 +6,7 @@ import videoReducer from './slices/videoSlice'
 import ytFormReducer from './slices/ytFormSlice'
 import requestReducer from './slices/requestSlice'
 import messageReducer from './slices/messageSlice'
+import editorReducer from './slices/editorSlice'
 
 export const store = configureStore({
   reducer: {
@@ -16,5 +17,6 @@ export const store = configureStore({
     admin: adminReducer,
     requests: requestReducer,
     messages: messageReducer,
+    editors: editorReducer,
   },
 })

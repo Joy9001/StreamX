@@ -8,11 +8,17 @@ import Request from '../models/request.model.js'
 // Create a new request
 export const createRequest = async (req, res) => {
 	try {
-		const { to_id, video_id, from_id, description, price, status } = req.body
+		const { to_id, video_id, from_id, description, price, status, requesterKind } = req.body
+
+		let toId = to_id
+
+		if (requesterKind == 'Owner') {
+			toId = await getEditorIdByGigId(to_id) || to_id
+		}
 
 		// Create new request
 		const newRequest = new Request({
-			to_id,
+			to_id: toId,
 			video_id,
 			from_id,
 			description,
@@ -55,30 +61,6 @@ export const getRequestsByToId = async (req, res) => {
 		console.log('Initial requests found:', requests.length)
 
 		if (!requests || requests.length === 0) {
-			console.log('No direct requests found, attempting alternative lookup')
-			const findEditor = await Editor.findById(to_id)
-			console.log('Found editor:', findEditor ? findEditor.name : 'No editor found')
-
-			if (!findEditor) {
-				console.log('No editor found with given ID')
-				return res.status(404).json({ message: 'Editor not found' })
-			}
-
-			const findEditorGig = await Editor_Gig.findOne({ email: findEditor.email })
-			console.log('Found editor gig:', findEditorGig ? findEditorGig._id : 'No editor gig found')
-
-			if (!findEditorGig) {
-				return res.status(404).json({ message: 'Editor gig not found' })
-			}
-
-			requests = await Request.find({ to_id: findEditorGig._id }).populate({
-				path: 'video_id',
-				select: 'url metaData _id',
-			})
-			console.log('Requests found after alternative lookup:', requests.length)
-		}
-
-		if (!requests || requests.length === 0) {
 			console.log('No requests found after all attempts')
 			return res.status(404).json({ message: 'Requests not found' })
 		}
@@ -92,10 +74,6 @@ export const getRequestsByToId = async (req, res) => {
 			let fromUser
 			fromUser = await Owner.findById(request.from_id)
 			from = 'Owner'
-			if (!fromUser) {
-				fromUser = await Editor_Gig.findById(request.from_id)
-				from = 'Editor'
-			}
 			if (!fromUser) {
 				fromUser = await Editor.findById(request.from_id)
 				from = 'Editor'
@@ -113,12 +91,8 @@ export const getRequestsByToId = async (req, res) => {
 			// Find editor (to_id)
 			let toUser
 			let to
-			toUser = await Editor_Gig.findById(request.to_id)
+			toUser = await Editor.findById(request.to_id)
 			to = 'Editor'
-			if (!toUser) {
-				toUser = await Editor.findById(request.to_id)
-				to = 'Editor'
-			}
 			if (!toUser) {
 				toUser = await Owner.findById(request.to_id)
 				to = 'Owner'
@@ -199,10 +173,6 @@ export const getRequestsByFromId = async (req, res) => {
 			fromUser = await Owner.findById(request.from_id)
 			from = 'Owner'
 			if (!fromUser) {
-				fromUser = await Editor_Gig.findById(request.from_id)
-				from = 'Editor'
-			}
-			if (!fromUser) {
 				fromUser = await Editor.findById(request.from_id)
 				from = 'Editor'
 			}
@@ -219,12 +189,8 @@ export const getRequestsByFromId = async (req, res) => {
 			// Find editor (to_id)
 			let toUser
 			let to
-			toUser = await Editor_Gig.findById(request.to_id)
+			toUser = await Editor.findById(request.to_id)
 			to = 'Editor'
-			if (!toUser) {
-				toUser = await Editor.findById(request.to_id)
-				to = 'Editor'
-			}
 			if (!toUser) {
 				toUser = await Owner.findById(request.to_id)
 				to = 'Owner'
@@ -354,10 +320,6 @@ export const getAllUpdatedRequests = async (req, res) => {
 			fromUser = await Owner.findById(request.from_id)
 			from = 'Owner'
 			if (!fromUser) {
-				fromUser = await Editor_Gig.findById(request.from_id)
-				from = 'Editor'
-			}
-			if (!fromUser) {
 				fromUser = await Editor.findById(request.from_id)
 				from = 'Editor'
 			}
@@ -368,12 +330,8 @@ export const getAllUpdatedRequests = async (req, res) => {
 			// Find editor (to_id)
 			let toUser
 			let to
-			toUser = await Editor_Gig.findById(request.to_id)
+			toUser = await Editor.findById(request.to_id)
 			to = 'Editor'
-			if (!toUser) {
-				toUser = await Editor.findById(request.to_id)
-				to = 'Editor'
-			}
 			if (!toUser) {
 				toUser = await Owner.findById(request.to_id)
 				to = 'Owner'
@@ -586,18 +544,10 @@ export const addMessageToRequest = async (req, res) => {
 		console.log('request from id', request.from_id.toString())
 		console.log('request to id', request.to_id.toString())
 
-		let fromId = await getEditorIdByGigId(request.from_id.toString())
-		fromId = fromId || request.from_id
-
-		let toId = await getEditorIdByGigId(request.to_id.toString())
-		toId = toId || request.to_id
-
-		console.log('fromId', fromId)
-		console.log('toId', toId)
 
 		// Make sure the sender is either the requester or the recipient
-		if (sender_id.toString() !== fromId.toString() &&
-			sender_id.toString() !== toId.toString()) {
+		if (sender_id.toString() !== request.from_id.toString() &&
+			sender_id.toString() !== request.to_id.toString()) {
 			return res.status(403).json({
 				success: false,
 				message: 'You are not authorized to add messages to this request'
