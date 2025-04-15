@@ -1,88 +1,60 @@
-import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Card from './Card'
 import searchIcon from '../../assets/search-svgrepo-com.svg'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useAuth0 } from '@auth0/auth0-react'
+import {
+  fetchEditors,
+  fetchEditorPlans,
+  fetchOwnerVideos,
+  setSearchTerm,
+  setPriceFilter,
+  setLanguageFilter,
+  setRatingFilter
+} from '../../store/slices/editorSlice'
 
 function Cards() {
-  const [editorData, setEditorData] = useState([])
-  const [plansData, setPlansData] = useState([])
-  const [combinedData, setCombinedData] = useState([])
-  const [ownerVideos, setOwnerVideos] = useState([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [priceFilter, setPriceFilter] = useState('all')
-  const [languageFilter, setLanguageFilter] = useState('all')
-  const [ratingFilter, setRatingFilter] = useState('all')
-  const userData = useSelector((state) => state.user.userData)
+  const dispatch = useDispatch()
   const { getAccessTokenSilently } = useAuth0()
-  const [accessToken, setAccessToken] = useState(null)
 
+  // Get state from Redux store
+  const userData = useSelector((state) => state.user.userData)
+  const {
+    combinedData,
+    searchTerm,
+    priceFilter,
+    languageFilter,
+    ratingFilter,
+    loadingEditors,
+    loadingPlans,
+    error
+  } = useSelector((state) => state.editors)
+
+  // Fetch access token and dispatch initial data loading
   useEffect(() => {
-    async function fetchAccessToken() {
+    async function initialize() {
       try {
         const token = await getAccessTokenSilently()
-        setAccessToken(token)
-      } catch (error) {
-        console.error('Error fetching access token:', error)
-      }
-    }
-    fetchAccessToken()
-  }, [getAccessTokenSilently])
 
-  useEffect(() => {
-    const fetchData = async () => {
-      console.log('Fetching data...')
-      try {
-        const editorRes = await axios.get('http://localhost:3000/editor_gig')
-        setEditorData(editorRes.data || [])
-        console.log('Editor Response:', editorRes)
+        // Fetch editors and plans in parallel
+        dispatch(fetchEditors())
+        dispatch(fetchEditorPlans())
 
-        const plansRes = await axios.get(
-          'http://localhost:3000/editor_gig/plans'
-        )
-        setPlansData(plansRes.data || [])
-        console.log('Plans Response:', plansRes)
-
-        // Fetch owner videos if userData exists
+        // Fetch videos if userData is available
         if (userData && userData.user_metadata && userData.user_metadata.role) {
-          const videosRes = await axios.get(
-            `http://localhost:3000/api/videos/all/${userData.user_metadata.role}/${userData._id}`,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`,
-              },
-            }
-          )
-          setOwnerVideos(videosRes.data || [])
-          console.log('Videos Response:', videosRes)
+          dispatch(fetchOwnerVideos({
+            userId: userData._id,
+            role: userData.user_metadata.role,
+            token
+          }))
         }
       } catch (error) {
-        console.error('Error fetching data:', error)
+        console.error('Error initializing data:', error)
       }
     }
 
-    fetchData()
-  }, [userData])
-
-  useEffect(() => {
-    if (editorData.length > 0 && plansData.length > 0) {
-      const combined = editorData.map((editor) => {
-        const plans = plansData.filter(
-          (plan) =>
-            plan.email.trim().toLowerCase() ===
-            editor.email.trim().toLowerCase()
-        )
-        return {
-          ...editor,
-          plans,
-          videos: ownerVideos, // Pass the videos to each editor
-        }
-      })
-      setCombinedData(combined)
-    }
-  }, [editorData, plansData, ownerVideos])
+    initialize()
+  }, [dispatch, getAccessTokenSilently, userData])
 
   // Filter combined data based on search term and filters
   const filteredData = combinedData.filter((editor) => {
@@ -165,6 +137,24 @@ function Cards() {
     return matchesSearch && matchesPrice && matchesLanguage && matchesRating
   })
 
+  // Show loading state
+  if (loadingEditors || loadingPlans) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+      </div>
+    )
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="text-center text-red-500 p-4">
+        Error loading data: {error}
+      </div>
+    )
+  }
+
   return (
     <div className='cards-container'>
       <div className='search-filters-container'>
@@ -173,7 +163,7 @@ function Cards() {
           <div className='relative w-1/2'>
             <input
               type='text'
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => dispatch(setSearchTerm(e.target.value))}
               placeholder='Search for any Skill, domain, or name...'
               className='input input-bordered w-full rounded border-2 border-solid border-gray-300 p-2 pr-10'
               value={searchTerm}
@@ -189,7 +179,7 @@ function Cards() {
           <div className='relative'>
             <select
               value={priceFilter}
-              onChange={(e) => setPriceFilter(e.target.value)}
+              onChange={(e) => dispatch(setPriceFilter(e.target.value))}
               className='input input-bordered cursor-pointer appearance-none rounded border-2 border-solid border-gray-300 bg-white p-2 pr-10 hover:border-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary'>
               <option value='all'>All Prices</option>
               <option value='under100'>Under ₹100</option>
@@ -211,7 +201,7 @@ function Cards() {
           <div className='relative'>
             <select
               value={languageFilter}
-              onChange={(e) => setLanguageFilter(e.target.value)}
+              onChange={(e) => dispatch(setLanguageFilter(e.target.value))}
               className='input input-bordered cursor-pointer appearance-none rounded border-2 border-solid border-gray-300 bg-white p-2 pr-10 hover:border-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary'>
               <option value='all'>All Languages</option>
               <option value='english'>English</option>
@@ -233,7 +223,7 @@ function Cards() {
           <div className='relative'>
             <select
               value={ratingFilter}
-              onChange={(e) => setRatingFilter(e.target.value)}
+              onChange={(e) => dispatch(setRatingFilter(e.target.value))}
               className='input input-bordered cursor-pointer appearance-none rounded border-2 border-solid border-gray-300 bg-white p-2 pr-10 hover:border-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary'>
               <option value='all'>All Ratings</option>
               <option value='4.8plus'>4.8★ & Above</option>
@@ -253,10 +243,18 @@ function Cards() {
           </div>
         </div>
       </div>
+
+      {/* Editor Cards */}
       <div className='cards-grid'>
-        {filteredData.map((editor, index) => (
-          <Card key={index} editor={editor} userData={userData} />
-        ))}
+        {filteredData.length > 0 ? (
+          filteredData.map((editor) => (
+            <Card key={editor._id} editor={editor} userData={userData} />
+          ))
+        ) : (
+          <div className='col-span-full text-center py-10 text-gray-500'>
+            No editors found matching your criteria.
+          </div>
+        )}
       </div>
     </div>
   )

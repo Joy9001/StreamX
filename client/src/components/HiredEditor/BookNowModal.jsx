@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 
-const Model = ({ isOpen, onClose, children }) => {
+const BookNowModal = ({ isOpen, onClose, children }) => {
   // Close modal with ESC key
   useEffect(() => {
     const handleEsc = (event) => {
@@ -33,7 +33,7 @@ const Model = ({ isOpen, onClose, children }) => {
     <div className='fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4 sm:p-6'>
       {/* Backdrop - animated */}
       <div
-        className='fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity'
+        className='fixed inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity'
         onClick={onClose}
         style={{
           animation: 'fadeIn 0.2s ease-out forwards',
@@ -108,4 +108,4 @@ const Model = ({ isOpen, onClose, children }) => {
   )
 }
 
-export default Model
+export default BookNowModal
