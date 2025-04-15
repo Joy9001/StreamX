@@ -167,9 +167,9 @@ function ContentTableApprove() {
   }
 
   return (
-    <div className='rounded-lg border border-gray-200 bg-white shadow-sm'>
-      <div className='overflow-x-auto'>
-        <table className='w-full divide-y divide-gray-200'>
+    <div className='rounded-lg border border-gray-200 bg-white shadow-sm min-h-[500px] flex flex-col h-full'>
+      <div className='overflow-x-auto flex-1 flex flex-col'>
+        <table className='w-full divide-y divide-gray-200 h-full'>
           <thead className='bg-gradient-to-r from-blue-50 to-indigo-50'>
             <tr>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
@@ -210,7 +210,7 @@ function ContentTableApprove() {
               </th>
             </tr>
           </thead>
-          <tbody className='divide-y divide-gray-200 bg-white'>
+          <tbody className='divide-y divide-gray-200 bg-white h-full'>
             {receivedRequests.length > 0 ? (
               receivedRequests.map((request) => (
                 <tr
@@ -320,11 +320,11 @@ function ContentTableApprove() {
                 </tr>
               ))
             ) : (
-              <tr>
+              <tr className='h-full'>
                 <td
                   colSpan='7'
-                  className='px-6 py-10 text-center text-sm text-gray-500'>
-                  <div className='flex flex-col items-center justify-center'>
+                  className='px-6 py-10 text-center text-sm text-gray-500 h-full'>
+                  <div className='flex flex-col items-center justify-center h-full min-h-[300px]'>
                     <FileText className='mb-2 h-10 w-10 text-gray-400' />
                     <p className='font-medium'>No requests found</p>
                     <p className='mt-1 text-xs text-gray-400'>

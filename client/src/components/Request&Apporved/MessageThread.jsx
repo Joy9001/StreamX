@@ -222,7 +222,7 @@ const MessageThread = ({ requestId, onClose, requestStatus = 'pending', messageC
 
             {/* Message thread panel */}
             {isOpen && (
-                <div className="absolute right-0 top-full z-10 mt-2 w-80 rounded-lg border border-gray-200 bg-white shadow-lg sm:w-96 md:w-[500px]">
+                <div className="fixed right-4 top-[40%] z-50 w-80 rounded-lg border-2 border-indigo-200 bg-white shadow-2xl ring-4 ring-indigo-50 sm:w-96 md:w-[500px] transform -translate-y-1/2">
                     <div className="flex items-center justify-between border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-blue-50 px-4 py-2">
                         <h3 className="flex items-center text-sm font-semibold text-gray-800">
                             <MessageSquare className="mr-2 h-4 w-4 text-indigo-500" />
