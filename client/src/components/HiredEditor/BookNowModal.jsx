@@ -1,6 +1,10 @@
 import React, { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 
 const BookNowModal = ({ isOpen, onClose, children }) => {
+  // Get the selected editor from Redux store
+  const { selectedEditor } = useSelector((state) => state.editors)
+
   // Close modal with ESC key
   useEffect(() => {
     const handleEsc = (event) => {
@@ -22,7 +26,7 @@ const BookNowModal = ({ isOpen, onClose, children }) => {
     }
   }, [isOpen, onClose])
 
-  if (!isOpen) return null
+  if (!isOpen || !selectedEditor) return null
 
   // Stop propagation to prevent closing the modal when clicking inside it
   const handleModalClick = (e) => {

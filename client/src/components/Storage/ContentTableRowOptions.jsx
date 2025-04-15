@@ -144,6 +144,7 @@ function ContentTableRowOptions({ video }) {
           description: requestForm.description,
           price: requestForm.price,
           status: 'pending',
+          requesterKind: userData.user_metadata.role
         },
         {
           headers: {

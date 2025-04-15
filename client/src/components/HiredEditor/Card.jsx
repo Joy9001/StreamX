@@ -37,15 +37,16 @@ function Card({ editor, userData }) {
     customPrice,
     currentVideoIndex = 0,
     sendingRequest,
-    error
+    error,
+    selectedEditor
   } = useSelector((state) => state.editors)
 
-  // Set this editor as the selected one when the model opens
-  useEffect(() => {
-    if (isModelOpen) {
-      dispatch(setSelectedEditor(editor))
-    }
-  }, [isModelOpen, editor, dispatch])
+  const handleBookNowClick = () => {
+    // First set the selected editor
+    dispatch(setSelectedEditor(editor))
+    // Then open the modal
+    dispatch(toggleModel(true))
+  }
 
   const plans = editor.plans
     ? {
@@ -103,9 +104,24 @@ function Card({ editor, userData }) {
       return
     }
 
+    // Use the selectedEditor from Redux for the plans
+    const editorPlans = selectedEditor.plans
+      ? {
+        Basic: {
+          price: `₹${selectedEditor.plans[0].basic.price}`,
+        },
+        Standard: {
+          price: `₹${selectedEditor.plans[0].standard.price}`,
+        },
+        Premium: {
+          price: `₹${selectedEditor.plans[0].premium.price}`,
+        },
+      }
+      : {}
+
     const price = showCustomPrice
       ? Number(customPrice)
-      : Number(plans[selectedPlan].price.replace('₹', ''))
+      : Number(editorPlans[selectedPlan].price.replace('₹', ''))
 
     if (isNaN(price) || price <= 0) {
       alert('Please enter a valid price')
@@ -116,12 +132,13 @@ function Card({ editor, userData }) {
       const token = await getAccessTokenSilently()
 
       const requestData = {
-        to_id: editor._id,
+        to_id: selectedEditor._id,
         video_id: selectedVideo._id,
         from_id: userData._id,
         description: projectDescription.trim(),
         price: price,
         status: 'pending',
+        requesterKind: userData.user_metadata.role
       }
 
       dispatch(sendBookingRequest({ requestData, token }))
@@ -212,7 +229,7 @@ function Card({ editor, userData }) {
               </button>
               <button
                 className='rounded bg-green-500 px-4 py-2 text-white transition hover:bg-green-600'
-                onClick={() => dispatch(toggleModel(true))}>
+                onClick={handleBookNowClick}>
                 Book Now
               </button>
             </div>
@@ -302,159 +319,201 @@ function Card({ editor, userData }) {
       )}
 
       <BookNowModal isOpen={isModelOpen} onClose={() => dispatch(toggleModel(false))}>
-        <div className='p-8'>
-          {/* Header Section */}
-          <div className='border-b border-gray-200 pb-6'>
-            <h2 className='text-3xl font-bold text-gray-900'>
-              Book {editor.name}
-            </h2>
-            <p className='mt-2 text-sm text-gray-500'>
-              Fill in the details below to send a booking request
-            </p>
-          </div>
+        {selectedEditor && (
+          <div className='p-8'>
+            {/* Header Section */}
+            <div className='border-b border-gray-200 pb-6'>
+              <h2 className='text-3xl font-bold text-gray-900'>
+                Book {selectedEditor.name}
+              </h2>
+              <p className='mt-2 text-sm text-gray-500'>
+                Fill in the details below to send a booking request
+              </p>
+            </div>
 
-          <form className='mt-8 space-y-8' onSubmit={handleBookingSubmit}>
-            {/* Editor Info Section */}
-            <div className='rounded-lg bg-gray-50 p-6'>
-              <h3 className='mb-4 text-lg font-medium text-gray-900'>
-                Editor Information
-              </h3>
-              <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700'>
-                    Editor Name
-                  </label>
-                  <input
-                    type='text'
-                    value={editor.name}
-                    disabled
-                    className='mt-1 block w-full rounded-lg border-gray-300 bg-white py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-                  />
-                </div>
+            <form className='mt-8 space-y-8' onSubmit={handleBookingSubmit}>
+              {/* Editor Info Section */}
+              <div className='rounded-lg bg-gray-50 p-6'>
+                <h3 className='mb-4 text-lg font-medium text-gray-900'>
+                  Editor Information
+                </h3>
+                <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700'>
+                      Editor Name
+                    </label>
+                    <input
+                      type='text'
+                      value={selectedEditor.name}
+                      disabled
+                      className='mt-1 block w-full rounded-lg border-gray-300 bg-white py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500'
+                    />
+                  </div>
 
-                <div>
-                  <label className='block text-sm font-medium text-gray-700'>
-                    Current Rating
-                  </label>
-                  <div className='mt-1 flex items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-3'>
-                    <img src={starIcon} alt='Rating' className='h-5 w-5' />
-                    <span className='font-medium text-gray-900'>
-                      {editor.rating}
-                    </span>
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700'>
+                      Current Rating
+                    </label>
+                    <div className='mt-1 flex items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-3'>
+                      <img src={starIcon} alt='Rating' className='h-5 w-5' />
+                      <span className='font-medium text-gray-900'>
+                        {selectedEditor.rating}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Video Selection Section */}
-            <div className='rounded-lg bg-gray-50 p-6'>
-              <h3 className='mb-2 text-lg font-medium text-gray-900'>
-                Select Video
-              </h3>
-              <p className='mb-4 text-sm text-gray-500'>
-                Choose the video you want the editor to work on
-              </p>
+              {/* Video Selection Section */}
+              <div className='rounded-lg bg-gray-50 p-6'>
+                <h3 className='mb-2 text-lg font-medium text-gray-900'>
+                  Select Video
+                </h3>
+                <p className='mb-4 text-sm text-gray-500'>
+                  Choose the video you want the editor to work on
+                </p>
 
-              <div className='mt-4 max-h-[300px] overflow-y-auto rounded-lg border border-gray-200 bg-white'>
-                {ownerVideos && ownerVideos.length > 0 ? (
-                  ownerVideos.map((video) => (
+                <div className='mt-4 max-h-[300px] overflow-y-auto rounded-lg border border-gray-200 bg-white'>
+                  {ownerVideos && ownerVideos.length > 0 ? (
+                    ownerVideos.map((video) => (
+                      <div
+                        key={video._id}
+                        className={`relative flex cursor-pointer border-b border-gray-200 p-4 last:border-b-0 hover:bg-gray-50 ${selectedVideo && selectedVideo._id === video._id
+                          ? 'bg-blue-50 hover:bg-blue-50'
+                          : ''
+                          }`}
+                        onClick={() => dispatch(setSelectedVideo(video))}>
+                        <div className='flex-grow'>
+                          <h3 className='text-lg font-semibold text-gray-900'>
+                            {video.metaData.name}
+                          </h3>
+                          <div className='mt-2 flex flex-col space-y-2 text-sm text-gray-500'>
+                            <div className='flex items-center space-x-4'>
+                              <span>
+                                Size:{' '}
+                                {(video.metaData.size / (1024 * 1024)).toFixed(2)}{' '}
+                                MB
+                              </span>
+                              <span>Type: {video.metaData.contentType}</span>
+                            </div>
+                            <div className='flex items-center space-x-4'>
+                              <span>
+                                Created:{' '}
+                                {new Date(
+                                  video.metaData.timeCreated
+                                ).toLocaleDateString()}
+                              </span>
+                              <span>
+                                Updated:{' '}
+                                {new Date(
+                                  video.metaData.updated
+                                ).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        {selectedVideo && selectedVideo._id === video._id && (
+                          <div className='absolute right-4 top-1/2 -translate-y-1/2 transform'>
+                            <svg
+                              className='h-5 w-5 text-blue-500'
+                              fill='currentColor'
+                              viewBox='0 0 20 20'>
+                              <path
+                                fillRule='evenodd'
+                                d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                                clipRule='evenodd'
+                              />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className='p-4 text-center text-gray-500'>
+                      No videos available. Please upload some videos first.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Plan Selection Section */}
+              <div className='rounded-lg bg-gray-50 p-6'>
+                <h3 className='mb-2 text-lg font-medium text-gray-900'>
+                  Select Plan
+                </h3>
+                <p className='mb-4 text-sm text-gray-500'>
+                  Choose from our predefined plans or set a custom price
+                </p>
+
+                <div className='mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3'>
+                  {selectedEditor.plans && Object.entries({
+                    Basic: {
+                      price: `₹${selectedEditor.plans[0].basic.price}`,
+                      description: selectedEditor.plans[0].basic.desc,
+                    },
+                    Standard: {
+                      price: `₹${selectedEditor.plans[0].standard.price}`,
+                      description: selectedEditor.plans[0].standard.desc,
+                    },
+                    Premium: {
+                      price: `₹${selectedEditor.plans[0].premium.price}`,
+                      description: selectedEditor.plans[0].premium.desc,
+                    },
+                  }).map(([planName, planDetails]) => (
                     <div
-                      key={video._id}
-                      className={`relative flex cursor-pointer border-b border-gray-200 p-4 last:border-b-0 hover:bg-gray-50 ${selectedVideo && selectedVideo._id === video._id
-                        ? 'bg-blue-50 hover:bg-blue-50'
-                        : ''
+                      key={planName}
+                      className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none ${selectedPlan === planName && !showCustomPrice
+                        ? 'border-blue-500 ring-2 ring-blue-500'
+                        : 'border-gray-300'
                         }`}
-                      onClick={() => dispatch(setSelectedVideo(video))}>
-                      <div className='flex-grow'>
-                        <h3 className='text-lg font-semibold text-gray-900'>
-                          {video.metaData.name}
-                        </h3>
-                        <div className='mt-2 flex flex-col space-y-2 text-sm text-gray-500'>
-                          <div className='flex items-center space-x-4'>
-                            <span>
-                              Size:{' '}
-                              {(video.metaData.size / (1024 * 1024)).toFixed(2)}{' '}
-                              MB
-                            </span>
-                            <span>Type: {video.metaData.contentType}</span>
-                          </div>
-                          <div className='flex items-center space-x-4'>
-                            <span>
-                              Created:{' '}
-                              {new Date(
-                                video.metaData.timeCreated
-                              ).toLocaleDateString()}
-                            </span>
-                            <span>
-                              Updated:{' '}
-                              {new Date(
-                                video.metaData.updated
-                              ).toLocaleDateString()}
-                            </span>
-                          </div>
+                      onClick={() => {
+                        dispatch(setSelectedPlan(planName))
+                        dispatch(setShowCustomPrice(false))
+                      }}>
+                      <div className='flex flex-1'>
+                        <div className='flex flex-col'>
+                          <span className='block text-sm font-medium text-gray-900'>
+                            {planName}
+                          </span>
+                          <span className='mt-1 flex items-center text-sm text-gray-500'>
+                            {planDetails.price}
+                          </span>
                         </div>
                       </div>
-                      {selectedVideo && selectedVideo._id === video._id && (
-                        <div className='absolute right-4 top-1/2 -translate-y-1/2 transform'>
+                      <div
+                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${selectedPlan === planName && !showCustomPrice
+                          ? 'border-transparent bg-blue-500 text-white'
+                          : 'border-gray-300 bg-white'
+                          }`}>
+                        {selectedPlan === planName && !showCustomPrice && (
                           <svg
-                            className='h-5 w-5 text-blue-500'
-                            fill='currentColor'
-                            viewBox='0 0 20 20'>
-                            <path
-                              fillRule='evenodd'
-                              d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                              clipRule='evenodd'
-                            />
+                            className='h-3 w-3 text-white'
+                            viewBox='0 0 12 12'
+                            fill='currentColor'>
+                            <path d='M3.707 5.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L5 6.586 3.707 5.293z' />
                           </svg>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
-                  ))
-                ) : (
-                  <div className='p-4 text-center text-gray-500'>
-                    No videos available. Please upload some videos first.
-                  </div>
-                )}
-              </div>
-            </div>
+                  ))}
 
-            {/* Plan Selection Section */}
-            <div className='rounded-lg bg-gray-50 p-6'>
-              <h3 className='mb-2 text-lg font-medium text-gray-900'>
-                Select Plan
-              </h3>
-              <p className='mb-4 text-sm text-gray-500'>
-                Choose from our predefined plans or set a custom price
-              </p>
-
-              <div className='mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3'>
-                {Object.entries(plans).map(([planName, planDetails]) => (
+                  {/* Custom Price Option */}
                   <div
-                    key={planName}
-                    className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none ${selectedPlan === planName && !showCustomPrice
-                      ? 'border-blue-500 ring-2 ring-blue-500'
-                      : 'border-gray-300'
-                      }`}
-                    onClick={() => {
-                      dispatch(setSelectedPlan(planName))
-                      dispatch(setShowCustomPrice(false))
-                    }}>
+                    className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none ${showCustomPrice ? 'border-blue-500 ring-2 ring-blue-500' : 'border-gray-300'}`}
+                    onClick={() => dispatch(setShowCustomPrice(true))}>
                     <div className='flex flex-1'>
                       <div className='flex flex-col'>
                         <span className='block text-sm font-medium text-gray-900'>
-                          {planName}
+                          Custom Price
                         </span>
                         <span className='mt-1 flex items-center text-sm text-gray-500'>
-                          {planDetails.price}
+                          Set your own price
                         </span>
                       </div>
                     </div>
                     <div
-                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${selectedPlan === planName && !showCustomPrice
-                        ? 'border-transparent bg-blue-500 text-white'
-                        : 'border-gray-300 bg-white'
-                        }`}>
-                      {selectedPlan === planName && !showCustomPrice && (
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${showCustomPrice ? 'border-transparent bg-blue-500 text-white' : 'border-gray-300 bg-white'}`}>
+                      {showCustomPrice && (
                         <svg
                           className='h-3 w-3 text-white'
                           viewBox='0 0 12 12'
@@ -464,100 +523,73 @@ function Card({ editor, userData }) {
                       )}
                     </div>
                   </div>
-                ))}
+                </div>
 
-                {/* Custom Price Option */}
-                <div
-                  className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none ${showCustomPrice ? 'border-blue-500 ring-2 ring-blue-500' : 'border-gray-300'}`}
-                  onClick={() => dispatch(setShowCustomPrice(true))}>
-                  <div className='flex flex-1'>
-                    <div className='flex flex-col'>
-                      <span className='block text-sm font-medium text-gray-900'>
-                        Custom Price
-                      </span>
-                      <span className='mt-1 flex items-center text-sm text-gray-500'>
-                        Set your own price
-                      </span>
+                {/* Custom Price Input */}
+                {showCustomPrice && (
+                  <div className='mt-4'>
+                    <label className='block text-sm font-medium text-gray-700'>
+                      Enter Custom Price (₹)
+                    </label>
+                    <div className='relative mt-1 rounded-lg shadow-sm'>
+                      <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
+                        <span className='text-gray-500 sm:text-sm'>₹</span>
+                      </div>
+                      <input
+                        type='number'
+                        value={customPrice}
+                        onChange={(e) => dispatch(setCustomPrice(e.target.value))}
+                        className='block w-full rounded-lg border-gray-300 py-3 pl-7 focus:border-blue-500 focus:ring-blue-500'
+                        placeholder='0.00'
+                      />
                     </div>
                   </div>
-                  <div
-                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${showCustomPrice ? 'border-transparent bg-blue-500 text-white' : 'border-gray-300 bg-white'}`}>
-                    {showCustomPrice && (
-                      <svg
-                        className='h-3 w-3 text-white'
-                        viewBox='0 0 12 12'
-                        fill='currentColor'>
-                        <path d='M3.707 5.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L5 6.586 3.707 5.293z' />
-                      </svg>
-                    )}
-                  </div>
-                </div>
+                )}
               </div>
 
-              {/* Custom Price Input */}
-              {showCustomPrice && (
-                <div className='mt-4'>
-                  <label className='block text-sm font-medium text-gray-700'>
-                    Enter Custom Price (₹)
-                  </label>
-                  <div className='relative mt-1 rounded-lg shadow-sm'>
-                    <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
-                      <span className='text-gray-500 sm:text-sm'>₹</span>
-                    </div>
-                    <input
-                      type='number'
-                      value={customPrice}
-                      onChange={(e) => dispatch(setCustomPrice(e.target.value))}
-                      className='block w-full rounded-lg border-gray-300 py-3 pl-7 focus:border-blue-500 focus:ring-blue-500'
-                      placeholder='0.00'
-                    />
-                  </div>
+              {/* Description Section */}
+              <div className='rounded-lg bg-gray-50 p-6'>
+                <h3 className='mb-2 text-lg font-medium text-gray-900'>
+                  Project Description
+                </h3>
+                <p className='mb-4 text-sm text-gray-500'>
+                  Describe your project requirements, timeline, and any specific
+                  details the editor should know
+                </p>
+                <textarea
+                  value={projectDescription}
+                  onChange={(e) => dispatch(setProjectDescription(e.target.value))}
+                  rows={4}
+                  className='mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
+                  placeholder='I need help with...'
+                />
+              </div>
+
+              {/* Show error if any */}
+              {error && (
+                <div className="p-4 rounded-lg bg-red-50 text-red-700">
+                  {error}
                 </div>
               )}
-            </div>
 
-            {/* Description Section */}
-            <div className='rounded-lg bg-gray-50 p-6'>
-              <h3 className='mb-2 text-lg font-medium text-gray-900'>
-                Project Description
-              </h3>
-              <p className='mb-4 text-sm text-gray-500'>
-                Describe your project requirements, timeline, and any specific
-                details the editor should know
-              </p>
-              <textarea
-                value={projectDescription}
-                onChange={(e) => dispatch(setProjectDescription(e.target.value))}
-                rows={4}
-                className='mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-                placeholder='I need help with...'
-              />
-            </div>
-
-            {/* Show error if any */}
-            {error && (
-              <div className="p-4 rounded-lg bg-red-50 text-red-700">
-                {error}
+              {/* Form Actions */}
+              <div className='flex justify-end space-x-3 border-t border-gray-200 pt-6'>
+                <button
+                  type='button'
+                  onClick={() => dispatch(resetBookingForm())}
+                  className='rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
+                  Cancel
+                </button>
+                <button
+                  type='submit'
+                  disabled={sendingRequest}
+                  className='rounded-lg bg-blue-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70'>
+                  {sendingRequest ? 'Sending...' : 'Send Request'}
+                </button>
               </div>
-            )}
-
-            {/* Form Actions */}
-            <div className='flex justify-end space-x-3 border-t border-gray-200 pt-6'>
-              <button
-                type='button'
-                onClick={() => dispatch(resetBookingForm())}
-                className='rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
-                Cancel
-              </button>
-              <button
-                type='submit'
-                disabled={sendingRequest}
-                className='rounded-lg bg-blue-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70'>
-                {sendingRequest ? 'Sending...' : 'Send Request'}
-              </button>
-            </div>
-          </form>
-        </div>
+            </form>
+          </div>
+        )}
       </BookNowModal>
     </>
   )

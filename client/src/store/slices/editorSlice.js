@@ -6,7 +6,7 @@ export const fetchEditors = createAsyncThunk(
     'editors/fetchEditors',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get('http://localhost:3000/editor_gig')
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/editor_gig`)
             return response.data || []
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Failed to fetch editors')
@@ -18,7 +18,7 @@ export const fetchEditorPlans = createAsyncThunk(
     'editors/fetchEditorPlans',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get('http://localhost:3000/editor_gig/plans')
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/editor_gig/plans`)
             return response.data || []
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Failed to fetch editor plans')
@@ -31,7 +31,7 @@ export const fetchOwnerVideos = createAsyncThunk(
     async ({ userId, role, token }, { rejectWithValue }) => {
         try {
             const response = await axios.get(
-                `http://localhost:3000/api/videos/all/${role}/${userId}`,
+                `${import.meta.env.VITE_BACKEND_URL}/api/videos/all/${role}/${userId}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ export const sendBookingRequest = createAsyncThunk(
     async ({ requestData, token }, { rejectWithValue }) => {
         try {
             const response = await axios.post(
-                'http://localhost:3000/requests/create',
+                `${import.meta.env.VITE_BACKEND_URL}/requests/create`,
                 requestData,
                 {
                     headers: {
