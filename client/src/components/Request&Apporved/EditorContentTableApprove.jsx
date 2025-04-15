@@ -1,5 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CheckCircle,
@@ -10,12 +10,14 @@ import {
   IndianRupee,
   FileText,
   ThumbsUp,
+  MessageSquare
 } from 'lucide-react'
-import { 
-  fetchRequestsToUser, 
-  approveRequest, 
+import {
+  fetchRequestsToUser,
+  approveRequest,
   rejectRequest
 } from '../../store/slices/requestSlice'
+import MessageThread from './MessageThread'
 
 function EditorContentTableApprove() {
   const { getAccessTokenSilently } = useAuth0()
@@ -23,25 +25,26 @@ function EditorContentTableApprove() {
   const { receivedRequests, loading, error } = useSelector((state) => state.requests)
   const { userData } = useSelector((state) => state.user)
   const userRole = userData?.user_metadata?.role
+  const [selectedRequestId, setSelectedRequestId] = useState(null)
 
   useEffect(() => {
     const fetchData = async () => {
       if (!userData) return
-      
+
       // Extract the MongoDB ID - depending on your data structure
       const userId = userData._id || userData.sub || userData.id
-      
+
       if (!userId) {
         console.error('No valid user ID found in userData:', userData)
         return
       }
-      
+
       try {
         const accessToken = await getAccessTokenSilently()
         console.log('Fetching editor requests to approve with ID:', userId)
-        dispatch(fetchRequestsToUser({ 
-          id: userId, 
-          accessToken 
+        dispatch(fetchRequestsToUser({
+          id: userId,
+          accessToken
         }))
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -56,12 +59,12 @@ function EditorContentTableApprove() {
       const accessToken = await getAccessTokenSilently()
       // Extract the correct user ID
       const userId = userData._id || userData.sub || userData.id
-      
+
       if (!userId) {
         console.error('No valid user ID found in userData:', userData)
         return
       }
-      
+
       console.log('Editor approving request:', { requestId, videoId, userId })
       dispatch(approveRequest({
         requestId,
@@ -168,6 +171,12 @@ function EditorContentTableApprove() {
                 Status
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
+                <div className='flex items-center'>
+                  <MessageSquare className='mr-2 h-4 w-4 text-purple-500' />
+                  Negotiate
+                </div>
+              </th>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 Action
               </th>
             </tr>
@@ -231,6 +240,13 @@ function EditorContentTableApprove() {
                         approval.status.slice(1)}
                     </span>
                   </td>
+                  <td className='whitespace-nowrap px-6 py-4'>
+                    <MessageThread
+                      requestId={approval._id}
+                      onClose={() => setSelectedRequestId(null)}
+                      requestStatus={approval.status}
+                    />
+                  </td>
                   <td className='whitespace-nowrap px-6 py-4 text-right text-sm'>
                     {approval.status === 'pending' && (
                       <div className='flex space-x-2'>
@@ -276,7 +292,7 @@ function EditorContentTableApprove() {
             ) : (
               <tr>
                 <td
-                  colSpan='6'
+                  colSpan='7'
                   className='px-6 py-10 text-center text-sm text-gray-500'>
                   <div className='flex flex-col items-center justify-center'>
                     <FileText className='mb-2 h-10 w-10 text-gray-400' />

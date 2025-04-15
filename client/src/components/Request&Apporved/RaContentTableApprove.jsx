@@ -1,5 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CheckCircle,
@@ -10,12 +10,14 @@ import {
   IndianRupee,
   FileText,
   ThumbsUp,
+  MessageSquare
 } from 'lucide-react'
 import {
   fetchRequestsToUser,
   approveRequest,
   rejectRequest
 } from '../../store/slices/requestSlice'
+import MessageThread from './MessageThread'
 
 function ContentTableApprove() {
   const { getAccessTokenSilently } = useAuth0()
@@ -23,6 +25,7 @@ function ContentTableApprove() {
   const { receivedRequests, loading, error } = useSelector((state) => state.requests)
   const userData = useSelector((state) => state.user.userData)
   const userRole = userData?.user_metadata?.role
+  const [selectedRequestId, setSelectedRequestId] = useState(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -169,6 +172,12 @@ function ContentTableApprove() {
                 Status
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
+                <div className='flex items-center'>
+                  <MessageSquare className='mr-2 h-4 w-4 text-indigo-500' />
+                  Negotiate
+                </div>
+              </th>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 Action
               </th>
             </tr>
@@ -232,6 +241,13 @@ function ContentTableApprove() {
                         request.status.slice(1)}
                     </span>
                   </td>
+                  <td className='whitespace-nowrap px-6 py-4'>
+                    <MessageThread
+                      requestId={request._id}
+                      onClose={() => setSelectedRequestId(null)}
+                      requestStatus={request.status}
+                    />
+                  </td>
                   <td className='whitespace-nowrap px-6 py-4 text-right text-sm'>
                     {request.status === 'pending' && (
                       <div className='flex space-x-2'>
@@ -277,7 +293,7 @@ function ContentTableApprove() {
             ) : (
               <tr>
                 <td
-                  colSpan='6'
+                  colSpan='7'
                   className='px-6 py-10 text-center text-sm text-gray-500'>
                   <div className='flex flex-col items-center justify-center'>
                     <FileText className='mb-2 h-10 w-10 text-gray-400' />
