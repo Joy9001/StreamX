@@ -1,80 +1,71 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import axios from 'axios'
 import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   Clock,
   CheckCircle,
   XCircle,
   Film,
   User,
-  DollarSign,
+  IndianRupee,
   FileText,
+  MessageSquare
 } from 'lucide-react'
+import { fetchRequestsFromUser } from '../../store/slices/requestSlice'
+import MessageThread from './MessageThread'
 
 function ContentTable() {
-  const [requests, setRequests] = useState([])
-  const [videoNames, setVideoNames] = useState({})
-  const [editorNames, setEditorNames] = useState({})
-  const [ownerNames, setOwnerNames] = useState({})
-  const userData = useSelector((state) => state.user.userData)
   const { getAccessTokenSilently } = useAuth0()
-  const [accessToken, setAccessToken] = useState(null)
-  const [userRole, setUserRole] = useState(null)
+  const dispatch = useDispatch()
+  const { sentRequests, loading, error } = useSelector((state) => state.requests)
+  const userData = useSelector((state) => state.user.userData)
+  const userRole = userData?.user_metadata?.role
+  const [selectedRequestId, setSelectedRequestId] = useState(null)
 
   useEffect(() => {
-    // Set user role when userData changes
-    if (userData && userData.user_metadata && userData.user_metadata.role) {
-      setUserRole(userData.user_metadata.role)
-    }
-  }, [userData])
+    const fetchData = async () => {
+      if (!userData) return
 
-  useEffect(() => {
-    async function fetchAccessToken() {
+      // Extract the MongoDB ID - depending on your data structure
+      const userId = userData._id || userData.sub || userData.id
+
+      if (!userId) {
+        console.error('No valid user ID found in userData:', userData)
+        return
+      }
+
       try {
-        const token = await getAccessTokenSilently()
-        setAccessToken(token)
+        const accessToken = await getAccessTokenSilently()
+        console.log('Fetching requests with ID:', userId)
+        dispatch(fetchRequestsFromUser({
+          id: userId,
+          accessToken
+        }))
       } catch (error) {
         console.error('Error fetching access token:', error)
       }
     }
-    if (userData && Object.keys(userData).length > 0) {
-      fetchAccessToken()
-    }
-  }, [getAccessTokenSilently, userData])
 
-  useEffect(() => {
-    async function fetchRequests() {
-      try {
-        if (!userRole || !userData?._id) return
+    fetchData()
+  }, [dispatch, getAccessTokenSilently, userData])
 
-        let endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/from-id/${userData._id}`
-
-        const res = await axios.get(endpoint, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-        })
-        console.log('res in ContentTable', res.data)
-        setRequests(res.data)
-      } catch (error) {
-        console.error('Error fetching requests:', error)
-      }
-    }
-
-    if (accessToken && userRole) {
-      fetchRequests()
-    }
-  }, [userData, accessToken, userRole])
-
-  if (!userRole) {
+  if (loading || !userRole) {
     return (
       <div className='flex h-64 items-center justify-center'>
         <div className='flex items-center rounded-lg bg-blue-50 p-4 text-blue-800'>
           <Clock className='mr-2 h-5 w-5 animate-spin text-blue-600' />
           <span className='font-medium'>Loading request data...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className='flex h-64 items-center justify-center'>
+        <div className='flex items-center rounded-lg bg-red-50 p-4 text-red-800'>
+          <XCircle className='mr-2 h-5 w-5 text-red-600' />
+          <span className='font-medium'>Error loading requests: {typeof error === 'object' ? (error.message || 'Unknown error') : error}</span>
         </div>
       </div>
     )
@@ -130,18 +121,24 @@ function ContentTable() {
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <DollarSign className='mr-2 h-4 w-4 text-teal-500' />
+                  <IndianRupee className='mr-2 h-4 w-4 text-teal-500' />
                   Price
                 </div>
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 Status
               </th>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
+                <div className='flex items-center'>
+                  <MessageSquare className='mr-2 h-4 w-4 text-teal-500' />
+                  Negotiate
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-200 bg-white'>
-            {requests.length > 0 ? (
-              requests.map((request) => (
+            {sentRequests.length > 0 ? (
+              sentRequests.map((request) => (
                 <tr
                   key={request._id}
                   className='transition-colors duration-150 hover:bg-gray-50'>
@@ -183,7 +180,7 @@ function ContentTable() {
                   <td className='whitespace-nowrap px-6 py-4'>
                     <div className='text-sm font-medium text-gray-900'>
                       <span className='flex items-center rounded-full bg-green-50 px-2.5 py-1 text-green-700'>
-                        <DollarSign className='mr-1 h-3.5 w-3.5' />
+                        <IndianRupee className='mr-1 h-3.5 w-3.5' />
                         {request.price}
                       </span>
                     </div>
@@ -198,12 +195,19 @@ function ContentTable() {
                         request.status.slice(1)}
                     </span>
                   </td>
+                  <td className='whitespace-nowrap px-6 py-4'>
+                    <MessageThread
+                      requestId={request._id}
+                      onClose={() => setSelectedRequestId(null)}
+                      requestStatus={request.status}
+                    />
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan='5'
+                  colSpan='6'
                   className='px-6 py-10 text-center text-sm text-gray-500'>
                   <div className='flex flex-col items-center justify-center'>
                     <FileText className='mb-2 h-10 w-10 text-gray-400' />

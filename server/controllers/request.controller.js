@@ -1,3 +1,4 @@
+import { getEditorIdByGigId } from '../helpers/editor.helper.js'
 import Admin from '../models/admin.model.js'
 import Editor from '../models/editor.models.js'
 import Editor_Gig from '../models/editorGig.model.js'
@@ -185,7 +186,7 @@ export const getRequestsByFromId = async (req, res) => {
 		console.log('Initial requests found:', requests.length)
 
 		if (!requests || requests.length === 0) {
-			return res.status(404).json({ message: 'Requests not found' })
+			return res.status(200).json([])
 		}
 
 		let processedRequests = []
@@ -533,5 +534,99 @@ export const aggregateRequestsController = async (req, res) => {
 	} catch (error) {
 		console.error('Error fetching requests:', error)
 		res.status(500).json({ message: 'Error fetching requests', error: error.message })
+	}
+}
+
+// Message thread controllers
+export const getRequestMessages = async (req, res) => {
+	try {
+		const { id } = req.params
+
+		const request = await Request.findById(id)
+		if (!request) {
+			return res.status(404).json({ message: 'Request not found' })
+		}
+
+		// Sort messages by timestamp (oldest first)
+		const messages = request.messages.sort((a, b) => a.timestamp - b.timestamp)
+
+		return res.status(200).json({
+			success: true,
+			messages,
+			requestId: id
+		})
+	} catch (error) {
+		console.error('Error fetching request messages:', error)
+		return res.status(500).json({
+			success: false,
+			message: 'Error fetching request messages',
+			error: error.message
+		})
+	}
+}
+
+export const addMessageToRequest = async (req, res) => {
+	try {
+		const { id } = req.params
+		const { sender_id, sender_role, sender_name, message } = req.body
+
+		if (!sender_id || !sender_role || !sender_name || !message) {
+			return res.status(400).json({
+				success: false,
+				message: 'Missing required fields for message'
+			})
+		}
+
+		const request = await Request.findById(id)
+		if (!request) {
+			return res.status(404).json({ message: 'Request not found' })
+		}
+
+		console.log('sender id', sender_id.toString())
+		console.log('request from id', request.from_id.toString())
+		console.log('request to id', request.to_id.toString())
+
+		let fromId = await getEditorIdByGigId(request.from_id.toString())
+		fromId = fromId || request.from_id
+
+		let toId = await getEditorIdByGigId(request.to_id.toString())
+		toId = toId || request.to_id
+
+		console.log('fromId', fromId)
+		console.log('toId', toId)
+
+		// Make sure the sender is either the requester or the recipient
+		if (sender_id.toString() !== fromId.toString() &&
+			sender_id.toString() !== toId.toString()) {
+			return res.status(403).json({
+				success: false,
+				message: 'You are not authorized to add messages to this request'
+			})
+		}
+
+		// Create and add the new message
+		const newMessage = {
+			sender_id,
+			sender_role,
+			sender_name,
+			message,
+			timestamp: new Date()
+		}
+
+		request.messages.push(newMessage)
+		await request.save()
+
+		return res.status(201).json({
+			success: true,
+			message: 'Message added successfully',
+			newMessage
+		})
+	} catch (error) {
+		console.error('Error adding message to request:', error)
+		return res.status(500).json({
+			success: false,
+			message: 'Error adding message to request',
+			error: error.message
+		})
 	}
 }

@@ -1,5 +1,32 @@
 import mongoose from 'mongoose'
 
+const messageSchema = new mongoose.Schema(
+	{
+		sender_id: {
+			type: mongoose.Schema.Types.ObjectId,
+			required: true,
+		},
+		sender_role: {
+			type: String,
+			enum: ['Owner', 'Editor'],
+			required: true,
+		},
+		sender_name: {
+			type: String,
+			required: true,
+		},
+		message: {
+			type: String,
+			required: true,
+		},
+		timestamp: {
+			type: Date,
+			default: Date.now,
+		},
+	},
+	{ _id: true }
+)
+
 const requestSchema = new mongoose.Schema(
 	{
 		to_id: {
@@ -29,6 +56,7 @@ const requestSchema = new mongoose.Schema(
 			enum: ['pending', 'approved', 'rejected'],
 			default: 'pending',
 		},
+		messages: [messageSchema],
 	},
 	{
 		timestamps: true,

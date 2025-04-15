@@ -1,128 +1,94 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import axios from 'axios'
 import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   CheckCircle,
   Clock,
   XCircle,
   Film,
   User,
-  DollarSign,
+  IndianRupee,
   FileText,
   ThumbsUp,
+  MessageSquare
 } from 'lucide-react'
+import {
+  fetchRequestsToUser,
+  approveRequest,
+  rejectRequest
+} from '../../store/slices/requestSlice'
+import MessageThread from './MessageThread'
 
 function ContentTableApprove() {
-  const [requests, setRequests] = useState([])
-  // const [videoNames, setVideoNames] = useState({})
-  // const [editorNames, setEditorNames] = useState({})
-  const [loading, setLoading] = useState(false)
   const { getAccessTokenSilently } = useAuth0()
-  const [accessToken, setAccessToken] = useState(null)
-  const [userRole, setUserRole] = useState(null)
+  const dispatch = useDispatch()
+  const { receivedRequests, loading, error } = useSelector((state) => state.requests)
   const userData = useSelector((state) => state.user.userData)
+  const userRole = userData?.user_metadata?.role
+  const [selectedRequestId, setSelectedRequestId] = useState(null)
 
   useEffect(() => {
-    // Set user role when userData changes
-    if (userData && userData.user_metadata && userData.user_metadata.role) {
-      setUserRole(userData.user_metadata.role)
-    }
-  }, [userData])
+    const fetchData = async () => {
+      if (!userData) return
 
-  useEffect(() => {
-    async function fetchAccessToken() {
-      try {
-        const token = await getAccessTokenSilently()
-        setAccessToken(token)
-      } catch (error) {
-        console.error('Error fetching access token:', error)
+      // Extract the MongoDB ID - depending on your data structure
+      const userId = userData._id || userData.sub || userData.id
+
+      if (!userId) {
+        console.error('No valid user ID found in userData:', userData)
+        return
       }
-    }
-    if (userData && Object.keys(userData).length > 0) {
-      fetchAccessToken()
-    }
-  }, [getAccessTokenSilently, userData])
 
-  useEffect(() => {
-    const fetchRequests = async () => {
       try {
-        if (!userRole || !userData?._id || !accessToken) return
-
-        // Use the editor endpoint to get requests where to_id matches owner's ID
-        const endpoint = `${import.meta.env.VITE_BACKEND_URL}/requests/to-id/${userData._id}`
-        console.log('Using endpoint:', endpoint)
-
-        const res = await axios.get(endpoint, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-        })
-
-        console.log('Owner ID:', userData._id)
-        console.log('All requests:', res.data)
-        console.log(
-          'Request to_ids:',
-          res.data.map((req) => req.to_id)
-        )
-        setRequests(res.data)
+        const accessToken = await getAccessTokenSilently()
+        console.log('Fetching requests to approve with ID:', userId)
+        dispatch(fetchRequestsToUser({
+          id: userId,
+          accessToken
+        }))
       } catch (error) {
-        console.error('Error fetching requests:', error)
+        console.error('Error fetching data:', error)
       }
     }
 
-    fetchRequests()
-  }, [userData, accessToken, userRole])
+    fetchData()
+  }, [dispatch, getAccessTokenSilently, userData])
 
   const handleApprove = async (requestId, videoId, toId) => {
     try {
-      setLoading(true)
-      // Send PATCH request to update request status
-      const response = await axios.patch(
-        `${import.meta.env.VITE_BACKEND_URL}/requests/${requestId}/status`,
-        { status: 'approved' },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-        }
-      )
+      const accessToken = await getAccessTokenSilently()
+      // Extract the correct user ID
+      const userId = userData._id || userData.sub || userData.id
 
-      if (response.data) {
-        // Update video ownership
-        const videoResponse = await axios.patch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/videos/${videoId}/owner`,
-          { owner_id: toId },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${accessToken}`,
-            },
-            withCredentials: true,
-          }
-        )
-
-        console.log('Video ownership updated:', videoResponse.data)
-
-        // Update the local state with the response from the server
-        setRequests((prevRequests) =>
-          prevRequests.map((req) =>
-            req._id === requestId ? { ...req, status: 'approved' } : req
-          )
-        )
-        console.log('Request approved and video ownership updated successfully')
+      if (!userId) {
+        console.error('No valid user ID found in userData:', userData)
+        return
       }
+
+      console.log('Approving request:', { requestId, videoId, toId })
+      dispatch(approveRequest({
+        requestId,
+        videoId,
+        toId,
+        userData: { ...userData, _id: userId },
+        accessToken,
+        userRole
+      }))
     } catch (error) {
-      console.error(
-        'Error approving request or updating video ownership:',
-        error
-      )
-    } finally {
-      setLoading(false)
+      console.error('Error approving request:', error)
+    }
+  }
+
+  const handleReject = async (requestId) => {
+    try {
+      const accessToken = await getAccessTokenSilently()
+      console.log('Rejecting request:', requestId)
+      dispatch(rejectRequest({
+        requestId,
+        accessToken
+      }))
+    } catch (error) {
+      console.error('Error rejecting request:', error)
     }
   }
 
@@ -150,12 +116,23 @@ function ContentTableApprove() {
     }
   }
 
-  if (!userRole) {
+  if (loading || !userRole) {
     return (
       <div className='flex h-64 items-center justify-center'>
         <div className='flex items-center rounded-lg bg-blue-50 p-4 text-blue-800'>
           <Clock className='mr-2 h-5 w-5 animate-spin text-blue-600' />
           <span className='font-medium'>Loading request data...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className='flex h-64 items-center justify-center'>
+        <div className='flex items-center rounded-lg bg-red-50 p-4 text-red-800'>
+          <XCircle className='mr-2 h-5 w-5 text-red-600' />
+          <span className='font-medium'>Error loading requests: {typeof error === 'object' ? (error.message || 'Unknown error') : error}</span>
         </div>
       </div>
     )
@@ -187,7 +164,7 @@ function ContentTableApprove() {
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <DollarSign className='mr-2 h-4 w-4 text-indigo-500' />
+                  <IndianRupee className='mr-2 h-4 w-4 text-indigo-500' />
                   Price
                 </div>
               </th>
@@ -195,13 +172,19 @@ function ContentTableApprove() {
                 Status
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
+                <div className='flex items-center'>
+                  <MessageSquare className='mr-2 h-4 w-4 text-indigo-500' />
+                  Negotiate
+                </div>
+              </th>
+              <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 Action
               </th>
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-200 bg-white'>
-            {requests.length > 0 ? (
-              requests.map((request) => (
+            {receivedRequests.length > 0 ? (
+              receivedRequests.map((request) => (
                 <tr
                   key={request._id}
                   className='transition-colors duration-150 hover:bg-gray-50'>
@@ -243,7 +226,7 @@ function ContentTableApprove() {
                   <td className='whitespace-nowrap px-6 py-4'>
                     <div className='text-sm font-medium text-gray-900'>
                       <span className='flex items-center rounded-full bg-green-50 px-2.5 py-1 text-green-700'>
-                        <DollarSign className='mr-1 h-3.5 w-3.5' />
+                        <IndianRupee className='mr-1 h-3.5 w-3.5' />
                         {request.price}
                       </span>
                     </div>
@@ -259,42 +242,64 @@ function ContentTableApprove() {
                     </span>
                   </td>
                   <td className='whitespace-nowrap px-6 py-4'>
-                    <button
-                      className={`inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                        request.status === 'approved'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-                      }`}
-                      onClick={() =>
-                        handleApprove(
-                          request._id,
-                          request.video._id,
-                          request.to.id
-                        )
-                      }
-                      disabled={request.status === 'approved' || loading}>
-                      {loading ? (
-                        <Clock className='mr-2 h-4 w-4 animate-spin' />
-                      ) : request.status === 'approved' ? (
-                        <CheckCircle className='mr-2 h-4 w-4' />
-                      ) : (
-                        <ThumbsUp className='mr-2 h-4 w-4' />
-                      )}
-                      {request.status === 'approved' ? 'Approved' : 'Approve'}
-                    </button>
+                    <MessageThread
+                      requestId={request._id}
+                      onClose={() => setSelectedRequestId(null)}
+                      requestStatus={request.status}
+                    />
+                  </td>
+                  <td className='whitespace-nowrap px-6 py-4 text-right text-sm'>
+                    {request.status === 'pending' && (
+                      <div className='flex space-x-2'>
+                        <button
+                          onClick={() => handleApprove(request._id, request.video._id, request.from._id)}
+                          className='flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 transition-colors hover:bg-green-100'
+                          disabled={loading}>
+                          {loading ? (
+                            <Clock className='mr-1 h-3 w-3 animate-spin' />
+                          ) : (
+                            <CheckCircle className='mr-1 h-3 w-3' />
+                          )}
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleReject(request._id)}
+                          className='flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 transition-colors hover:bg-red-100'
+                          disabled={loading}>
+                          {loading ? (
+                            <Clock className='mr-1 h-3 w-3 animate-spin' />
+                          ) : (
+                            <XCircle className='mr-1 h-3 w-3' />
+                          )}
+                          Reject
+                        </button>
+                      </div>
+                    )}
+                    {request.status === 'approved' && (
+                      <span className='flex items-center text-xs text-green-600'>
+                        <ThumbsUp className='mr-1 h-3 w-3' />
+                        Approved
+                      </span>
+                    )}
+                    {request.status === 'rejected' && (
+                      <span className='flex items-center text-xs text-red-600'>
+                        <XCircle className='mr-1 h-3 w-3' />
+                        Rejected
+                      </span>
+                    )}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan='6'
+                  colSpan='7'
                   className='px-6 py-10 text-center text-sm text-gray-500'>
                   <div className='flex flex-col items-center justify-center'>
                     <FileText className='mb-2 h-10 w-10 text-gray-400' />
                     <p className='font-medium'>No requests found</p>
                     <p className='mt-1 text-xs text-gray-400'>
-                      When you receive requests, they will appear here
+                      When users send you requests, they will appear here
                     </p>
                   </div>
                 </td>
