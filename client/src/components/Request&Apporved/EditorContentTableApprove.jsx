@@ -7,7 +7,7 @@ import {
   XCircle,
   Film,
   User,
-  DollarSign,
+  IndianRupee,
   FileText,
   ThumbsUp,
 } from 'lucide-react'
@@ -160,7 +160,7 @@ function EditorContentTableApprove() {
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <DollarSign className='mr-2 h-4 w-4 text-purple-500' />
+                  <IndianRupee className='mr-2 h-4 w-4 text-purple-500' />
                   Price
                 </div>
               </th>
@@ -216,7 +216,7 @@ function EditorContentTableApprove() {
                   <td className='whitespace-nowrap px-6 py-4'>
                     <div className='text-sm font-medium text-gray-900'>
                       <span className='flex items-center rounded-full bg-green-50 px-2.5 py-1 text-green-700'>
-                        <DollarSign className='mr-1 h-3.5 w-3.5' />
+                        <IndianRupee className='mr-1 h-3.5 w-3.5' />
                         {approval.price}
                       </span>
                     </div>
