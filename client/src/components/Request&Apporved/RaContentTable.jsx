@@ -7,7 +7,7 @@ import {
   XCircle,
   Film,
   User,
-  DollarSign,
+  IndianRupee,
   FileText,
 } from 'lucide-react'
 import { fetchRequestsFromUser } from '../../store/slices/requestSlice'
@@ -22,20 +22,20 @@ function ContentTable() {
   useEffect(() => {
     const fetchData = async () => {
       if (!userData) return
-      
+
       // Extract the MongoDB ID - depending on your data structure
       const userId = userData._id || userData.sub || userData.id
-      
+
       if (!userId) {
         console.error('No valid user ID found in userData:', userData)
         return
       }
-      
+
       try {
         const accessToken = await getAccessTokenSilently()
         console.log('Fetching requests with ID:', userId)
-        dispatch(fetchRequestsFromUser({ 
-          id: userId, 
+        dispatch(fetchRequestsFromUser({
+          id: userId,
           accessToken
         }))
       } catch (error) {
@@ -118,7 +118,7 @@ function ContentTable() {
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <DollarSign className='mr-2 h-4 w-4 text-teal-500' />
+                  <IndianRupee className='mr-2 h-4 w-4 text-teal-500' />
                   Price
                 </div>
               </th>
@@ -171,7 +171,7 @@ function ContentTable() {
                   <td className='whitespace-nowrap px-6 py-4'>
                     <div className='text-sm font-medium text-gray-900'>
                       <span className='flex items-center rounded-full bg-green-50 px-2.5 py-1 text-green-700'>
-                        <DollarSign className='mr-1 h-3.5 w-3.5' />
+                        <IndianRupee className='mr-1 h-3.5 w-3.5' />
                         {request.price}
                       </span>
                     </div>

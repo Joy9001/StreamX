@@ -7,13 +7,13 @@ import {
   XCircle,
   Film,
   User,
-  DollarSign,
+  IndianRupee,
   FileText,
   ThumbsUp,
 } from 'lucide-react'
-import { 
-  fetchRequestsToUser, 
-  approveRequest, 
+import {
+  fetchRequestsToUser,
+  approveRequest,
   rejectRequest
 } from '../../store/slices/requestSlice'
 
@@ -27,21 +27,21 @@ function ContentTableApprove() {
   useEffect(() => {
     const fetchData = async () => {
       if (!userData) return
-      
+
       // Extract the MongoDB ID - depending on your data structure
       const userId = userData._id || userData.sub || userData.id
-      
+
       if (!userId) {
         console.error('No valid user ID found in userData:', userData)
         return
       }
-      
+
       try {
         const accessToken = await getAccessTokenSilently()
         console.log('Fetching requests to approve with ID:', userId)
-        dispatch(fetchRequestsToUser({ 
-          id: userId, 
-          accessToken 
+        dispatch(fetchRequestsToUser({
+          id: userId,
+          accessToken
         }))
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -56,12 +56,12 @@ function ContentTableApprove() {
       const accessToken = await getAccessTokenSilently()
       // Extract the correct user ID
       const userId = userData._id || userData.sub || userData.id
-      
+
       if (!userId) {
         console.error('No valid user ID found in userData:', userData)
         return
       }
-      
+
       console.log('Approving request:', { requestId, videoId, toId })
       dispatch(approveRequest({
         requestId,
@@ -161,7 +161,7 @@ function ContentTableApprove() {
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <DollarSign className='mr-2 h-4 w-4 text-indigo-500' />
+                  <IndianRupee className='mr-2 h-4 w-4 text-indigo-500' />
                   Price
                 </div>
               </th>
@@ -217,7 +217,7 @@ function ContentTableApprove() {
                   <td className='whitespace-nowrap px-6 py-4'>
                     <div className='text-sm font-medium text-gray-900'>
                       <span className='flex items-center rounded-full bg-green-50 px-2.5 py-1 text-green-700'>
-                        <DollarSign className='mr-1 h-3.5 w-3.5' />
+                        <IndianRupee className='mr-1 h-3.5 w-3.5' />
                         {request.price}
                       </span>
                     </div>
