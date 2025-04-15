@@ -185,7 +185,7 @@ export const getRequestsByFromId = async (req, res) => {
 		console.log('Initial requests found:', requests.length)
 
 		if (!requests || requests.length === 0) {
-			return res.status(404).json({ message: 'Requests not found' })
+			return res.status(200).json([])
 		}
 
 		let processedRequests = []
