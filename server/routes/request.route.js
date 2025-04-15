@@ -9,6 +9,9 @@ import {
 	getRequestsByFromId,
 	getRequestsByToId,
 	updateRequestStatus,
+	// New message controllers
+	addMessageToRequest,
+	getRequestMessages,
 } from '../controllers/request.controller.js'
 
 const router = express.Router()
@@ -36,5 +39,9 @@ router.patch('/:id/status', updateRequestStatus)
 router.delete('/delete/:id', deleteRequest)
 
 router.get('/aggregate/:fromId', aggregateRequestsController)
+
+// Message thread routes
+router.get('/:id/messages', getRequestMessages)
+router.post('/:id/messages', addMessageToRequest)
 
 export default router
