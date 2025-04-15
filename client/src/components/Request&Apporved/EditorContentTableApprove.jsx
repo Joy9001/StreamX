@@ -17,15 +17,22 @@ import {
   approveRequest,
   rejectRequest
 } from '../../store/slices/requestSlice'
+import { fetchMessageCounts, clearAllMessages } from '../../store/slices/messageSlice'
 import MessageThread from './MessageThread'
 
 function EditorContentTableApprove() {
   const { getAccessTokenSilently } = useAuth0()
   const dispatch = useDispatch()
   const { receivedRequests, loading, error } = useSelector((state) => state.requests)
+  const { messageCounts, countLoading } = useSelector((state) => state.messages)
   const { userData } = useSelector((state) => state.user)
   const userRole = userData?.user_metadata?.role
   const [selectedRequestId, setSelectedRequestId] = useState(null)
+
+  // Reset messages when component mounts
+  useEffect(() => {
+    dispatch(clearAllMessages())
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,6 +60,27 @@ function EditorContentTableApprove() {
 
     fetchData()
   }, [dispatch, getAccessTokenSilently, userData])
+
+  // Fetch message counts for all requests when requests are loaded
+  useEffect(() => {
+    const fetchCounts = async () => {
+      if (!receivedRequests || receivedRequests.length === 0 || !userData) return;
+
+      try {
+        const accessToken = await getAccessTokenSilently();
+        const requestIds = receivedRequests.map(approval => approval._id);
+
+        dispatch(fetchMessageCounts({
+          requestIds,
+          accessToken
+        }));
+      } catch (error) {
+        console.error('Error fetching message counts:', error);
+      }
+    };
+
+    fetchCounts();
+  }, [receivedRequests, getAccessTokenSilently, userData, dispatch]);
 
   const handleApprove = async (requestId, videoId) => {
     try {
@@ -245,6 +273,7 @@ function EditorContentTableApprove() {
                       requestId={approval._id}
                       onClose={() => setSelectedRequestId(null)}
                       requestStatus={approval.status}
+                      messageCount={messageCounts[approval._id] || 0}
                     />
                   </td>
                   <td className='whitespace-nowrap px-6 py-4 text-right text-sm'>

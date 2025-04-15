@@ -12,15 +12,22 @@ import {
   MessageSquare
 } from 'lucide-react'
 import { fetchRequestsFromUser } from '../../store/slices/requestSlice'
+import { fetchMessageCounts, clearAllMessages } from '../../store/slices/messageSlice'
 import MessageThread from './MessageThread'
 
 function ContentTable() {
   const { getAccessTokenSilently } = useAuth0()
   const dispatch = useDispatch()
   const { sentRequests, loading, error } = useSelector((state) => state.requests)
+  const { messageCounts, countLoading } = useSelector((state) => state.messages)
   const userData = useSelector((state) => state.user.userData)
   const userRole = userData?.user_metadata?.role
   const [selectedRequestId, setSelectedRequestId] = useState(null)
+
+  // Reset messages when component mounts
+  useEffect(() => {
+    dispatch(clearAllMessages())
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,6 +55,27 @@ function ContentTable() {
 
     fetchData()
   }, [dispatch, getAccessTokenSilently, userData])
+
+  // Fetch message counts for all requests when requests are loaded
+  useEffect(() => {
+    const fetchCounts = async () => {
+      if (!sentRequests || sentRequests.length === 0 || !userData) return;
+
+      try {
+        const accessToken = await getAccessTokenSilently();
+        const requestIds = sentRequests.map(request => request._id);
+
+        dispatch(fetchMessageCounts({
+          requestIds,
+          accessToken
+        }));
+      } catch (error) {
+        console.error('Error fetching message counts:', error);
+      }
+    };
+
+    fetchCounts();
+  }, [sentRequests, getAccessTokenSilently, userData, dispatch]);
 
   if (loading || !userRole) {
     return (
@@ -200,6 +228,7 @@ function ContentTable() {
                       requestId={request._id}
                       onClose={() => setSelectedRequestId(null)}
                       requestStatus={request.status}
+                      messageCount={messageCounts[request._id] || 0}
                     />
                   </td>
                 </tr>

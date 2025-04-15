@@ -18,20 +18,45 @@ import {
     clearMessages
 } from '../../store/slices/messageSlice'
 
-const MessageThread = ({ requestId, onClose, requestStatus = 'pending' }) => {
+const MessageThread = ({ requestId, onClose, requestStatus = 'pending', messageCount = null }) => {
     const [newMessage, setNewMessage] = useState('')
     const [isOpen, setIsOpen] = useState(false)
     const [isRefreshing, setIsRefreshing] = useState(false)
+    const [hasCheckedMessages, setHasCheckedMessages] = useState(messageCount !== null)
+    const [localMessageCount, setLocalMessageCount] = useState(messageCount || 0)
+    const threadId = `thread-${requestId}`
     const messagesEndRef = useRef(null)
     const { getAccessTokenSilently } = useAuth0()
     const dispatch = useDispatch()
 
-    const { messages: rawMessages, loading, sending, error } = useSelector((state) => state.messages)
+    const { messagesById, loading, sending, error, messageCounts } = useSelector((state) => state.messages)
     const userData = useSelector((state) => state.user.userData)
     const userRole = userData?.user_metadata?.role || 'Editor'
 
+    // Get messages for this specific thread
+    const rawMessages = messagesById[requestId] || []
+
     // Sort messages in chronological order (oldest first)
     const messages = [...rawMessages].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+
+    // Update local message count when messages are loaded or when count changes in redux
+    useEffect(() => {
+        // First try the direct messages array
+        if (messages.length > 0) {
+            setLocalMessageCount(messages.length)
+            setHasCheckedMessages(true)
+        }
+        // Then check the global message counts
+        else if (typeof messageCounts[requestId] !== 'undefined') {
+            setLocalMessageCount(messageCounts[requestId])
+            setHasCheckedMessages(true)
+        }
+        // If we have an explicit messageCount prop, use that
+        else if (messageCount !== null) {
+            setLocalMessageCount(messageCount)
+            setHasCheckedMessages(true)
+        }
+    }, [messages, messageCounts, requestId, messageCount])
 
     // Determine if the thread is view-only based on request status
     const isViewOnly = requestStatus === 'approved' || requestStatus === 'rejected'
@@ -42,14 +67,23 @@ const MessageThread = ({ requestId, onClose, requestStatus = 'pending' }) => {
     }
 
     // Fetch messages when thread is opened
-    const loadMessages = async () => {
+    const loadMessages = async (initialCheck = false) => {
         if (!requestId) return
 
         try {
             const accessToken = await getAccessTokenSilently()
-            dispatch(fetchRequestMessages({ requestId, accessToken }))
+            const response = await dispatch(fetchRequestMessages({ requestId, accessToken })).unwrap()
+            if (initialCheck) {
+                setHasCheckedMessages(true)
+                if (response && response.messages) {
+                    setLocalMessageCount(response.messages.length)
+                }
+            }
         } catch (error) {
             console.error('Error fetching messages:', error)
+            if (initialCheck) {
+                setHasCheckedMessages(true)
+            }
         }
     }
 
@@ -60,7 +94,10 @@ const MessageThread = ({ requestId, onClose, requestStatus = 'pending' }) => {
         setIsRefreshing(true)
         try {
             const accessToken = await getAccessTokenSilently()
-            await dispatch(fetchRequestMessages({ requestId, accessToken }))
+            const response = await dispatch(fetchRequestMessages({ requestId, accessToken })).unwrap()
+            if (response && response.messages) {
+                setLocalMessageCount(response.messages.length)
+            }
         } catch (error) {
             console.error('Error refreshing messages:', error)
         } finally {
@@ -68,22 +105,33 @@ const MessageThread = ({ requestId, onClose, requestStatus = 'pending' }) => {
         }
     }
 
+    // Initial load to check if there are any messages for view-only threads
+    useEffect(() => {
+        if (isViewOnly && !hasCheckedMessages && requestId) {
+            loadMessages(true)
+        }
+    }, [isViewOnly, requestId, hasCheckedMessages])
+
+    // Load messages when thread is opened
     useEffect(() => {
         if (isOpen) {
             loadMessages()
-        } else {
-            dispatch(clearMessages())
         }
 
+        // Clean up when component unmounts
         return () => {
-            dispatch(clearMessages())
+            if (isOpen) {
+                dispatch(clearMessages(requestId))
+            }
         }
     }, [isOpen, requestId, dispatch])
 
     // Scroll to bottom when messages change
     useEffect(() => {
-        scrollToBottom()
-    }, [messages])
+        if (isOpen && messages.length > 0) {
+            scrollToBottom()
+        }
+    }, [messages, isOpen])
 
     const handleSendMessage = async (e) => {
         e.preventDefault()
@@ -103,6 +151,7 @@ const MessageThread = ({ requestId, onClose, requestStatus = 'pending' }) => {
             }))
 
             setNewMessage('')
+            setLocalMessageCount(prev => prev + 1)
         } catch (error) {
             console.error('Error sending message:', error)
         }
@@ -110,6 +159,12 @@ const MessageThread = ({ requestId, onClose, requestStatus = 'pending' }) => {
 
     const toggleThread = () => {
         setIsOpen(prev => !prev)
+    }
+
+    // Function to close the thread
+    const closeThread = () => {
+        setIsOpen(false)
+        if (onClose) onClose()
     }
 
     // Format timestamp
@@ -124,9 +179,25 @@ const MessageThread = ({ requestId, onClose, requestStatus = 'pending' }) => {
     // Get status text for the button
     const getStatusText = () => {
         if (isViewOnly) {
-            return messages.length > 0 ? 'View Thread' : 'No Messages'
+            return localMessageCount > 0 ? 'View History' : 'No Messages';
         }
-        return isOpen ? 'Close Thread' : 'Negotiation Thread'
+        return isOpen ? 'Close Thread' : 'Negotiation Thread';
+    }
+
+    // Determine if button should be disabled
+    const isButtonDisabled = isViewOnly && !loading && !isRefreshing && localMessageCount === 0 && hasCheckedMessages;
+
+    // Early return if view-only and no messages (after checking)
+    if (isViewOnly && hasCheckedMessages && localMessageCount === 0) {
+        return (
+            <button
+                disabled
+                className="flex items-center rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-500 opacity-60 cursor-not-allowed"
+            >
+                <MessageSquare className="mr-1 h-4 w-4" />
+                <span>No Messages</span>
+            </button>
+        );
     }
 
     return (
@@ -134,16 +205,17 @@ const MessageThread = ({ requestId, onClose, requestStatus = 'pending' }) => {
             {/* Message thread toggle button */}
             <button
                 onClick={toggleThread}
-                className={`flex items-center rounded-md ${isOpen ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-600'} px-3 py-1.5 text-sm font-medium transition-all`}
-                disabled={isViewOnly && messages.length === 0}
+                className={`flex items-center rounded-md ${isOpen ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-600'} px-3 py-1.5 text-sm font-medium transition-all ${isButtonDisabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+                disabled={isButtonDisabled}
+                data-thread-id={threadId}
             >
                 <MessageSquare className="mr-1 h-4 w-4" />
                 <span>
-                    {getStatusText()}
+                    {loading && !hasCheckedMessages && isViewOnly ? 'Checking...' : getStatusText()}
                 </span>
-                {messages.length > 0 && !isOpen && (
+                {localMessageCount > 0 && !isOpen && (
                     <span className="ml-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-800">
-                        {messages.length}
+                        {localMessageCount}
                     </span>
                 )}
             </button>
@@ -171,7 +243,7 @@ const MessageThread = ({ requestId, onClose, requestStatus = 'pending' }) => {
                                 <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                             </button>
                             <button
-                                onClick={onClose || toggleThread}
+                                onClick={closeThread}
                                 className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                                 title="Close thread"
                             >
