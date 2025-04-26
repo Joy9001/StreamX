@@ -1,23 +1,16 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import Navbar from '../NavBar/Navbar.jsx'
-import EditorContentTableApprove from './EditorContentTableApprove.jsx'
+import ApproveTable from './ApproveTable.jsx'
 import RaasNav from './RaasNav.jsx'
 import ContentTable from './RaContentTable.jsx'
-import RaContentTableApprove from './RaContentTableApprove.jsx'
 import ErrorBoundary from './ErrorBoundary.jsx'
-import { CheckCircle, Send, ArrowRightLeft, Inbox } from 'lucide-react'
+import { Send, Inbox } from 'lucide-react'
 
 const RequestApprove = () => {
   const [showApproved, setShowApproved] = useState(false)
   const navOpen = useSelector((state) => state.ui.navbarOpen)
   const drawer = useSelector((state) => state.ui.drawer)
-  const { userData } = useSelector((state) => state.user)
-
-  const ApprovalComponent =
-    userData?.user_metadata?.role === 'Editor'
-      ? EditorContentTableApprove
-      : RaContentTableApprove
 
   return (
     <div className='storage-main flex h-screen'>
@@ -110,7 +103,7 @@ const RequestApprove = () => {
             </div>
             <div className='storage-content-body flex-1'>
               <ErrorBoundary>
-                {showApproved ? <ApprovalComponent /> : <ContentTable />}
+                {showApproved ? <ApproveTable /> : <ContentTable />}
               </ErrorBoundary>
             </div>
           </div>
