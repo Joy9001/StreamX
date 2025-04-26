@@ -197,15 +197,15 @@ function ContentTable() {
                       <div className='h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-gray-200'>
                         <img
                           src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                            request.from.name || 'User'
+                            request.to.name || 'User'
                           )}&background=random&color=fff`}
-                          alt={request.from.name}
+                          alt={request.to.name}
                           className='h-full w-full object-cover'
                         />
                       </div>
                       <div className='ml-3'>
                         <div className='text-sm font-medium text-gray-900'>
-                          {request.from.name}
+                          {request.to.name}
                         </div>
                       </div>
                     </div>
