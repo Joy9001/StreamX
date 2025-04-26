@@ -10,7 +10,8 @@ import {
     IndianRupee,
     FileText,
     ThumbsUp,
-    MessageSquare
+    MessageSquare,
+    Settings,
 } from 'lucide-react'
 import {
     fetchRequestsToUser,
@@ -211,7 +212,10 @@ function ApproveTable() {
                                 </div>
                             </th>
                             <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
-                                Status
+                                <div className='flex items-center'>
+                                    <Clock className={`mr-2 h-4 w-4 ${iconColor}`} />
+                                    Status
+                                </div>
                             </th>
                             <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                                 <div className='flex items-center'>
@@ -220,7 +224,10 @@ function ApproveTable() {
                                 </div>
                             </th>
                             <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
-                                Action
+                                <div className='flex items-center'>
+                                    <Settings className={`mr-2 h-4 w-4 ${iconColor}`} />
+                                    Action
+                                </div>
                             </th>
                         </tr>
                     </thead>
