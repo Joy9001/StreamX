@@ -23,6 +23,7 @@ function ContentTable() {
   const userData = useSelector((state) => state.user.userData)
   const userRole = userData?.user_metadata?.role
   const [selectedRequestId, setSelectedRequestId] = useState(null)
+  const isEditor = userRole === 'Editor'
 
   // Reset messages when component mounts
   useEffect(() => {
@@ -123,42 +124,51 @@ function ContentTable() {
     }
   }
 
+  // Determine header gradient and icon colors based on role
+  const headerGradient = isEditor ? 'from-purple-50 to-indigo-50' : 'from-teal-50 to-blue-50'
+  const iconColor = isEditor ? 'text-purple-500' : 'text-teal-500'
+  const iconBgColor = isEditor ? 'bg-purple-100' : 'bg-teal-100'
+  const iconTextColor = isEditor ? 'text-purple-600' : 'text-teal-600'
+
   return (
     <div className='rounded-lg border border-gray-200 bg-white shadow-sm'>
       <div className='overflow-x-auto'>
         <table className='w-full divide-y divide-gray-200'>
-          <thead className='bg-gradient-to-r from-teal-50 to-blue-50'>
+          <thead className={`bg-gradient-to-r ${headerGradient}`}>
             <tr>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <Film className='mr-2 h-4 w-4 text-teal-500' />
-                  Video
+                  <Film className={`mr-2 h-4 w-4 ${iconColor}`} />
+                  Video Name
                 </div>
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <User className='mr-2 h-4 w-4 text-teal-500' />
-                  {userRole === 'Owner' ? 'Editor' : 'Owner'}
+                  <User className={`mr-2 h-4 w-4 ${iconColor}`} />
+                  {isEditor ? 'Owner Name' : 'Editor Name'}
                 </div>
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <FileText className='mr-2 h-4 w-4 text-teal-500' />
+                  <FileText className={`mr-2 h-4 w-4 ${iconColor}`} />
                   Description
                 </div>
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <IndianRupee className='mr-2 h-4 w-4 text-teal-500' />
+                  <IndianRupee className={`mr-2 h-4 w-4 ${iconColor}`} />
                   Price
                 </div>
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
-                Status
+                <div className='flex items-center'>
+                  <Clock className={`mr-2 h-4 w-4 ${iconColor}`} />
+                  Status
+                </div>
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700'>
                 <div className='flex items-center'>
-                  <MessageSquare className='mr-2 h-4 w-4 text-teal-500' />
+                  <MessageSquare className={`mr-2 h-4 w-4 ${iconColor}`} />
                   Negotiate
                 </div>
               </th>
@@ -172,8 +182,8 @@ function ContentTable() {
                   className='transition-colors duration-150 hover:bg-gray-50'>
                   <td className='whitespace-nowrap px-6 py-4'>
                     <div className='flex items-center'>
-                      <div className='flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-teal-100'>
-                        <Film className='h-5 w-5 text-teal-600' />
+                      <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${iconBgColor}`}>
+                        <Film className={`h-5 w-5 ${iconTextColor}`} />
                       </div>
                       <div className='ml-4'>
                         <div className='text-sm font-medium text-gray-900'>
@@ -187,15 +197,15 @@ function ContentTable() {
                       <div className='h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-gray-200'>
                         <img
                           src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                            request.from.name || 'User'
+                            request.to.name || 'User'
                           )}&background=random&color=fff`}
-                          alt={request.from.name}
+                          alt={request.to.name}
                           className='h-full w-full object-cover'
                         />
                       </div>
                       <div className='ml-3'>
                         <div className='text-sm font-medium text-gray-900'>
-                          {request.from.name}
+                          {request.to.name}
                         </div>
                       </div>
                     </div>
