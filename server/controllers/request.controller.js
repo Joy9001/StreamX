@@ -1,7 +1,6 @@
 import { getEditorIdByGigId } from '../helpers/editor.helper.js'
 import Admin from '../models/admin.model.js'
 import Editor from '../models/editor.models.js'
-import Editor_Gig from '../models/editorGig.model.js'
 import Owner from '../models/owner.model.js'
 import Request from '../models/request.model.js'
 
@@ -578,5 +577,29 @@ export const addMessageToRequest = async (req, res) => {
 			message: 'Error adding message to request',
 			error: error.message
 		})
+	}
+}
+
+export const getRequestsByFromToId = async (req, res) => {
+	try {
+		const { from_id, to_id } = req.body
+		console.log('from_id', from_id)
+		console.log('to_id', to_id)
+
+		const requests = await Request.find({ from_id, to_id }).populate({
+			path: 'video_id',
+			select: 'url metaData'
+		}).lean()
+
+		console.log('requests', requests)
+
+		if (!requests) {
+			return res.status(404).json({ message: 'Requests not found' })
+		}
+
+		return res.status(200).json(requests)
+	} catch (error) {
+		console.error('Error fetching requests:', error)
+		return res.status(500).json({ message: 'Error fetching requests', error: error.message })
 	}
 }

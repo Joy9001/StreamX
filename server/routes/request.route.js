@@ -1,17 +1,17 @@
 import express from 'express'
 import {
+	addMessageToRequest,
 	aggregateRequestsController,
 	createRequest,
 	deleteRequest,
 	getAdminRequests,
 	getAllRequests,
 	getAllUpdatedRequests,
-	getRequestsByFromId,
-	getRequestsByToId,
-	updateRequestStatus,
-	// New message controllers
-	addMessageToRequest,
 	getRequestMessages,
+	getRequestsByFromId,
+	getRequestsByFromToId,
+	getRequestsByToId,
+	updateRequestStatus
 } from '../controllers/request.controller.js'
 
 const router = express.Router()
@@ -24,10 +24,10 @@ router.get('/', getAllRequests)
 
 router.get('/all', getAllUpdatedRequests)
 
-// Get requests by owner ID
+// Get requests by owner/editor ID
 router.get('/to-id/:to_id', getRequestsByToId)
 
-// Get requests by editor ID
+// Get requests by owner/editor ID
 router.get('/from-id/:from_id', getRequestsByFromId)
 
 // Get admin requests
@@ -43,5 +43,7 @@ router.get('/aggregate/:fromId', aggregateRequestsController)
 // Message thread routes
 router.get('/:id/messages', getRequestMessages)
 router.post('/:id/messages', addMessageToRequest)
+
+router.post('/from-to', getRequestsByFromToId)
 
 export default router
