@@ -16,11 +16,14 @@ function ContentTableRowOptions({ video }) {
   const [hiredEditors, setHiredEditors] = useState([])
   const [hiredByOwners, setHiredByOwners] = useState([])
   const [selectedUser, setSelectedUser] = useState(null)
+  const [ownerRequests, setOwnerRequests] = useState([])
+  const [selectedRequest, setSelectedRequest] = useState(null)
   const [requestForm, setRequestForm] = useState({
     description: '',
     price: 0,
   })
   const [showRequestForm, setShowRequestForm] = useState(false)
+  const [showOwnerRequests, setShowOwnerRequests] = useState(false)
   const { getAccessTokenSilently } = useAuth0()
 
   useEffect(() => {
@@ -84,6 +87,7 @@ function ContentTableRowOptions({ video }) {
       setHiredEditors(response.data)
       setIsModalOpen(true)
       setShowRequestForm(false)
+      setShowOwnerRequests(false)
     } catch (error) {
       console.error('Error fetching hired editors:', error)
     }
@@ -104,26 +108,86 @@ function ContentTableRowOptions({ video }) {
       setHiredByOwners(response.data)
       setIsModalOpen(true)
       setShowRequestForm(false)
+      setShowOwnerRequests(false)
     } catch (error) {
       console.error('Error fetching hired-by owners:', error)
     }
   }
 
-  // async function handleRevokeOwner() {}
+  async function fetchOwnerRequests(ownerId) {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/requests/from-to`,
+        {
+          from_id: ownerId,
+          to_id: userData._id
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        }
+      )
+      console.log('Fetched owner requests:', response.data)
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching owner requests:', error)
+      return []
+    }
+  }
 
-  // async function handleRevokeEditor() {}
-
-  function handleSelectUser(user) {
+  async function handleSelectUser(user) {
+    console.log('User selected:', user);
+    console.log('Current role:', userData.user_metadata.role);
     setSelectedUser(user)
-    setShowRequestForm(true)
+
+    if (userData.user_metadata.role === 'Editor') {
+      // For editors, fetch requests from the selected owner
+      console.log('Fetching requests for editor from owner:', user._id);
+      const requests = await fetchOwnerRequests(user._id)
+      setOwnerRequests(requests)
+      console.log('Setting ownerRequests state with', requests.length, 'requests');
+
+      if (requests && requests.length > 0) {
+        console.log('Showing owner requests view');
+        setShowOwnerRequests(true)
+        setShowRequestForm(false)
+      } else {
+        // If no requests, show error message
+        console.log('No requests found, showing error message');
+        alert('You cannot request this owner because they have not sent you any requests.');
+        setIsModalOpen(false)
+      }
+    } else {
+      // For owners, show the form directly
+      console.log('Owner selecting an editor, showing form');
+      setShowRequestForm(true)
+      setShowOwnerRequests(false)
+      setRequestForm({
+        description: `Request to edit video ${video.metaData.name}`,
+        price: 0,
+      })
+    }
+  }
+
+  function handleSelectRequest(request) {
+    setSelectedRequest(request)
     setRequestForm({
-      description: `${userData.user_metadata.role === 'Owner' ? 'Request to edit video' : 'Request for ownership of video'} ${video.metaData.name}`,
-      price: 0,
+      description: request.description,
+      price: request.price
     })
+    setShowRequestForm(true)
+    setShowOwnerRequests(false)
   }
 
   function handleRequestFormChange(e) {
     const { name, value } = e.target
+
+    // For editors with a selected request, don't allow price changes
+    if (userData.user_metadata.role === 'Editor' && selectedRequest && name === 'price') {
+      return
+    }
+
     setRequestForm({
       ...requestForm,
       [name]: name === 'price' ? parseFloat(value) : value,
@@ -155,7 +219,9 @@ function ContentTableRowOptions({ video }) {
       console.log('Request created successfully')
       setIsModalOpen(false)
       setShowRequestForm(false)
+      setShowOwnerRequests(false)
       setSelectedUser(null)
+      setSelectedRequest(null)
       alert('Request sent successfully!')
     } catch (error) {
       console.error('Error creating request:', error)
@@ -230,12 +296,12 @@ function ContentTableRowOptions({ video }) {
           </li>
         </ul>
       </div>
-      {/* Hired Editors Modal */}
+      {/* Hired Editors/Owners Modal */}
       <dialog
         id='hired_editors_modal'
         className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
         <div className='modal-box'>
-          {!showRequestForm ? (
+          {!showRequestForm && !showOwnerRequests ? (
             <>
               <h3 className='mb-4 text-lg font-bold'>
                 {userData.user_metadata.role === 'Owner'
@@ -302,6 +368,47 @@ function ContentTableRowOptions({ video }) {
                 )}
               </div>
             </>
+          ) : showOwnerRequests ? (
+            <>
+              <h3 className='mb-4 text-lg font-bold'>
+                Requests from {selectedUser?.username}
+              </h3>
+              <div className='overflow-x-auto'>
+                {ownerRequests.length > 0 ? (
+                  <table className='table'>
+                    <thead>
+                      <tr>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ownerRequests.map((request) => (
+                        <tr key={request._id}>
+                          <td>{request.description}</td>
+                          <td>${request.price.toFixed(2)}</td>
+                          <td>
+                            <button
+                              className='btn btn-primary btn-sm'
+                              onClick={() => handleSelectRequest(request)}>
+                              Select
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p className='py-4 text-center'>No requests found from this owner</p>
+                )}
+                <button
+                  className='btn btn-ghost mt-4'
+                  onClick={() => setShowOwnerRequests(false)}>
+                  Back to List
+                </button>
+              </div>
+            </>
           ) : (
             <>
               <h3 className='mb-4 text-lg font-bold'>
@@ -335,7 +442,13 @@ function ContentTableRowOptions({ video }) {
                     min='0'
                     step='0.01'
                     required
+                    disabled={userData.user_metadata.role === 'Editor' && selectedRequest}
                   />
+                  {userData.user_metadata.role === 'Editor' && selectedRequest && (
+                    <p className='text-sm text-gray-600 mt-1'>
+                      Price is fixed based on the selected request.
+                    </p>
+                  )}
                 </div>
 
                 <div className='form-control mt-6'>
@@ -346,19 +459,38 @@ function ContentTableRowOptions({ video }) {
               </form>
               <button
                 className='btn btn-ghost mt-4'
-                onClick={() => setShowRequestForm(false)}>
+                onClick={() => {
+                  if (userData.user_metadata.role === 'Editor' && ownerRequests.length > 0) {
+                    setShowOwnerRequests(true)
+                    setShowRequestForm(false)
+                  } else {
+                    setShowRequestForm(false)
+                    setShowOwnerRequests(false)
+                  }
+                  setSelectedRequest(null)
+                }}>
                 Back to List
               </button>
             </>
           )}
           <div className='modal-action'>
-            <button className='btn' onClick={() => setIsModalOpen(false)}>
+            <button className='btn' onClick={() => {
+              setIsModalOpen(false)
+              setShowRequestForm(false)
+              setShowOwnerRequests(false)
+              setSelectedRequest(null)
+            }}>
               Close
             </button>
           </div>
         </div>
         <form method='dialog' className='modal-backdrop'>
-          <button onClick={() => setIsModalOpen(false)}>close</button>
+          <button onClick={() => {
+            setIsModalOpen(false)
+            setShowRequestForm(false)
+            setShowOwnerRequests(false)
+            setSelectedRequest(null)
+          }}>close</button>
         </form>
       </dialog>
     </>
