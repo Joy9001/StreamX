@@ -2,6 +2,7 @@ import express from 'express'
 import {
 	addMessageToRequest,
 	aggregateRequestsController,
+	changePrice,
 	createRequest,
 	deleteRequest,
 	getAdminRequests,
@@ -11,7 +12,7 @@ import {
 	getRequestsByFromId,
 	getRequestsByFromToId,
 	getRequestsByToId,
-	updateRequestStatus
+	updateRequestStatus,
 } from '../controllers/request.controller.js'
 
 const router = express.Router()
@@ -45,5 +46,6 @@ router.get('/:id/messages', getRequestMessages)
 router.post('/:id/messages', addMessageToRequest)
 
 router.post('/from-to', getRequestsByFromToId)
+router.post('/change-price', changePrice)
 
 export default router

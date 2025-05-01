@@ -12,7 +12,7 @@ export const createRequest = async (req, res) => {
 		let toId = to_id
 
 		if (requesterKind == 'Owner') {
-			toId = await getEditorIdByGigId(to_id) || to_id
+			toId = (await getEditorIdByGigId(to_id)) || to_id
 		}
 
 		// Create new request
@@ -510,14 +510,14 @@ export const getRequestMessages = async (req, res) => {
 		return res.status(200).json({
 			success: true,
 			messages,
-			requestId: id
+			requestId: id,
 		})
 	} catch (error) {
 		console.error('Error fetching request messages:', error)
 		return res.status(500).json({
 			success: false,
 			message: 'Error fetching request messages',
-			error: error.message
+			error: error.message,
 		})
 	}
 }
@@ -530,7 +530,7 @@ export const addMessageToRequest = async (req, res) => {
 		if (!sender_id || !sender_role || !sender_name || !message) {
 			return res.status(400).json({
 				success: false,
-				message: 'Missing required fields for message'
+				message: 'Missing required fields for message',
 			})
 		}
 
@@ -543,13 +543,11 @@ export const addMessageToRequest = async (req, res) => {
 		console.log('request from id', request.from_id.toString())
 		console.log('request to id', request.to_id.toString())
 
-
 		// Make sure the sender is either the requester or the recipient
-		if (sender_id.toString() !== request.from_id.toString() &&
-			sender_id.toString() !== request.to_id.toString()) {
+		if (sender_id.toString() !== request.from_id.toString() && sender_id.toString() !== request.to_id.toString()) {
 			return res.status(403).json({
 				success: false,
-				message: 'You are not authorized to add messages to this request'
+				message: 'You are not authorized to add messages to this request',
 			})
 		}
 
@@ -559,7 +557,7 @@ export const addMessageToRequest = async (req, res) => {
 			sender_role,
 			sender_name,
 			message,
-			timestamp: new Date()
+			timestamp: new Date(),
 		}
 
 		request.messages.push(newMessage)
@@ -568,14 +566,14 @@ export const addMessageToRequest = async (req, res) => {
 		return res.status(201).json({
 			success: true,
 			message: 'Message added successfully',
-			newMessage
+			newMessage,
 		})
 	} catch (error) {
 		console.error('Error adding message to request:', error)
 		return res.status(500).json({
 			success: false,
 			message: 'Error adding message to request',
-			error: error.message
+			error: error.message,
 		})
 	}
 }
@@ -586,10 +584,12 @@ export const getRequestsByFromToId = async (req, res) => {
 		console.log('from_id', from_id)
 		console.log('to_id', to_id)
 
-		const requests = await Request.find({ from_id, to_id }).populate({
-			path: 'video_id',
-			select: 'url metaData'
-		}).lean()
+		const requests = await Request.find({ from_id, to_id })
+			.populate({
+				path: 'video_id',
+				select: 'url metaData',
+			})
+			.lean()
 
 		console.log('requests', requests)
 
@@ -601,5 +601,32 @@ export const getRequestsByFromToId = async (req, res) => {
 	} catch (error) {
 		console.error('Error fetching requests:', error)
 		return res.status(500).json({ message: 'Error fetching requests', error: error.message })
+	}
+}
+
+export const changePrice = async (req, res) => {
+	try {
+		const { id, price } = req.body
+		const request = await Request.findById(id)
+
+		if (!request) {
+			return res.status(404).json({ message: 'Request not found' })
+		}
+
+		request.price = price
+		await request.save()
+
+		return res.status(200).json({
+			success: true,
+			message: 'Price changed successfully',
+			request,
+		})
+	} catch (error) {
+		console.error('Error changing price:', error)
+		return res.status(500).json({
+			success: false,
+			message: 'Error changing price',
+			error: error.message,
+		})
 	}
 }
