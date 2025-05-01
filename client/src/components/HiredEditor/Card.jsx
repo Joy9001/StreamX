@@ -18,7 +18,7 @@ import {
   toggleDrawer,
   toggleModel,
   resetBookingForm,
-  sendBookingRequest
+  sendBookingRequest,
 } from '../../store/slices/editorSlice'
 
 function Card({ editor, userData }) {
@@ -38,7 +38,7 @@ function Card({ editor, userData }) {
     currentVideoIndex = 0,
     sendingRequest,
     error,
-    selectedEditor
+    selectedEditor,
   } = useSelector((state) => state.editors)
 
   const handleBookNowClick = () => {
@@ -50,28 +50,28 @@ function Card({ editor, userData }) {
 
   const plans = editor.plans
     ? {
-      Basic: {
-        price: `₹${editor.plans[0].basic.price}`,
-        description: editor.plans[0].basic.desc,
-        delivery: `${editor.plans[0].basic.deliveryTime} day delivery`,
-        revisions: 'Unlimited revisions',
-        availableSkills: editor.plans[0].basic.ServiceOptions,
-      },
-      Standard: {
-        price: `₹${editor.plans[0].standard.price}`,
-        description: editor.plans[0].standard.desc,
-        delivery: `${editor.plans[0].standard.deliveryTime} day delivery`,
-        revisions: 'Unlimited revisions',
-        availableSkills: editor.plans[0].standard.ServiceOptions,
-      },
-      Premium: {
-        price: `₹${editor.plans[0].premium.price}`,
-        description: editor.plans[0].premium.desc,
-        delivery: `${editor.plans[0].premium.deliveryTime} day delivery`,
-        revisions: 'Unlimited revisions',
-        availableSkills: editor.plans[0].premium.ServiceOptions,
-      },
-    }
+        Basic: {
+          price: `₹${editor.plans[0].basic.price}`,
+          description: editor.plans[0].basic.desc,
+          delivery: `${editor.plans[0].basic.deliveryTime} day delivery`,
+          revisions: 'Unlimited revisions',
+          availableSkills: editor.plans[0].basic.ServiceOptions,
+        },
+        Standard: {
+          price: `₹${editor.plans[0].standard.price}`,
+          description: editor.plans[0].standard.desc,
+          delivery: `${editor.plans[0].standard.deliveryTime} day delivery`,
+          revisions: 'Unlimited revisions',
+          availableSkills: editor.plans[0].standard.ServiceOptions,
+        },
+        Premium: {
+          price: `₹${editor.plans[0].premium.price}`,
+          description: editor.plans[0].premium.desc,
+          delivery: `${editor.plans[0].premium.deliveryTime} day delivery`,
+          revisions: 'Unlimited revisions',
+          availableSkills: editor.plans[0].premium.ServiceOptions,
+        },
+      }
     : {}
 
   const services = ['React', 'JavaScript', 'Tailwind CSS', 'Node.js', 'MongoDB']
@@ -83,9 +83,10 @@ function Card({ editor, userData }) {
   ]
 
   const handleVideoChange = (direction) => {
-    let newIndex = direction === 'next'
-      ? (currentVideoIndex + 1) % videos.length
-      : (currentVideoIndex - 1 + videos.length) % videos.length
+    let newIndex =
+      direction === 'next'
+        ? (currentVideoIndex + 1) % videos.length
+        : (currentVideoIndex - 1 + videos.length) % videos.length
 
     // In a real implementation, you would add a reducer action for this
     // For now we'll use the current index from local component scope
@@ -107,16 +108,16 @@ function Card({ editor, userData }) {
     // Use the selectedEditor from Redux for the plans
     const editorPlans = selectedEditor.plans
       ? {
-        Basic: {
-          price: `₹${selectedEditor.plans[0].basic.price}`,
-        },
-        Standard: {
-          price: `₹${selectedEditor.plans[0].standard.price}`,
-        },
-        Premium: {
-          price: `₹${selectedEditor.plans[0].premium.price}`,
-        },
-      }
+          Basic: {
+            price: `₹${selectedEditor.plans[0].basic.price}`,
+          },
+          Standard: {
+            price: `₹${selectedEditor.plans[0].standard.price}`,
+          },
+          Premium: {
+            price: `₹${selectedEditor.plans[0].premium.price}`,
+          },
+        }
       : {}
 
     const price = showCustomPrice
@@ -138,7 +139,7 @@ function Card({ editor, userData }) {
         description: projectDescription.trim(),
         price: price,
         status: 'pending',
-        requesterKind: userData.user_metadata.role
+        requesterKind: userData.user_metadata.role,
       }
 
       dispatch(sendBookingRequest({ requestData, token }))
@@ -241,8 +242,9 @@ function Card({ editor, userData }) {
             {['Basic', 'Standard', 'Premium'].map((planName) => (
               <div
                 key={planName}
-                className={`cursor-pointer rounded-lg border border-gray-300 px-4 py-2 text-center ${selectedPlan === planName ? 'border-blue-500 shadow-lg' : ''
-                  }`}
+                className={`cursor-pointer rounded-lg border border-gray-300 px-4 py-2 text-center ${
+                  selectedPlan === planName ? 'border-blue-500 shadow-lg' : ''
+                }`}
                 onClick={() => dispatch(setSelectedPlan(planName))}>
                 <p
                   className={
@@ -305,10 +307,13 @@ function Card({ editor, userData }) {
 
       {isDrawerOpen && (
         <div
-          className={`fixed right-0 top-0 z-50 h-screen w-3/5 transform overflow-y-auto bg-white shadow-lg transition-transform ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
-            }`}>
+          className={`fixed right-0 top-0 z-50 h-screen w-3/5 transform overflow-y-auto bg-white shadow-lg transition-transform ${
+            isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}>
           <div className='drawer-header flex justify-between p-4'>
-            <button onClick={() => dispatch(toggleDrawer())} className='text-black'>
+            <button
+              onClick={() => dispatch(toggleDrawer())}
+              className='text-black'>
               X
             </button>
           </div>
@@ -318,7 +323,9 @@ function Card({ editor, userData }) {
         </div>
       )}
 
-      <BookNowModal isOpen={isModelOpen} onClose={() => dispatch(toggleModel(false))}>
+      <BookNowModal
+        isOpen={isModelOpen}
+        onClose={() => dispatch(toggleModel(false))}>
         {selectedEditor && (
           <div className='p-8'>
             {/* Header Section */}
@@ -378,10 +385,11 @@ function Card({ editor, userData }) {
                     ownerVideos.map((video) => (
                       <div
                         key={video._id}
-                        className={`relative flex cursor-pointer border-b border-gray-200 p-4 last:border-b-0 hover:bg-gray-50 ${selectedVideo && selectedVideo._id === video._id
-                          ? 'bg-blue-50 hover:bg-blue-50'
-                          : ''
-                          }`}
+                        className={`relative flex cursor-pointer border-b border-gray-200 p-4 last:border-b-0 hover:bg-gray-50 ${
+                          selectedVideo && selectedVideo._id === video._id
+                            ? 'bg-blue-50 hover:bg-blue-50'
+                            : ''
+                        }`}
                         onClick={() => dispatch(setSelectedVideo(video))}>
                         <div className='flex-grow'>
                           <h3 className='text-lg font-semibold text-gray-900'>
@@ -391,7 +399,9 @@ function Card({ editor, userData }) {
                             <div className='flex items-center space-x-4'>
                               <span>
                                 Size:{' '}
-                                {(video.metaData.size / (1024 * 1024)).toFixed(2)}{' '}
+                                {(video.metaData.size / (1024 * 1024)).toFixed(
+                                  2
+                                )}{' '}
                                 MB
                               </span>
                               <span>Type: {video.metaData.contentType}</span>
@@ -446,56 +456,59 @@ function Card({ editor, userData }) {
                 </p>
 
                 <div className='mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3'>
-                  {selectedEditor.plans && Object.entries({
-                    Basic: {
-                      price: `₹${selectedEditor.plans[0].basic.price}`,
-                      description: selectedEditor.plans[0].basic.desc,
-                    },
-                    Standard: {
-                      price: `₹${selectedEditor.plans[0].standard.price}`,
-                      description: selectedEditor.plans[0].standard.desc,
-                    },
-                    Premium: {
-                      price: `₹${selectedEditor.plans[0].premium.price}`,
-                      description: selectedEditor.plans[0].premium.desc,
-                    },
-                  }).map(([planName, planDetails]) => (
-                    <div
-                      key={planName}
-                      className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none ${selectedPlan === planName && !showCustomPrice
-                        ? 'border-blue-500 ring-2 ring-blue-500'
-                        : 'border-gray-300'
+                  {selectedEditor.plans &&
+                    Object.entries({
+                      Basic: {
+                        price: `₹${selectedEditor.plans[0].basic.price}`,
+                        description: selectedEditor.plans[0].basic.desc,
+                      },
+                      Standard: {
+                        price: `₹${selectedEditor.plans[0].standard.price}`,
+                        description: selectedEditor.plans[0].standard.desc,
+                      },
+                      Premium: {
+                        price: `₹${selectedEditor.plans[0].premium.price}`,
+                        description: selectedEditor.plans[0].premium.desc,
+                      },
+                    }).map(([planName, planDetails]) => (
+                      <div
+                        key={planName}
+                        className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none ${
+                          selectedPlan === planName && !showCustomPrice
+                            ? 'border-blue-500 ring-2 ring-blue-500'
+                            : 'border-gray-300'
                         }`}
-                      onClick={() => {
-                        dispatch(setSelectedPlan(planName))
-                        dispatch(setShowCustomPrice(false))
-                      }}>
-                      <div className='flex flex-1'>
-                        <div className='flex flex-col'>
-                          <span className='block text-sm font-medium text-gray-900'>
-                            {planName}
-                          </span>
-                          <span className='mt-1 flex items-center text-sm text-gray-500'>
-                            {planDetails.price}
-                          </span>
+                        onClick={() => {
+                          dispatch(setSelectedPlan(planName))
+                          dispatch(setShowCustomPrice(false))
+                        }}>
+                        <div className='flex flex-1'>
+                          <div className='flex flex-col'>
+                            <span className='block text-sm font-medium text-gray-900'>
+                              {planName}
+                            </span>
+                            <span className='mt-1 flex items-center text-sm text-gray-500'>
+                              {planDetails.price}
+                            </span>
+                          </div>
+                        </div>
+                        <div
+                          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+                            selectedPlan === planName && !showCustomPrice
+                              ? 'border-transparent bg-blue-500 text-white'
+                              : 'border-gray-300 bg-white'
+                          }`}>
+                          {selectedPlan === planName && !showCustomPrice && (
+                            <svg
+                              className='h-3 w-3 text-white'
+                              viewBox='0 0 12 12'
+                              fill='currentColor'>
+                              <path d='M3.707 5.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L5 6.586 3.707 5.293z' />
+                            </svg>
+                          )}
                         </div>
                       </div>
-                      <div
-                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${selectedPlan === planName && !showCustomPrice
-                          ? 'border-transparent bg-blue-500 text-white'
-                          : 'border-gray-300 bg-white'
-                          }`}>
-                        {selectedPlan === planName && !showCustomPrice && (
-                          <svg
-                            className='h-3 w-3 text-white'
-                            viewBox='0 0 12 12'
-                            fill='currentColor'>
-                            <path d='M3.707 5.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L5 6.586 3.707 5.293z' />
-                          </svg>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
 
                   {/* Custom Price Option */}
                   <div
@@ -538,7 +551,9 @@ function Card({ editor, userData }) {
                       <input
                         type='number'
                         value={customPrice}
-                        onChange={(e) => dispatch(setCustomPrice(e.target.value))}
+                        onChange={(e) =>
+                          dispatch(setCustomPrice(e.target.value))
+                        }
                         className='block w-full rounded-lg border-gray-300 py-3 pl-7 focus:border-blue-500 focus:ring-blue-500'
                         placeholder='0.00'
                       />
@@ -558,7 +573,9 @@ function Card({ editor, userData }) {
                 </p>
                 <textarea
                   value={projectDescription}
-                  onChange={(e) => dispatch(setProjectDescription(e.target.value))}
+                  onChange={(e) =>
+                    dispatch(setProjectDescription(e.target.value))
+                  }
                   rows={4}
                   className='mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
                   placeholder='I need help with...'
@@ -567,7 +584,7 @@ function Card({ editor, userData }) {
 
               {/* Show error if any */}
               {error && (
-                <div className="p-4 rounded-lg bg-red-50 text-red-700">
+                <div className='rounded-lg bg-red-50 p-4 text-red-700'>
                   {error}
                 </div>
               )}

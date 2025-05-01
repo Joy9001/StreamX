@@ -10,7 +10,7 @@ import {
   setSearchTerm,
   setPriceFilter,
   setLanguageFilter,
-  setRatingFilter
+  setRatingFilter,
 } from '../../store/slices/editorSlice'
 
 function Cards() {
@@ -27,7 +27,7 @@ function Cards() {
     ratingFilter,
     loadingEditors,
     loadingPlans,
-    error
+    error,
   } = useSelector((state) => state.editors)
 
   // Fetch access token and dispatch initial data loading
@@ -42,11 +42,13 @@ function Cards() {
 
         // Fetch videos if userData is available
         if (userData && userData.user_metadata && userData.user_metadata.role) {
-          dispatch(fetchOwnerVideos({
-            userId: userData._id,
-            role: userData.user_metadata.role,
-            token
-          }))
+          dispatch(
+            fetchOwnerVideos({
+              userId: userData._id,
+              role: userData.user_metadata.role,
+              token,
+            })
+          )
         }
       } catch (error) {
         console.error('Error initializing data:', error)
@@ -140,8 +142,8 @@ function Cards() {
   // Show loading state
   if (loadingEditors || loadingPlans) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+      <div className='flex h-64 items-center justify-center'>
+        <div className='h-16 w-16 animate-spin rounded-full border-b-4 border-t-4 border-blue-500'></div>
       </div>
     )
   }
@@ -149,7 +151,7 @@ function Cards() {
   // Show error state
   if (error) {
     return (
-      <div className="text-center text-red-500 p-4">
+      <div className='p-4 text-center text-red-500'>
         Error loading data: {error}
       </div>
     )
@@ -251,7 +253,7 @@ function Cards() {
             <Card key={editor._id} editor={editor} userData={userData} />
           ))
         ) : (
-          <div className='col-span-full text-center py-10 text-gray-500'>
+          <div className='col-span-full py-10 text-center text-gray-500'>
             No editors found matching your criteria.
           </div>
         )}

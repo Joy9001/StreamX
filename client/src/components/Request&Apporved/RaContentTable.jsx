@@ -9,16 +9,21 @@ import {
   User,
   IndianRupee,
   FileText,
-  MessageSquare
+  MessageSquare,
 } from 'lucide-react'
 import { fetchRequestsFromUser } from '../../store/slices/requestSlice'
-import { fetchMessageCounts, clearAllMessages } from '../../store/slices/messageSlice'
+import {
+  fetchMessageCounts,
+  clearAllMessages,
+} from '../../store/slices/messageSlice'
 import MessageThread from './MessageThread'
 
 function ContentTable() {
   const { getAccessTokenSilently } = useAuth0()
   const dispatch = useDispatch()
-  const { sentRequests, loading, error } = useSelector((state) => state.requests)
+  const { sentRequests, loading, error } = useSelector(
+    (state) => state.requests
+  )
   const { messageCounts, countLoading } = useSelector((state) => state.messages)
   const userData = useSelector((state) => state.user.userData)
   const userRole = userData?.user_metadata?.role
@@ -28,7 +33,7 @@ function ContentTable() {
   // Reset messages when component mounts
   useEffect(() => {
     dispatch(clearAllMessages())
-  }, [dispatch]);
+  }, [dispatch])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,10 +50,12 @@ function ContentTable() {
       try {
         const accessToken = await getAccessTokenSilently()
         console.log('Fetching requests with ID:', userId)
-        dispatch(fetchRequestsFromUser({
-          id: userId,
-          accessToken
-        }))
+        dispatch(
+          fetchRequestsFromUser({
+            id: userId,
+            accessToken,
+          })
+        )
       } catch (error) {
         console.error('Error fetching access token:', error)
       }
@@ -60,23 +67,25 @@ function ContentTable() {
   // Fetch message counts for all requests when requests are loaded
   useEffect(() => {
     const fetchCounts = async () => {
-      if (!sentRequests || sentRequests.length === 0 || !userData) return;
+      if (!sentRequests || sentRequests.length === 0 || !userData) return
 
       try {
-        const accessToken = await getAccessTokenSilently();
-        const requestIds = sentRequests.map(request => request._id);
+        const accessToken = await getAccessTokenSilently()
+        const requestIds = sentRequests.map((request) => request._id)
 
-        dispatch(fetchMessageCounts({
-          requestIds,
-          accessToken
-        }));
+        dispatch(
+          fetchMessageCounts({
+            requestIds,
+            accessToken,
+          })
+        )
       } catch (error) {
-        console.error('Error fetching message counts:', error);
+        console.error('Error fetching message counts:', error)
       }
-    };
+    }
 
-    fetchCounts();
-  }, [sentRequests, getAccessTokenSilently, userData, dispatch]);
+    fetchCounts()
+  }, [sentRequests, getAccessTokenSilently, userData, dispatch])
 
   if (loading || !userRole) {
     return (
@@ -94,7 +103,12 @@ function ContentTable() {
       <div className='flex h-64 items-center justify-center'>
         <div className='flex items-center rounded-lg bg-red-50 p-4 text-red-800'>
           <XCircle className='mr-2 h-5 w-5 text-red-600' />
-          <span className='font-medium'>Error loading requests: {typeof error === 'object' ? (error.message || 'Unknown error') : error}</span>
+          <span className='font-medium'>
+            Error loading requests:{' '}
+            {typeof error === 'object'
+              ? error.message || 'Unknown error'
+              : error}
+          </span>
         </div>
       </div>
     )
@@ -125,7 +139,9 @@ function ContentTable() {
   }
 
   // Determine header gradient and icon colors based on role
-  const headerGradient = isEditor ? 'from-purple-50 to-indigo-50' : 'from-teal-50 to-blue-50'
+  const headerGradient = isEditor
+    ? 'from-purple-50 to-indigo-50'
+    : 'from-teal-50 to-blue-50'
   const iconColor = isEditor ? 'text-purple-500' : 'text-teal-500'
   const iconBgColor = isEditor ? 'bg-purple-100' : 'bg-teal-100'
   const iconTextColor = isEditor ? 'text-purple-600' : 'text-teal-600'
@@ -182,7 +198,8 @@ function ContentTable() {
                   className='transition-colors duration-150 hover:bg-gray-50'>
                   <td className='whitespace-nowrap px-6 py-4'>
                     <div className='flex items-center'>
-                      <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${iconBgColor}`}>
+                      <div
+                        className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${iconBgColor}`}>
                         <Film className={`h-5 w-5 ${iconTextColor}`} />
                       </div>
                       <div className='ml-4'>

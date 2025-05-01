@@ -275,7 +275,11 @@
         "languages": ["English", "Spanish"],
         "profileImage": "/images/gigs/motion-graphics.jpg",
         "bio": "I will create motion graphics for your videos",
-        "skills": ["Character Animation", "Motion Design", "Typography Animation"],
+        "skills": [
+          "Character Animation",
+          "Motion Design",
+          "Typography Animation"
+        ],
         "gigDescription": "Motion graphics design service with quick turnaround",
         "plans": {
           "basic": {

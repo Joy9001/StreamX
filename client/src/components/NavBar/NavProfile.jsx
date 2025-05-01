@@ -52,7 +52,7 @@ function NavProfile({ logout, user }) {
               My Account
             </div>
             <ul>
-              <li 
+              <li
                 onClick={handleProfileClick}
                 className='flex cursor-pointer items-center px-4 py-2 text-gray-700 hover:bg-secondary'>
                 <User className='mr-2 h-4 w-4' />

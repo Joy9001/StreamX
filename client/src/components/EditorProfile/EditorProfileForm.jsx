@@ -9,10 +9,18 @@ export default function EditorProfileForm({ initialData, onClose }) {
     bio: initialData.bio,
     socials: {
       website: initialData.website || '',
-      github: initialData.github ? `https://github.com/${initialData.github}` : '',
-      twitter: initialData.twitter ? `https://twitter.com/${initialData.twitter.replace('@', '')}` : '',
-      instagram: initialData.instagram ? `https://instagram.com/${initialData.instagram}` : '',
-      facebook: initialData.facebook ? `https://facebook.com/${initialData.facebook}` : '',
+      github: initialData.github
+        ? `https://github.com/${initialData.github}`
+        : '',
+      twitter: initialData.twitter
+        ? `https://twitter.com/${initialData.twitter.replace('@', '')}`
+        : '',
+      instagram: initialData.instagram
+        ? `https://instagram.com/${initialData.instagram}`
+        : '',
+      facebook: initialData.facebook
+        ? `https://facebook.com/${initialData.facebook}`
+        : '',
     },
     profilephoto: initialData.profilePicture,
   })
@@ -83,8 +91,7 @@ export default function EditorProfileForm({ initialData, onClose }) {
                   setIsEditing(false)
                   onClose()
                 }}
-                className='btn btn-ghost btn-sm'
-              >
+                className='btn btn-ghost btn-sm'>
                 <X className='h-5 w-5' />
                 Cancel
               </button>
@@ -96,8 +103,7 @@ export default function EditorProfileForm({ initialData, onClose }) {
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className='btn btn-ghost btn-sm'
-            >
+              className='btn btn-ghost btn-sm'>
               <Edit2 className='h-5 w-5' />
               Edit
             </button>
@@ -117,8 +123,7 @@ export default function EditorProfileForm({ initialData, onClose }) {
               type='button'
               onClick={() => fileInputRef.current?.click()}
               className='absolute bottom-0 right-0 rounded-full bg-white p-2 shadow-lg'
-              disabled={!isEditing}
-            >
+              disabled={!isEditing}>
               <Camera className='h-5 w-5 text-gray-600' />
             </button>
             <input

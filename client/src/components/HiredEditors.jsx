@@ -65,7 +65,10 @@ function HiredEditors() {
               <div className='flex items-center gap-4'>
                 <div className='h-10 w-10 overflow-hidden rounded-full'>
                   <img
-                    src={editor.profilephoto || "https://imgix.ranker.com/list_img_v2/1360/2681360/original/the-best-ichigo-quotes?auto=format&q=50&fit=crop&fm=pjpg&dpr=2&crop=faces&h=185.86387434554973&w=355"}
+                    src={
+                      editor.profilephoto ||
+                      'https://imgix.ranker.com/list_img_v2/1360/2681360/original/the-best-ichigo-quotes?auto=format&q=50&fit=crop&fm=pjpg&dpr=2&crop=faces&h=185.86387434554973&w=355'
+                    }
                     alt={editor.username}
                     className='h-full w-full object-cover'
                   />

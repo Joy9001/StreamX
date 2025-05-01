@@ -120,16 +120,16 @@ function ContentTableRowOptions({ video }) {
         `${import.meta.env.VITE_BACKEND_URL}/requests/from-to`,
         {
           from_id: ownerId,
-          to_id: userData._id
+          to_id: userData._id,
         },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-          }
+          },
         }
       )
       console.log('Fetched owner requests:', response.data)
-      return response.data;
+      return response.data
     } catch (error) {
       console.error('Error fetching owner requests:', error)
       return []
@@ -137,30 +137,36 @@ function ContentTableRowOptions({ video }) {
   }
 
   async function handleSelectUser(user) {
-    console.log('User selected:', user);
-    console.log('Current role:', userData.user_metadata.role);
+    console.log('User selected:', user)
+    console.log('Current role:', userData.user_metadata.role)
     setSelectedUser(user)
 
     if (userData.user_metadata.role === 'Editor') {
       // For editors, fetch requests from the selected owner
-      console.log('Fetching requests for editor from owner:', user._id);
+      console.log('Fetching requests for editor from owner:', user._id)
       const requests = await fetchOwnerRequests(user._id)
       setOwnerRequests(requests)
-      console.log('Setting ownerRequests state with', requests.length, 'requests');
+      console.log(
+        'Setting ownerRequests state with',
+        requests.length,
+        'requests'
+      )
 
       if (requests && requests.length > 0) {
-        console.log('Showing owner requests view');
+        console.log('Showing owner requests view')
         setShowOwnerRequests(true)
         setShowRequestForm(false)
       } else {
         // If no requests, show error message
-        console.log('No requests found, showing error message');
-        alert('You cannot request this owner because they have not sent you any requests.');
+        console.log('No requests found, showing error message')
+        alert(
+          'You cannot request this owner because they have not sent you any requests.'
+        )
         setIsModalOpen(false)
       }
     } else {
       // For owners, show the form directly
-      console.log('Owner selecting an editor, showing form');
+      console.log('Owner selecting an editor, showing form')
       setShowRequestForm(true)
       setShowOwnerRequests(false)
       setRequestForm({
@@ -174,7 +180,7 @@ function ContentTableRowOptions({ video }) {
     setSelectedRequest(request)
     setRequestForm({
       description: request.description,
-      price: request.price
+      price: request.price,
     })
     setShowRequestForm(true)
     setShowOwnerRequests(false)
@@ -184,7 +190,11 @@ function ContentTableRowOptions({ video }) {
     const { name, value } = e.target
 
     // For editors with a selected request, don't allow price changes
-    if (userData.user_metadata.role === 'Editor' && selectedRequest && name === 'price') {
+    if (
+      userData.user_metadata.role === 'Editor' &&
+      selectedRequest &&
+      name === 'price'
+    ) {
       return
     }
 
@@ -208,7 +218,7 @@ function ContentTableRowOptions({ video }) {
           description: requestForm.description,
           price: requestForm.price,
           status: 'pending',
-          requesterKind: userData.user_metadata.role
+          requesterKind: userData.user_metadata.role,
         },
         {
           headers: {
@@ -400,7 +410,9 @@ function ContentTableRowOptions({ video }) {
                     </tbody>
                   </table>
                 ) : (
-                  <p className='py-4 text-center'>No requests found from this owner</p>
+                  <p className='py-4 text-center'>
+                    No requests found from this owner
+                  </p>
                 )}
                 <button
                   className='btn btn-ghost mt-4'
@@ -442,13 +454,17 @@ function ContentTableRowOptions({ video }) {
                     min='0'
                     step='0.01'
                     required
-                    disabled={userData.user_metadata.role === 'Editor' && selectedRequest}
+                    disabled={
+                      userData.user_metadata.role === 'Editor' &&
+                      selectedRequest
+                    }
                   />
-                  {userData.user_metadata.role === 'Editor' && selectedRequest && (
-                    <p className='text-sm text-gray-600 mt-1'>
-                      Price is fixed based on the selected request.
-                    </p>
-                  )}
+                  {userData.user_metadata.role === 'Editor' &&
+                    selectedRequest && (
+                      <p className='mt-1 text-sm text-gray-600'>
+                        Price is fixed based on the selected request.
+                      </p>
+                    )}
                 </div>
 
                 <div className='form-control mt-6'>
@@ -460,7 +476,10 @@ function ContentTableRowOptions({ video }) {
               <button
                 className='btn btn-ghost mt-4'
                 onClick={() => {
-                  if (userData.user_metadata.role === 'Editor' && ownerRequests.length > 0) {
+                  if (
+                    userData.user_metadata.role === 'Editor' &&
+                    ownerRequests.length > 0
+                  ) {
                     setShowOwnerRequests(true)
                     setShowRequestForm(false)
                   } else {
@@ -474,23 +493,28 @@ function ContentTableRowOptions({ video }) {
             </>
           )}
           <div className='modal-action'>
-            <button className='btn' onClick={() => {
-              setIsModalOpen(false)
-              setShowRequestForm(false)
-              setShowOwnerRequests(false)
-              setSelectedRequest(null)
-            }}>
+            <button
+              className='btn'
+              onClick={() => {
+                setIsModalOpen(false)
+                setShowRequestForm(false)
+                setShowOwnerRequests(false)
+                setSelectedRequest(null)
+              }}>
               Close
             </button>
           </div>
         </div>
         <form method='dialog' className='modal-backdrop'>
-          <button onClick={() => {
-            setIsModalOpen(false)
-            setShowRequestForm(false)
-            setShowOwnerRequests(false)
-            setSelectedRequest(null)
-          }}>close</button>
+          <button
+            onClick={() => {
+              setIsModalOpen(false)
+              setShowRequestForm(false)
+              setShowOwnerRequests(false)
+              setSelectedRequest(null)
+            }}>
+            close
+          </button>
         </form>
       </dialog>
     </>

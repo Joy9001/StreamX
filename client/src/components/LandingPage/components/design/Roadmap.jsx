@@ -1,17 +1,17 @@
-import { gradient } from "../../assets";
+import { gradient } from '../../assets'
 
 export const Gradient = () => {
   return (
-    <div className="absolute top-[18.25rem] -left-[30.375rem] w-[56.625rem] opacity-60 mix-blend-color-dodge pointer-events-none">
-      <div className="absolute top-1/2 left-1/2 w-[58.85rem] h-[58.85rem] -translate-x-3/4 -translate-y-1/2">
+    <div className='pointer-events-none absolute -left-[30.375rem] top-[18.25rem] w-[56.625rem] opacity-60 mix-blend-color-dodge'>
+      <div className='absolute left-1/2 top-1/2 h-[58.85rem] w-[58.85rem] -translate-x-3/4 -translate-y-1/2'>
         <img
-          className="w-full"
+          className='w-full'
           src={gradient}
           width={942}
           height={942}
-          alt="Gradient"
+          alt='Gradient'
         />
       </div>
     </div>
-  );
-};
+  )
+}

@@ -10,24 +10,25 @@ export const fetchRequestsFromUser = createAsyncThunk(
       // Use from_id as the parameter name to match the backend
       const url = `${import.meta.env.VITE_BACKEND_URL}/requests/from-id/${id}`
       console.log('Making API request to:', url)
-      
+
       // Make sure the ID is a valid format for the backend
       if (!id) {
         console.error('Invalid ID provided:', id)
         return rejectWithValue('Invalid user ID')
       }
-      
-      const response = await axios.get(
-        url,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-        }
+
+      const response = await axios.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      })
+      console.log(
+        'Got response from fetchRequestsFromUser:',
+        response.status,
+        response.data
       )
-      console.log('Got response from fetchRequestsFromUser:', response.status, response.data)
       return response.data
     } catch (error) {
       console.error('Error in fetchRequestsFromUser:', error)
@@ -37,7 +38,9 @@ export const fetchRequestsFromUser = createAsyncThunk(
         return []
       }
       return rejectWithValue(
-        error.response?.data?.message || error.message || 'Failed to fetch requests'
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to fetch requests'
       )
     }
   }
@@ -51,24 +54,25 @@ export const fetchRequestsToUser = createAsyncThunk(
       // Use to_id as the parameter name to match the backend
       const url = `${import.meta.env.VITE_BACKEND_URL}/requests/to-id/${id}`
       console.log('Making API request to:', url)
-      
+
       // Make sure the ID is a valid format for the backend
       if (!id) {
         console.error('Invalid ID provided:', id)
         return rejectWithValue('Invalid user ID')
       }
-      
-      const response = await axios.get(
-        url,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-        }
+
+      const response = await axios.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      })
+      console.log(
+        'Got response from fetchRequestsToUser:',
+        response.status,
+        response.data
       )
-      console.log('Got response from fetchRequestsToUser:', response.status, response.data)
       return response.data
     } catch (error) {
       console.error('Error in fetchRequestsToUser:', error)
@@ -78,7 +82,9 @@ export const fetchRequestsToUser = createAsyncThunk(
         return []
       }
       return rejectWithValue(
-        error.response?.data?.message || error.message || 'Failed to fetch requests'
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to fetch requests'
       )
     }
   }
@@ -88,8 +94,9 @@ export const approveRequest = createAsyncThunk(
   'requests/approveRequest',
   async (requestData, { rejectWithValue }) => {
     try {
-      const { requestId, videoId, toId, userData, accessToken, userRole } = requestData
-      
+      const { requestId, videoId, toId, userData, accessToken, userRole } =
+        requestData
+
       // Update request status to approved
       const response = await axios.patch(
         `${import.meta.env.VITE_BACKEND_URL}/requests/${requestId}/status`,
@@ -102,7 +109,7 @@ export const approveRequest = createAsyncThunk(
           withCredentials: true,
         }
       )
-      
+
       // Update video ownership or editor access based on user role
       if (userRole === 'Owner') {
         const videoResponse = await axios.patch(
@@ -134,11 +141,13 @@ export const approveRequest = createAsyncThunk(
         )
         return { request: response.data, video: videoResponse.data }
       }
-      
+
       return { request: response.data }
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || 'Failed to approve request'
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to approve request'
       )
     }
   }
@@ -149,7 +158,7 @@ export const rejectRequest = createAsyncThunk(
   async (requestData, { rejectWithValue }) => {
     try {
       const { requestId, accessToken } = requestData
-      
+
       const response = await axios.patch(
         `${import.meta.env.VITE_BACKEND_URL}/requests/${requestId}/status`,
         { status: 'rejected' },
@@ -161,11 +170,13 @@ export const rejectRequest = createAsyncThunk(
           withCredentials: true,
         }
       )
-      
+
       return response.data
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || 'Failed to reject request'
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to reject request'
       )
     }
   }
@@ -177,7 +188,7 @@ const requestSlice = createSlice({
     sentRequests: [],
     receivedRequests: [],
     loading: false,
-    error: null
+    error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -196,7 +207,7 @@ const requestSlice = createSlice({
         state.loading = false
         state.error = action.payload
       })
-      
+
       // Handle fetchRequestsToUser
       .addCase(fetchRequestsToUser.pending, (state) => {
         state.loading = true
@@ -211,7 +222,7 @@ const requestSlice = createSlice({
         state.loading = false
         state.error = action.payload
       })
-      
+
       // Handle approveRequest
       .addCase(approveRequest.pending, (state) => {
         state.loading = true
@@ -220,14 +231,14 @@ const requestSlice = createSlice({
       .addCase(approveRequest.fulfilled, (state, action) => {
         state.loading = false
         // Update in both lists if request exists there
-        state.sentRequests = state.sentRequests.map(req => 
-          req._id === action.payload.request._id 
-            ? { ...req, status: 'approved' } 
+        state.sentRequests = state.sentRequests.map((req) =>
+          req._id === action.payload.request._id
+            ? { ...req, status: 'approved' }
             : req
         )
-        state.receivedRequests = state.receivedRequests.map(req => 
-          req._id === action.payload.request._id 
-            ? { ...req, status: 'approved' } 
+        state.receivedRequests = state.receivedRequests.map((req) =>
+          req._id === action.payload.request._id
+            ? { ...req, status: 'approved' }
             : req
         )
       })
@@ -235,7 +246,7 @@ const requestSlice = createSlice({
         state.loading = false
         state.error = action.payload
       })
-      
+
       // Handle rejectRequest
       .addCase(rejectRequest.pending, (state) => {
         state.loading = true
@@ -244,22 +255,18 @@ const requestSlice = createSlice({
       .addCase(rejectRequest.fulfilled, (state, action) => {
         state.loading = false
         // Update in both lists if request exists there
-        state.sentRequests = state.sentRequests.map(req => 
-          req._id === action.payload._id 
-            ? { ...req, status: 'rejected' } 
-            : req
+        state.sentRequests = state.sentRequests.map((req) =>
+          req._id === action.payload._id ? { ...req, status: 'rejected' } : req
         )
-        state.receivedRequests = state.receivedRequests.map(req => 
-          req._id === action.payload._id 
-            ? { ...req, status: 'rejected' } 
-            : req
+        state.receivedRequests = state.receivedRequests.map((req) =>
+          req._id === action.payload._id ? { ...req, status: 'rejected' } : req
         )
       })
       .addCase(rejectRequest.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })
-  }
+  },
 })
 
-export default requestSlice.reducer 
+export default requestSlice.reducer

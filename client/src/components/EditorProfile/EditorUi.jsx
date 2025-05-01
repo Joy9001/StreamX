@@ -12,7 +12,6 @@ import EditorProfileForm from './EditorProfileForm'
 import HiredByCard from './HiredByCard'
 import RequestsCard from '../OwnerProfile/RequestsCard'
 
-
 function EditorUi() {
   const [showProfileForm, setShowProfileForm] = useState(false)
   const navOpen = useSelector((state) => state.ui.navbarOpen)
@@ -31,7 +30,7 @@ function EditorUi() {
         <div id='webcrumbs' className='no-scrollbar overflow-auto'>
           <div className='w-full rounded-lg bg-white p-8'>
             <div className='flex gap-8'>
-              <EditorProfileCard 
+              <EditorProfileCard
                 onEditProfile={() => setShowProfileForm(true)}
               />
 
@@ -64,7 +63,10 @@ function EditorUi() {
                 ✕
               </button>
             </form>
-            <EditorProfileForm initialData={userData} onClose={() => setShowProfileForm(false)} />
+            <EditorProfileForm
+              initialData={userData}
+              onClose={() => setShowProfileForm(false)}
+            />
           </div>
           <form method='dialog' className='modal-backdrop'>
             <button onClick={() => setShowProfileForm(false)}>close</button>

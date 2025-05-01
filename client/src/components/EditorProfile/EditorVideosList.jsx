@@ -4,40 +4,43 @@ import { useSelector } from 'react-redux'
 import { Clock, HardDrive, FileVideo } from 'lucide-react'
 
 function EditorVideosList() {
-  const [videos, setVideos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { userData } = useSelector((state) => state.user);
-  const editorId = userData?._id;
+  const [videos, setVideos] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const { userData } = useSelector((state) => state.user)
+  const editorId = userData?._id
 
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        setLoading(true);
-        console.log('Fetching videos for editor:', editorId);
-        
-        const response = await axios.get(`http://localhost:3000/api/videos/editor/${editorId}`, {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          withCredentials: true
-        });
-        
-        console.log('Videos data:', response.data);
-        setVideos(response.data);
-        setError(null);
+        setLoading(true)
+        console.log('Fetching videos for editor:', editorId)
+
+        const response = await axios.get(
+          `http://localhost:3000/api/videos/editor/${editorId}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            withCredentials: true,
+          }
+        )
+
+        console.log('Videos data:', response.data)
+        setVideos(response.data)
+        setError(null)
       } catch (err) {
-        console.error('Error fetching videos:', err);
-        setError('Failed to load videos');
+        console.error('Error fetching videos:', err)
+        setError('Failed to load videos')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
     if (editorId) {
-      fetchVideos();
+      fetchVideos()
     }
-  }, [editorId]);
+  }, [editorId])
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -73,14 +76,16 @@ function EditorVideosList() {
         </div>
         <div className='space-y-4'>
           {[1, 2, 3].map((i) => (
-            <div key={i} className='flex animate-pulse items-center justify-between border-b pb-2'>
+            <div
+              key={i}
+              className='flex animate-pulse items-center justify-between border-b pb-2'>
               <div className='h-6 w-1/3 rounded bg-gray-200'></div>
               <div className='h-6 w-24 rounded bg-gray-200'></div>
             </div>
           ))}
         </div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -88,7 +93,7 @@ function EditorVideosList() {
       <div className='h-full rounded-lg bg-white p-6'>
         <p className='text-center text-red-500'>{error}</p>
       </div>
-    );
+    )
   }
 
   return (
@@ -113,7 +118,9 @@ function EditorVideosList() {
                 <span className='min-w-[30px] text-gray-500'>{index + 1}.</span>
                 <div>
                   <span className='font-medium text-gray-800'>
-                    {video.metaData?.name || video.metadata?.fileName || 'Untitled'}
+                    {video.metaData?.name ||
+                      video.metadata?.fileName ||
+                      'Untitled'}
                   </span>
                   <div className='mt-1 flex items-center gap-4 text-sm text-gray-500'>
                     <p>Owner: {video.owner?.name}</p>

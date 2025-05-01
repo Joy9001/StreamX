@@ -31,7 +31,9 @@ function HiredByCard() {
               <div className='flex items-center gap-4'>
                 <span className='min-w-[30px] text-gray-500'>{index + 1}.</span>
                 <div>
-                  <span className='font-medium text-gray-800'>{company.name}</span>
+                  <span className='font-medium text-gray-800'>
+                    {company.name}
+                  </span>
                   <p className='text-sm text-gray-500'>{company.role}</p>
                 </div>
               </div>

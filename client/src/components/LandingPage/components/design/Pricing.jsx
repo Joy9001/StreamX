@@ -1,29 +1,29 @@
-import { lines } from "../../assets";
+import { lines } from '../../assets'
 
 export const LeftLine = () => {
   return (
-    <div className="hidden lg:block absolute top-1/2 right-full w-[92.5rem] h-[11.0625rem] -translate-y-1/2 pointer-events-none">
+    <div className='pointer-events-none absolute right-full top-1/2 hidden h-[11.0625rem] w-[92.5rem] -translate-y-1/2 lg:block'>
       <img
-        className="w-full"
+        className='w-full'
         src={lines}
         width={1480}
         height={177}
-        alt="Lines"
+        alt='Lines'
       />
     </div>
-  );
-};
+  )
+}
 
 export const RightLine = () => {
   return (
-    <div className="hidden lg:block absolute top-1/2 left-full w-[92.5rem] h-[11.0625rem] -translate-y-1/2 -scale-x-100 pointer-events-none">
+    <div className='pointer-events-none absolute left-full top-1/2 hidden h-[11.0625rem] w-[92.5rem] -translate-y-1/2 -scale-x-100 lg:block'>
       <img
-        className="w-full"
+        className='w-full'
         src={lines}
         width={1480}
         height={177}
-        alt="Lines"
+        alt='Lines'
       />
     </div>
-  );
-};
+  )
+}

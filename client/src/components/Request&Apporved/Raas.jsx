@@ -15,14 +15,16 @@ const RequestApprove = () => {
   return (
     <div className='storage-main flex h-screen'>
       <div
-        className={`navbar h-full transition-all duration-300 ${navOpen ? 'w-[15%]' : 'w-[5%]'
-          } pl-0`}>
+        className={`navbar h-full transition-all duration-300 ${
+          navOpen ? 'w-[15%]' : 'w-[5%]'
+        } pl-0`}>
         <Navbar title='Request & Approve' />
       </div>
       <div className={`storage-container flex flex-grow`}>
         <div
-          className={`storage-main flex-grow p-4 transition-all duration-300 ${drawer ? 'mr-4' : 'mr-0'
-            }`}>
+          className={`storage-main flex-grow p-4 transition-all duration-300 ${
+            drawer ? 'mr-4' : 'mr-0'
+          }`}>
           <RaasNav />
 
           <div className='mb-8 mt-6'>
@@ -30,10 +32,11 @@ const RequestApprove = () => {
               <div className='flex'>
                 <button
                   onClick={() => setShowApproved(false)}
-                  className={`group relative flex flex-1 items-center justify-center gap-2 border-b-2 px-6 py-4 transition-all duration-300 ${!showApproved
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                    }`}>
+                  className={`group relative flex flex-1 items-center justify-center gap-2 border-b-2 px-6 py-4 transition-all duration-300 ${
+                    !showApproved
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                  }`}>
                   <Send
                     className={`h-5 w-5 transition-all duration-300 ${!showApproved ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'}`}
                   />
@@ -46,10 +49,11 @@ const RequestApprove = () => {
 
                 <button
                   onClick={() => setShowApproved(true)}
-                  className={`group relative flex flex-1 items-center justify-center gap-2 border-b-2 px-6 py-4 transition-all duration-300 ${showApproved
-                    ? 'border-green-500 bg-green-50 text-green-700'
-                    : 'border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                    }`}>
+                  className={`group relative flex flex-1 items-center justify-center gap-2 border-b-2 px-6 py-4 transition-all duration-300 ${
+                    showApproved
+                      ? 'border-green-500 bg-green-50 text-green-700'
+                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                  }`}>
                   <Inbox
                     className={`h-5 w-5 transition-all duration-300 ${showApproved ? 'text-green-500' : 'text-gray-400 group-hover:text-gray-500'}`}
                   />
@@ -72,10 +76,11 @@ const RequestApprove = () => {
           </div>
 
           <div
-            className={`storage-content rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 flex flex-col min-h-[600px] ${showApproved
-              ? 'border-t-4 border-t-green-500'
-              : 'border-t-4 border-t-blue-500'
-              }`}>
+            className={`storage-content flex min-h-[600px] flex-col rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 ${
+              showApproved
+                ? 'border-t-4 border-t-green-500'
+                : 'border-t-4 border-t-blue-500'
+            }`}>
             <div className='storage-content-header mb-4 border-b border-gray-100 pb-4'>
               <h2 className='flex items-center text-xl font-semibold text-gray-800'>
                 {showApproved ? (

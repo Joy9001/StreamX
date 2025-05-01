@@ -21,7 +21,7 @@ function EditorProfileCard({ onEditProfile }) {
           <div className='h-6 w-2/3 animate-pulse rounded bg-gray-200'></div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -36,20 +36,24 @@ function EditorProfileCard({ onEditProfile }) {
         <div className='text-center'>
           <div className='avatar mb-4'>
             <div className='w-24 rounded-full ring ring-primary ring-offset-2 ring-offset-base-100'>
-              <img 
-                src="https://imgix.ranker.com/list_img_v2/1360/2681360/original/the-best-ichigo-quotes?auto=format&q=50&fit=crop&fm=pjpg&dpr=2&crop=faces&h=185.86387434554973&w=355" 
-                alt='profile' 
+              <img
+                src='https://imgix.ranker.com/list_img_v2/1360/2681360/original/the-best-ichigo-quotes?auto=format&q=50&fit=crop&fm=pjpg&dpr=2&crop=faces&h=185.86387434554973&w=355'
+                alt='profile'
               />
             </div>
           </div>
-          <h4 className='text-xl font-bold text-gray-800'>{userData?.name || 'Anonymous'}</h4>
+          <h4 className='text-xl font-bold text-gray-800'>
+            {userData?.name || 'Anonymous'}
+          </h4>
           <p className='text-gray-500'>{userData?.email}</p>
         </div>
 
         <div>
           <p className='mb-2 font-medium text-gray-700'>Membership Level</p>
-          <div className={`rounded-lg ${membershipStyles[userData?.membership || 'bronze']} p-2 text-center`}>
-            {userData?.membership?.charAt(0).toUpperCase() + userData?.membership?.slice(1) || 'Bronze'}
+          <div
+            className={`rounded-lg ${membershipStyles[userData?.membership || 'bronze']} p-2 text-center`}>
+            {userData?.membership?.charAt(0).toUpperCase() +
+              userData?.membership?.slice(1) || 'Bronze'}
           </div>
         </div>
       </div>

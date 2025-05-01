@@ -7,9 +7,10 @@ function StorageCard({ editorData }) {
 
   // Calculate total used storage from video file sizes
   const usedStorage = videos.reduce((total, video) => {
-    const sizeInMB = typeof video.fileSize === 'string' 
-      ? parseInt(video.fileSize.replace('MB', ''))
-      : video.fileSize || 0
+    const sizeInMB =
+      typeof video.fileSize === 'string'
+        ? parseInt(video.fileSize.replace('MB', ''))
+        : video.fileSize || 0
     return total + sizeInMB
   }, 0)
 
@@ -26,7 +27,9 @@ function StorageCard({ editorData }) {
 
       <div className='space-y-4'>
         <div className='text-gray-700'>
-          <p className='font-medium'>Total Storage: {(totalStorage / 1024).toFixed(2)} GB</p>
+          <p className='font-medium'>
+            Total Storage: {(totalStorage / 1024).toFixed(2)} GB
+          </p>
         </div>
 
         <div>
