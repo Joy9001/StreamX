@@ -5,7 +5,7 @@ import Navbar from '../NavBar/Navbar.jsx'
 import ApproveTable from './ApproveTable.jsx'
 import ErrorBoundary from './ErrorBoundary.jsx'
 import RaasNav from './RaasNav.jsx'
-import ContentTable from './RequestTable.jsx'
+import RequestTable from './RequestTable.jsx'
 
 const RequestApprove = () => {
   const [showApproved, setShowApproved] = useState(false)
@@ -49,7 +49,7 @@ const RequestApprove = () => {
 
                 <button
                   onClick={() => setShowApproved(true)}
-                  className={`group relative flex flex-1 items-center justify-center gap-2 border-b-2 px-6 py-4 transition-all duration-300 ${
+                  className={`group relative flex flex-1 items-center justify-center gap-2 border-b-2 px-4 py-4 transition-all duration-300 ${
                     showApproved
                       ? 'border-green-500 bg-green-50 text-green-700'
                       : 'border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700'
@@ -108,7 +108,7 @@ const RequestApprove = () => {
             </div>
             <div className='storage-content-body flex-1'>
               <ErrorBoundary>
-                {showApproved ? <ApproveTable /> : <ContentTable />}
+                {showApproved ? <ApproveTable /> : <RequestTable />}
               </ErrorBoundary>
             </div>
           </div>

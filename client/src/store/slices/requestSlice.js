@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 
 // Async thunks for API calls
@@ -182,6 +182,38 @@ export const rejectRequest = createAsyncThunk(
   }
 )
 
+export const changeRequestPrice = createAsyncThunk(
+  'requests/changeRequestPrice',
+  async (priceData, { rejectWithValue }) => {
+    try {
+      const { id, price, accessToken } = priceData
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/requests/change-price`,
+        {
+          id,
+          price,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+        }
+      )
+
+      return response.data
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to change request price'
+      )
+    }
+  }
+)
+
 const requestSlice = createSlice({
   name: 'requests',
   initialState: {
@@ -265,6 +297,31 @@ const requestSlice = createSlice({
       .addCase(rejectRequest.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
+      })
+
+      // Handle changeRequestPrice
+      .addCase(changeRequestPrice.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(changeRequestPrice.fulfilled, (state, action) => {
+        console.log('changeRequestPrice fulfilled', action.payload)
+        state.loading = false
+        // Update the price in both sent and received requests
+        state.sentRequests = state.sentRequests.map((req) =>
+          req._id === action.payload.request._id
+            ? { ...req, price: action.payload.request.price }
+            : req
+        )
+        state.receivedRequests = state.receivedRequests.map((req) =>
+          req._id === action.payload.request._id
+            ? { ...req, price: action.payload.request.price }
+            : req
+        )
+      })
+      .addCase(changeRequestPrice.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload.message
       })
   },
 })

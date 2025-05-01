@@ -2,10 +2,12 @@ import { useAuth0 } from '@auth0/auth0-react'
 import {
   CheckCircle,
   Clock,
+  Edit,
   FileText,
   Film,
   IndianRupee,
   MessageSquare,
+  Save,
   User,
   XCircle,
 } from 'lucide-react'
@@ -15,10 +17,13 @@ import {
   clearAllMessages,
   fetchMessageCounts,
 } from '../../store/slices/messageSlice'
-import { fetchRequestsFromUser } from '../../store/slices/requestSlice'
+import {
+  changeRequestPrice,
+  fetchRequestsFromUser,
+} from '../../store/slices/requestSlice'
 import MessageThread from './MessageThread'
 
-function ContentTable() {
+function RequestTable() {
   const { getAccessTokenSilently } = useAuth0()
   const dispatch = useDispatch()
   const { sentRequests, loading, error } = useSelector(
@@ -27,7 +32,9 @@ function ContentTable() {
   const { messageCounts } = useSelector((state) => state.messages)
   const userData = useSelector((state) => state.user.userData)
   const userRole = userData?.user_metadata?.role
-  const [setSelectedRequestId] = useState(null)
+  const [editingPrice, setEditingPrice] = useState({})
+  const [newPrices, setNewPrices] = useState({})
+  const [priceErrors, setPriceErrors] = useState({})
   const isEditor = userRole === 'Editor'
 
   // Reset messages when component mounts
@@ -138,6 +145,61 @@ function ContentTable() {
     }
   }
 
+  // Handle starting price edit
+  const handleEditPrice = (requestId, currentPrice) => {
+    setEditingPrice((prev) => ({ ...prev, [requestId]: true }))
+    setNewPrices((prev) => ({ ...prev, [requestId]: currentPrice }))
+    setPriceErrors((prev) => ({ ...prev, [requestId]: '' }))
+  }
+
+  // Handle price change
+  const handlePriceChange = (requestId, value) => {
+    const numValue = parseInt(value, 10)
+    setNewPrices((prev) => ({ ...prev, [requestId]: value }))
+
+    if (isNaN(numValue) || numValue <= 0) {
+      setPriceErrors((prev) => ({
+        ...prev,
+        [requestId]: 'Price must be a positive number',
+      }))
+    } else {
+      setPriceErrors((prev) => ({ ...prev, [requestId]: '' }))
+    }
+  }
+
+  // Handle save price
+  const handleSavePrice = async (requestId) => {
+    const price = parseInt(newPrices[requestId], 10)
+
+    if (isNaN(price) || price <= 0) {
+      setPriceErrors((prev) => ({
+        ...prev,
+        [requestId]: 'Price must be a positive number',
+      }))
+      return
+    }
+
+    try {
+      const accessToken = await getAccessTokenSilently()
+      await dispatch(
+        changeRequestPrice({
+          id: requestId,
+          price,
+          accessToken,
+        })
+      ).unwrap()
+
+      // Reset editing state
+      setEditingPrice((prev) => ({ ...prev, [requestId]: false }))
+    } catch (error) {
+      console.error('Failed to update price:', error)
+      setPriceErrors((prev) => ({
+        ...prev,
+        [requestId]: error.message || 'Failed to update price',
+      }))
+    }
+  }
+
   // Determine header gradient and icon colors based on role
   const headerGradient = isEditor
     ? 'from-purple-50 to-indigo-50'
@@ -234,10 +296,63 @@ function ContentTable() {
                   </td>
                   <td className='whitespace-nowrap px-6 py-4'>
                     <div className='text-sm font-medium text-gray-900'>
-                      <span className='flex items-center rounded-full bg-green-50 px-2.5 py-1 text-green-700'>
-                        <IndianRupee className='mr-1 h-3.5 w-3.5' />
-                        {request.price}
-                      </span>
+                      {!isEditor && request.status === 'pending' ? (
+                        editingPrice[request._id] ? (
+                          <div className='flex flex-col'>
+                            <div className='flex items-center'>
+                              <div className='relative flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-blue-700'>
+                                <IndianRupee className='mr-1 h-3.5 w-3.5' />
+                                <input
+                                  type='number'
+                                  min='1'
+                                  value={newPrices[request._id] || ''}
+                                  onChange={(e) =>
+                                    handlePriceChange(
+                                      request._id,
+                                      e.target.value
+                                    )
+                                  }
+                                  className='w-20 bg-transparent p-0 focus:outline-none'
+                                  aria-label='Edit price'
+                                />
+                                <button
+                                  onClick={() => handleSavePrice(request._id)}
+                                  className='ml-2 rounded-full p-1 hover:bg-blue-100'
+                                  title='Save price'
+                                  aria-label='Save price'>
+                                  <Save className='h-3.5 w-3.5 text-blue-600' />
+                                </button>
+                              </div>
+                            </div>
+                            {priceErrors[request._id] && (
+                              <span className='mt-1 text-xs text-red-500'>
+                                {priceErrors[request._id]}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <div className='flex items-center'>
+                            <span className='flex items-center rounded-full bg-green-50 px-2.5 py-1 text-green-700'>
+                              <IndianRupee className='mr-1 h-3.5 w-3.5' />
+                              {request.price}
+                            </span>
+                            <button
+                              onClick={() =>
+                                handleEditPrice(request._id, request.price)
+                              }
+                              className='ml-2 rounded-full p-1 hover:bg-gray-100'
+                              title='Edit price'
+                              aria-label='Edit price'>
+                              <Edit className='h-3.5 w-3.5 text-gray-500' />
+                            </button>
+                          </div>
+                        )
+                      ) : (
+                        <span className='flex items-center rounded-full bg-green-50 px-2.5 py-1 text-green-700'>
+                          <IndianRupee className='mr-1 h-3.5 w-3.5' />
+                          {request.price}
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className='whitespace-nowrap px-6 py-4'>
@@ -253,7 +368,6 @@ function ContentTable() {
                   <td className='whitespace-nowrap px-6 py-4'>
                     <MessageThread
                       requestId={request._id}
-                      onClose={() => setSelectedRequestId(null)}
                       requestStatus={request.status}
                       messageCount={messageCounts[request._id] || 0}
                     />
@@ -282,4 +396,4 @@ function ContentTable() {
   )
 }
 
-export default ContentTable
+export default RequestTable
