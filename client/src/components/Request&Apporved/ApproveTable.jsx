@@ -1,27 +1,27 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import { useEffect, useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 import {
   CheckCircle,
   Clock,
-  XCircle,
-  Film,
-  User,
-  IndianRupee,
   FileText,
-  ThumbsUp,
+  Film,
+  IndianRupee,
   MessageSquare,
   Settings,
+  ThumbsUp,
+  User,
+  XCircle,
 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import {
-  fetchRequestsToUser,
+  clearAllMessages,
+  fetchMessageCounts,
+} from '../../store/slices/messageSlice'
+import {
   approveRequest,
+  fetchRequestsToUser,
   rejectRequest,
 } from '../../store/slices/requestSlice'
-import {
-  fetchMessageCounts,
-  clearAllMessages,
-} from '../../store/slices/messageSlice'
 import MessageThread from './MessageThread'
 
 function ApproveTable() {
@@ -30,10 +30,10 @@ function ApproveTable() {
   const { receivedRequests, loading, error } = useSelector(
     (state) => state.requests
   )
-  const { messageCounts, countLoading } = useSelector((state) => state.messages)
+  const { messageCounts } = useSelector((state) => state.messages)
   const { userData } = useSelector((state) => state.user)
   const userRole = userData?.user_metadata?.role
-  const [selectedRequestId, setSelectedRequestId] = useState(null)
+  const [setSelectedRequestId] = useState(null)
   const isEditor = userRole === 'Editor'
 
   // Reset messages when component mounts

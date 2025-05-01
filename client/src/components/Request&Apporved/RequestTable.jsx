@@ -1,21 +1,21 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import { useEffect, useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 import {
-  Clock,
   CheckCircle,
-  XCircle,
-  Film,
-  User,
-  IndianRupee,
+  Clock,
   FileText,
+  Film,
+  IndianRupee,
   MessageSquare,
+  User,
+  XCircle,
 } from 'lucide-react'
-import { fetchRequestsFromUser } from '../../store/slices/requestSlice'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import {
-  fetchMessageCounts,
   clearAllMessages,
+  fetchMessageCounts,
 } from '../../store/slices/messageSlice'
+import { fetchRequestsFromUser } from '../../store/slices/requestSlice'
 import MessageThread from './MessageThread'
 
 function ContentTable() {
@@ -24,10 +24,10 @@ function ContentTable() {
   const { sentRequests, loading, error } = useSelector(
     (state) => state.requests
   )
-  const { messageCounts, countLoading } = useSelector((state) => state.messages)
+  const { messageCounts } = useSelector((state) => state.messages)
   const userData = useSelector((state) => state.user.userData)
   const userRole = userData?.user_metadata?.role
-  const [selectedRequestId, setSelectedRequestId] = useState(null)
+  const [setSelectedRequestId] = useState(null)
   const isEditor = userRole === 'Editor'
 
   // Reset messages when component mounts

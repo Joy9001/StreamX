@@ -1,11 +1,11 @@
+import { Inbox, Send } from 'lucide-react'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import Navbar from '../NavBar/Navbar.jsx'
 import ApproveTable from './ApproveTable.jsx'
-import RaasNav from './RaasNav.jsx'
-import ContentTable from './RaContentTable.jsx'
 import ErrorBoundary from './ErrorBoundary.jsx'
-import { Send, Inbox } from 'lucide-react'
+import RaasNav from './RaasNav.jsx'
+import ContentTable from './RequestTable.jsx'
 
 const RequestApprove = () => {
   const [showApproved, setShowApproved] = useState(false)
