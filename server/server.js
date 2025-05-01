@@ -5,15 +5,15 @@ import express from 'express'
 import morgan from 'morgan'
 import connectMongo from './db/connectMongo.db.js'
 import { authCheck } from './middlewares/auth0.middleware.js'
-import AdminRouter from './routes/admin.route.js'
+import adminRouter from './routes/admin.route.js'
 import auth0Router from './routes/auth0.route.js'
-import editor_gig_route from './routes/editorGig.route.js'
-import editorProfileRoute from './routes/editorProfile.route.js'
-import OwnerRouter from './routes/owner.route.js'
-import requestRoutes from './routes/request.route.js'
-import UserRoute from './routes/user.route.js'
-import VideoRouter from './routes/video.route.js'
-import YTRouter from './routes/yt.route.js'
+import editorGigRoute from './routes/editorGig.route.js'
+import editorProfileRouter from './routes/editorProfile.route.js'
+import ownerRouter from './routes/owner.route.js'
+import requestRouter from './routes/request.route.js'
+import userRouter from './routes/user.route.js'
+import videoRouter from './routes/video.route.js'
+import ytRouter from './routes/yt.route.js'
 
 dotenv.config()
 
@@ -65,15 +65,15 @@ app.get('/', (req, res) => {
 	res.send('Backend is up!')
 })
 
-app.use('/requests', requestRoutes)
+app.use('/requests', requestRouter)
 app.use('/auth0', authCheck, auth0Router)
-app.use('/api/videos', VideoRouter)
-app.use('/api/yt', YTRouter)
-app.use('/api', OwnerRouter)
-app.use('/api/admin', AdminRouter)
-app.use('/editor_gig', editor_gig_route)
-app.use('/editorProfile', editorProfileRoute)
-app.use('/user', UserRoute)
+app.use('/api/videos', videoRouter)
+app.use('/api/yt', ytRouter)
+app.use('/api', ownerRouter)
+app.use('/api/admin', adminRouter)
+app.use('/editor_gig', editorGigRoute)
+app.use('/editorProfile', editorProfileRouter)
+app.use('/user', userRouter)
 
 //? Error handling middleware
 app.use((req, res, next) => {
