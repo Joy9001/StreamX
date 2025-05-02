@@ -1,8 +1,8 @@
-import { HelpCircle, LogOut, MoreVertical, User } from 'lucide-react'
+import { LogOut, MoreVertical, User } from 'lucide-react'
 import PropTypes from 'prop-types'
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 function NavProfile({ logout, user }) {
   const popupRef = useRef(null)

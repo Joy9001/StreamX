@@ -1,7 +1,14 @@
 import logoImage from '@/assets/logoX.png'
 import { setNavbarOpen } from '@/store/slices/uiSlice'
 import { useAuth0 } from '@auth0/auth0-react'
-import { Briefcase, ChevronLeft, Settings, User, Video } from 'lucide-react'
+import {
+  Briefcase,
+  ChevronLeft,
+  CircleDollarSign,
+  Settings,
+  User,
+  Video,
+} from 'lucide-react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -17,6 +24,7 @@ function Navbar({ title }) {
   const Menus = [
     { title: 'Storage', icon: Video, route: '/storage' },
     { title: 'Request & Approve', icon: Settings, route: '/req-n-approve' },
+    { title: 'Wallet', icon: CircleDollarSign, route: '/payments' },
   ]
 
   if (userData?.user_metadata?.role === 'Owner') {

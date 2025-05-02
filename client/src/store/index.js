@@ -7,6 +7,7 @@ import ytFormReducer from './slices/ytFormSlice'
 import requestReducer from './slices/requestSlice'
 import messageReducer from './slices/messageSlice'
 import editorReducer from './slices/editorSlice'
+import paymentReducer from './slices/paymentSlice'
 
 export const store = configureStore({
   reducer: {
@@ -18,5 +19,6 @@ export const store = configureStore({
     requests: requestReducer,
     messages: messageReducer,
     editors: editorReducer,
+    payment: paymentReducer,
   },
 })

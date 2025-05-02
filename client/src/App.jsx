@@ -12,6 +12,7 @@ import GigProfile from './components/GigProfile/GigProfile.jsx'
 import HiredEditor from './components/HiredEditor/HiredEditor.jsx'
 import Landing from './components/LandingPage/Landing.jsx'
 import Profile from './components/OwnerProfile/Profile.jsx'
+import Payment from './components/Payments/Payment.jsx'
 import RequestApprove from './components/Request&Apporved/Raas.jsx'
 import Storage from './components/Storage/Storage.jsx'
 
@@ -96,6 +97,18 @@ function App() {
           <Navigate to='/admin-panel' replace />
         ) : (
           <RequestApprove />
+        )
+      ) : (
+        <Navigate to='/' replace />
+      ),
+    },
+    {
+      path: '/payments',
+      element: isAuthenticated ? (
+        isAdmin ? (
+          <Navigate to='/admin-panel' replace />
+        ) : (
+          <Payment />
         )
       ) : (
         <Navigate to='/' replace />
