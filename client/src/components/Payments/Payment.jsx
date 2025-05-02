@@ -11,6 +11,7 @@ import {
   withdrawMoney,
 } from '../../store/slices/paymentSlice'
 import Navbar from '../NavBar/Navbar'
+import PaymentNav from './PaymentNav'
 
 export default function Payment() {
   const dispatch = useDispatch()
@@ -181,14 +182,24 @@ export default function Payment() {
   const totalPages = Math.ceil(totalTransactions / pageSize)
 
   return (
-    <div className='flex'>
-      <Navbar title='Wallet' />
-      <div className='flex-1 overflow-auto p-4'>
-        <div className='container mx-auto max-w-5xl px-4 py-8'>
-          <h1 className='mb-8 text-center text-3xl font-bold'>Your Wallet</h1>
+    <div className='payment-main flex h-screen'>
+      <div className='navbar-container h-full flex-shrink-0'>
+        <Navbar title='Wallet' />
+      </div>
+
+      {/* Main */}
+      <div className='payment-container flex flex-grow overflow-hidden pl-6'>
+        <div className='payment-main-wrapper flex h-full flex-grow flex-col transition-all duration-300'>
+          {/* Inside Nav */}
+          <div className='flex-shrink-0 p-4 pb-2'>
+            <PaymentNav />
+          </div>
+
+          {/* Main Content */}
+          <div className='payment-content flex-1 overflow-y-auto p-4 pt-2'>
 
           {/* Balance Card */}
-          <div className='mb-8 rounded-lg bg-white p-6 shadow-md'>
+          <div className='payment-balance-card mb-8 rounded-lg bg-white p-6 shadow-md'>
             <div className='flex items-center justify-between'>
               <div>
                 <h2 className='text-xl font-semibold text-gray-700'>
@@ -216,7 +227,7 @@ export default function Payment() {
 
           {/* Deposit Form */}
           {showDepositForm && (
-            <div className='mb-8 rounded-lg bg-white p-6 shadow-md'>
+            <div className='payment-deposit-form mb-8 rounded-lg bg-white p-6 shadow-md'>
               <h2 className='mb-4 text-xl font-semibold'>
                 Add Money to Wallet
               </h2>
@@ -282,7 +293,7 @@ export default function Payment() {
 
           {/* Withdraw Form */}
           {showWithdrawForm && (
-            <div className='mb-8 rounded-lg bg-white p-6 shadow-md'>
+            <div className='payment-withdraw-form mb-8 rounded-lg bg-white p-6 shadow-md'>
               <h2 className='mb-4 text-xl font-semibold'>Withdraw Money</h2>
               {withdrawSuccess ? (
                 <div className='rounded-md bg-green-100 p-4 text-green-800'>
@@ -397,7 +408,7 @@ export default function Payment() {
           )}
 
           {/* Transaction History */}
-          <div className='rounded-lg bg-white p-6 shadow-md'>
+          <div className='payment-transaction-history rounded-lg bg-white p-6 shadow-md'>
             <h2 className='mb-4 text-xl font-semibold'>Transaction History</h2>
             {transactionsLoading ? (
               <div className='py-4 text-center'>Loading transactions...</div>
@@ -503,6 +514,7 @@ export default function Payment() {
                 )}
               </>
             )}
+          </div>
           </div>
         </div>
       </div>
