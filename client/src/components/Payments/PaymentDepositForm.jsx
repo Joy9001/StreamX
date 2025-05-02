@@ -8,13 +8,13 @@ import {
 import { CreditCard, Banknote, Building, Lock } from 'lucide-react'
 
 // Using Lucid React icons instead of custom SVGs
-const CreditCardIcon = () => <CreditCard className="h-5 w-5" />
+const CreditCardIcon = () => <CreditCard className='h-5 w-5' />
 
-const PayPalIcon = () => <Banknote className="h-5 w-5" />
+const PayPalIcon = () => <Banknote className='h-5 w-5' />
 
-const BankIcon = () => <Building className="h-5 w-5" />
+const BankIcon = () => <Building className='h-5 w-5' />
 
-const LockIcon = () => <Lock className="h-4 w-4" />
+const LockIcon = () => <Lock className='h-4 w-4' />
 
 function PaymentDepositForm({ onClose }) {
   const dispatch = useDispatch()

@@ -16,7 +16,7 @@ import { useState } from 'react'
 export default function Payment() {
   const dispatch = useDispatch()
   const { userData } = useSelector((state) => state.user)
-  
+
   // Local UI state - only keeping what's necessary
   const [showDepositForm, setShowDepositForm] = useState(false)
   const [showWithdrawForm, setShowWithdrawForm] = useState(false)
@@ -79,9 +79,9 @@ export default function Payment() {
           {/* Main Content */}
           <div className='payment-content flex-1 overflow-y-auto p-4 pt-2'>
             {/* Balance Card */}
-            <PaymentBalanceCard 
-              onToggleDepositForm={toggleDepositForm} 
-              onToggleWithdrawForm={toggleWithdrawForm} 
+            <PaymentBalanceCard
+              onToggleDepositForm={toggleDepositForm}
+              onToggleWithdrawForm={toggleWithdrawForm}
             />
 
             {/* Deposit Form */}
@@ -93,7 +93,7 @@ export default function Payment() {
             {showWithdrawForm && (
               <PaymentWithdrawForm onClose={toggleWithdrawForm} />
             )}
-            
+
             {/* Transaction History */}
             <PaymentTransactionHistory />
           </div>

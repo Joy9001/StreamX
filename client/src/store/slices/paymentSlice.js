@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 
 // Async thunks for API calls
@@ -183,7 +183,10 @@ const paymentSlice = createSlice({
         state.depositSuccess = true
         // Add the new transaction to the beginning of transactions list
         if (action.payload.transaction) {
-          state.transactions = [action.payload.transaction, ...state.transactions]
+          state.transactions = [
+            action.payload.transaction,
+            ...state.transactions,
+          ]
           state.totalTransactions += 1
         }
       })
@@ -205,7 +208,10 @@ const paymentSlice = createSlice({
         state.withdrawSuccess = true
         // Add the new transaction to the beginning of transactions list
         if (action.payload.transaction) {
-          state.transactions = [action.payload.transaction, ...state.transactions]
+          state.transactions = [
+            action.payload.transaction,
+            ...state.transactions,
+          ]
           state.totalTransactions += 1
         }
       })
