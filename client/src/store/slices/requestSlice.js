@@ -94,8 +94,11 @@ export const approveRequest = createAsyncThunk(
   'requests/approveRequest',
   async (requestData, { rejectWithValue }) => {
     try {
-      const { requestId, videoId, toId, userData, accessToken, userRole } =
+      const { requestId, videoId, toId, userData, accessToken, userRole, price } =
         requestData
+
+      // No need to fetch request details since we now pass the price directly
+      const transactionAmount = price
 
       // Update request status to approved
       const response = await axios.patch(
@@ -110,9 +113,31 @@ export const approveRequest = createAsyncThunk(
         }
       )
 
+      let walletTransactionResponse = null
+      let videoResponse = null
+
       // Update video ownership or editor access based on user role
       if (userRole === 'Owner') {
-        const videoResponse = await axios.patch(
+        // Process wallet transaction - deduct from owner (userData._id) and add to editor (toId)
+        walletTransactionResponse = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/api/wallet/transfer`,
+          {
+            fromUserId: userData._id,
+            toUserId: toId,
+            amount: transactionAmount,
+            description: `Payment for video editing service`
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+          }
+        )
+
+        // Update video ownership
+        videoResponse = await axios.patch(
           `${import.meta.env.VITE_BACKEND_URL}/api/videos/${videoId}/owner`,
           { owner_id: toId },
           {
@@ -123,9 +148,14 @@ export const approveRequest = createAsyncThunk(
             withCredentials: true,
           }
         )
-        return { request: response.data, video: videoResponse.data }
+
+        return { 
+          request: response.data, 
+          video: videoResponse.data, 
+          transaction: walletTransactionResponse.data 
+        }
       } else if (userRole === 'Editor') {
-        const videoResponse = await axios.patch(
+        videoResponse = await axios.patch(
           `${import.meta.env.VITE_BACKEND_URL}/api/videos/${videoId}/editor`,
           {
             editorId: userData._id,
@@ -144,6 +174,7 @@ export const approveRequest = createAsyncThunk(
 
       return { request: response.data }
     } catch (error) {
+      console.error('Error in approveRequest:', error)
       return rejectWithValue(
         error.response?.data?.message ||
           error.message ||
