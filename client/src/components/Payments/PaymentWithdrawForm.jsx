@@ -1,22 +1,59 @@
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
+import { withdrawMoney, resetPaymentErrors } from '../../store/slices/paymentSlice'
 
-function PaymentWithdrawForm({
-  withdrawAmount,
-  setWithdrawAmount,
-  bankDetails,
-  setBankDetails,
-  walletBalance,
-  error,
-  withdrawLoading,
-  withdrawSuccess,
-  handleWithdrawSubmit
-}) {
+function PaymentWithdrawForm({ onClose }) {
+  const dispatch = useDispatch()
+  const { userData } = useSelector((state) => state.user)
+  const { walletBalance, withdrawLoading, withdrawSuccess, error } = useSelector(
+    (state) => state.payment
+  )
+
+  const [amount, setAmount] = useState('')
+  const [bankDetails, setBankDetails] = useState({
+    accountNumber: '',
+    routingNumber: '',
+    accountName: '',
+  })
+
+  // Clean up on success
+  useEffect(() => {
+    if (withdrawSuccess) {
+      const timer = setTimeout(() => {
+        onClose()
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [withdrawSuccess, onClose])
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (
+      !amount ||
+      parseFloat(amount) <= 0 ||
+      parseFloat(amount) > walletBalance
+    ) {
+      return
+    }
+    
+    dispatch(resetPaymentErrors())
+    dispatch(
+      withdrawMoney({
+        id: userData._id,
+        amount: parseFloat(amount),
+        bankDetails,
+        accessToken: userData.accessToken,
+      })
+    )
+  }
+
   if (withdrawSuccess) {
     return (
       <div className='payment-withdraw-form mb-8 rounded-lg bg-white p-6 shadow-md'>
         <h2 className='mb-4 text-xl font-semibold'>Withdraw Money</h2>
         <div className='rounded-md bg-green-100 p-4 text-green-800'>
-          Successfully requested withdrawal of ${withdrawAmount}. It
+          Successfully requested withdrawal of ${amount}. It
           will be processed within 1-3 business days.
         </div>
       </div>
@@ -26,7 +63,7 @@ function PaymentWithdrawForm({
   return (
     <div className='payment-withdraw-form mb-8 rounded-lg bg-white p-6 shadow-md'>
       <h2 className='mb-4 text-xl font-semibold'>Withdraw Money</h2>
-      <form onSubmit={handleWithdrawSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className='mb-4'>
           <label
             htmlFor='withdrawAmount'
@@ -39,8 +76,8 @@ function PaymentWithdrawForm({
             id='withdrawAmount'
             className='w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500'
             placeholder='Enter amount'
-            value={withdrawAmount}
-            onChange={(e) => setWithdrawAmount(e.target.value)}
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
             min='1'
             max={walletBalance}
             step='0.01'
@@ -126,8 +163,8 @@ function PaymentWithdrawForm({
           className='w-full rounded-md bg-indigo-600 px-4 py-2 text-white transition duration-300 hover:bg-indigo-700 disabled:bg-gray-400'
           disabled={
             withdrawLoading ||
-            parseFloat(withdrawAmount) > walletBalance ||
-            parseFloat(withdrawAmount) <= 0
+            parseFloat(amount) > walletBalance ||
+            parseFloat(amount) <= 0
           }
         >
           {withdrawLoading ? 'Processing...' : 'Withdraw Money'}
@@ -138,15 +175,7 @@ function PaymentWithdrawForm({
 }
 
 PaymentWithdrawForm.propTypes = {
-  withdrawAmount: PropTypes.string.isRequired,
-  setWithdrawAmount: PropTypes.func.isRequired,
-  bankDetails: PropTypes.object.isRequired,
-  setBankDetails: PropTypes.func.isRequired,
-  walletBalance: PropTypes.number.isRequired,
-  error: PropTypes.string,
-  withdrawLoading: PropTypes.bool.isRequired,
-  withdrawSuccess: PropTypes.bool.isRequired,
-  handleWithdrawSubmit: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired,
 }
 
 export default PaymentWithdrawForm

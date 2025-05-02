@@ -1,13 +1,30 @@
-import PropTypes from 'prop-types'
+import { useDispatch, useSelector } from 'react-redux'
+import { setCurrentPage } from '../../store/slices/paymentSlice'
 
-function PaymentTransactionHistory({
-  transactions,
-  transactionsLoading,
-  currentPage,
-  totalPages,
-  handlePageChange,
-  formatDate
-}) {
+function PaymentTransactionHistory() {
+  const dispatch = useDispatch()
+  const { transactions, transactionsLoading, currentPage, totalTransactions } =
+    useSelector((state) => state.payment)
+
+  // Calculate total pages
+  const pageSize = 10 // This could be moved to a constant or config
+  const totalPages = Math.ceil(totalTransactions / pageSize)
+
+  const handlePageChange = (newPage) => {
+    dispatch(setCurrentPage(newPage))
+  }
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
   return (
     <div className='payment-transaction-history rounded-lg bg-white p-6 shadow-md'>
       <h2 className='mb-4 text-xl font-semibold'>Transaction History</h2>
@@ -25,32 +42,27 @@ function PaymentTransactionHistory({
                 <tr>
                   <th
                     scope='col'
-                    className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'
-                  >
+                    className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
                     Date
                   </th>
                   <th
                     scope='col'
-                    className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'
-                  >
+                    className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
                     Transaction ID
                   </th>
                   <th
                     scope='col'
-                    className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'
-                  >
+                    className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
                     Description
                   </th>
                   <th
                     scope='col'
-                    className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'
-                  >
+                    className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
                     Amount
                   </th>
                   <th
                     scope='col'
-                    className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'
-                  >
+                    className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'>
                     Status
                   </th>
                 </tr>
@@ -72,10 +84,9 @@ function PaymentTransactionHistory({
                         transaction.type === 'deposit'
                           ? 'text-green-600'
                           : 'text-red-600'
-                      }`}
-                    >
-                      {transaction.type === 'deposit' ? '+' : '-'}
-                      ${transaction.amount.toFixed(2)}
+                      }`}>
+                      {transaction.type === 'deposit' ? '+' : '-'}$
+                      {transaction.amount.toFixed(2)}
                     </td>
                     <td className='whitespace-nowrap px-6 py-4 text-sm'>
                       <span
@@ -83,10 +94,9 @@ function PaymentTransactionHistory({
                           transaction.status === 'completed'
                             ? 'bg-green-100 text-green-800'
                             : transaction.status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-red-100 text-red-800'
+                        }`}>
                         {transaction.status}
                       </span>
                     </td>
@@ -108,15 +118,13 @@ function PaymentTransactionHistory({
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className='rounded-md border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50'
-                >
+                  className='rounded-md border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50'>
                   Previous
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className='rounded-md border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50'
-                >
+                  className='rounded-md border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50'>
                   Next
                 </button>
               </div>
@@ -126,15 +134,6 @@ function PaymentTransactionHistory({
       )}
     </div>
   )
-}
-
-PaymentTransactionHistory.propTypes = {
-  transactions: PropTypes.array.isRequired,
-  transactionsLoading: PropTypes.bool.isRequired,
-  currentPage: PropTypes.number.isRequired,
-  totalPages: PropTypes.number.isRequired,
-  handlePageChange: PropTypes.func.isRequired,
-  formatDate: PropTypes.func.isRequired
 }
 
 export default PaymentTransactionHistory
