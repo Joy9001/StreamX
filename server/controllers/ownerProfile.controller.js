@@ -45,7 +45,7 @@ export const createOwnerProfile = async (req, res) => {
 
 		let findOwner = await Owner.findOne({ _id: id })
 		findOwner.username = username
-		findOwner.YTchannelname = YTchannelname
+		findOwner.ytChannelname = YTchannelname
 		findOwner.ytChannelLink = ytChannelLink
 		findOwner.profilephoto = downloadURL
 
@@ -137,7 +137,7 @@ export const updateOwnerProfile = async (req, res) => {
 
 		owner.username = username
 		// owner.email = email || owner.email
-		owner.YTchannelname = YTchannelname
+		owner.ytChannelname = YTchannelname
 		owner.ytChannelLink = ytChannelLink
 
 		if (req.file) {
