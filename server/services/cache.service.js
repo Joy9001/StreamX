@@ -145,14 +145,33 @@ export class CacheService {
 		console.log('Cache invalidated for admin:', adminId)
 	}
 
-	async invalidateRequestCaches(requestId) {
+	async invalidateRequestCaches(request) {
 		const keysToDelete = []
 
-		//keys from admin controller
+		// Admin/general keys
 		keysToDelete.push(this.generateKey('request', { key: 'all' }))
 
+		if (request) {
+			if (typeof request === 'object') {
+				const { _id, to_id, from_id } = request
+
+				if (_id) keysToDelete.push(this.generateKey('requestMessages', { id: _id }))
+				if (to_id) keysToDelete.push(this.generateKey('requests', { to_id }))
+				if (from_id) {
+					keysToDelete.push(this.generateKey('requests', { from_id }))
+					keysToDelete.push(this.generateKey('aggregateRequests', { fromId: from_id }))
+				}
+				if (to_id && from_id) {
+					keysToDelete.push(this.generateKey('requestsByFromTo', { from_id, to_id }))
+				}
+			} else {
+				const requestId = request
+				keysToDelete.push(this.generateKey('requestMessages', { id: requestId }))
+			}
+		}
+
 		await this.delete([...new Set(keysToDelete)])
-		console.log('Cache invalidated for request:', requestId)
+		console.log('Cache invalidated for request:', request)
 	}
 
 	async invalidateEditorGigCaches(email) {
