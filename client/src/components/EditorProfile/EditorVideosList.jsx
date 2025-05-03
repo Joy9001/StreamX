@@ -1,23 +1,22 @@
-import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import { FileVideo, HardDrive } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Clock, HardDrive, FileVideo } from 'lucide-react'
 
 function EditorVideosList() {
   const [videos, setVideos] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const { userData } = useSelector((state) => state.user)
-  const editorId = userData?._id
 
   useEffect(() => {
     const fetchVideos = async () => {
       try {
         setLoading(true)
-        console.log('Fetching videos for editor:', editorId)
+        console.log('Fetching videos for editor:', userData?._id)
 
         const response = await axios.get(
-          `http://localhost:3000/api/videos/editor/${editorId}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/all/${userData.user_metadata.role}/${userData?._id}`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -26,8 +25,8 @@ function EditorVideosList() {
           }
         )
 
-        console.log('Videos data:', response.data)
-        setVideos(response.data)
+        console.log('Videos data:', response.data.videos)
+        setVideos(response.data.videos)
         setError(null)
       } catch (err) {
         console.error('Error fetching videos:', err)
@@ -37,10 +36,10 @@ function EditorVideosList() {
       }
     }
 
-    if (editorId) {
+    if (userData?._id) {
       fetchVideos()
     }
-  }, [editorId])
+  }, [userData])
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -118,23 +117,19 @@ function EditorVideosList() {
                 <span className='min-w-[30px] text-gray-500'>{index + 1}.</span>
                 <div>
                   <span className='font-medium text-gray-800'>
-                    {video.metaData?.name ||
-                      video.metadata?.fileName ||
-                      'Untitled'}
+                    {video.metaData?.name || 'Untitled'}
                   </span>
-                  <div className='mt-1 flex items-center gap-4 text-sm text-gray-500'>
-                    <p>Owner: {video.owner?.name}</p>
-                    <div className='flex items-center gap-1'>
-                      <Clock className='h-4 w-4' />
-                      {video.metadata?.duration || '0:00'}
-                    </div>
+                  <div className='mt-1 flex flex-wrap items-center gap-4 text-sm text-gray-500'>
+                    {video.owner && <p>Owner: {video.owner || 'Unknown'}</p>}
                     <div className='flex items-center gap-1'>
                       <HardDrive className='h-4 w-4' />
-                      {video.metadata?.fileSize}
+                      {video.metaData?.size
+                        ? `${(video.metaData.size / (1024 * 1024)).toFixed(2)} MB`
+                        : 'Unknown size'}
                     </div>
                     <div className='flex items-center gap-1'>
                       <FileVideo className='h-4 w-4' />
-                      {video.metadata?.contentType || 'video/mp4'}
+                      {video.metaData?.contentType || 'video/mp4'}
                     </div>
                   </div>
                 </div>

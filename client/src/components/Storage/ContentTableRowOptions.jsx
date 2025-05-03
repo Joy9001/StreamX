@@ -41,7 +41,7 @@ function ContentTableRowOptions({ video }) {
   async function handleDelete() {
     try {
       const res = await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/api/videos/delete/${userData.user_metadata.role}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/videos/delete`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -51,6 +51,7 @@ function ContentTableRowOptions({ video }) {
           data: {
             id: video._id,
             userId: userData._id,
+            role: userData.user_metadata.role,
           },
         }
       )

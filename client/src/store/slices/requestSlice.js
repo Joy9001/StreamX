@@ -94,8 +94,15 @@ export const approveRequest = createAsyncThunk(
   'requests/approveRequest',
   async (requestData, { rejectWithValue }) => {
     try {
-      const { requestId, videoId, toId, userData, accessToken, userRole, price } =
-        requestData
+      const {
+        requestId,
+        videoId,
+        toId,
+        userData,
+        accessToken,
+        userRole,
+        price,
+      } = requestData
 
       // No need to fetch request details since we now pass the price directly
       const transactionAmount = price
@@ -125,7 +132,7 @@ export const approveRequest = createAsyncThunk(
             fromUserId: userData._id,
             toUserId: toId,
             amount: transactionAmount,
-            description: `Payment for video editing service`
+            description: `Payment for video editing service`,
           },
           {
             headers: {
@@ -138,8 +145,12 @@ export const approveRequest = createAsyncThunk(
 
         // Update video ownership
         videoResponse = await axios.patch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/videos/${videoId}/owner`,
-          { owner_id: toId },
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/update-ownership`,
+          {
+            videoId: videoId,
+            role: 'owner',
+            userId: toId,
+          },
           {
             headers: {
               'Content-Type': 'application/json',
@@ -149,17 +160,18 @@ export const approveRequest = createAsyncThunk(
           }
         )
 
-        return { 
-          request: response.data, 
-          video: videoResponse.data, 
-          transaction: walletTransactionResponse.data 
+        return {
+          request: response.data,
+          video: videoResponse.data,
+          transaction: walletTransactionResponse.data,
         }
       } else if (userRole === 'Editor') {
         videoResponse = await axios.patch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/videos/${videoId}/editor`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/update-ownership`,
           {
-            editorId: userData._id,
-            editorAccess: true,
+            videoId: videoId,
+            role: 'editor',
+            userId: userData._id,
           },
           {
             headers: {

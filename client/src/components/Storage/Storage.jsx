@@ -46,11 +46,13 @@ function Storage() {
     if (file) {
       const formData = new FormData()
       formData.append('file', file)
+      formData.append('role', userData.user_metadata.role)
+      formData.append('userId', userData._id)
       console.log('formData', formData)
       console.log('accessToken in handleFileUpload', accessToken)
       try {
         const res = await axios.post(
-          `${import.meta.env.VITE_BACKEND_URL}/api/videos/upload/${userData.user_metadata.role}/${userData._id}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/upload`,
           formData,
           {
             headers: {

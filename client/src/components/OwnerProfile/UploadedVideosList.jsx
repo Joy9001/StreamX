@@ -6,13 +6,19 @@ function UploadedVideosList() {
   const [videos, setVideos] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const userData = useSelector((state) => state.user.userData)
+  const { userData } = useSelector((state) => state.user)
 
   useEffect(() => {
     const fetchVideos = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/videos/all/${userData.user_metadata.role}/${userData._id}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/all/${userData.user_metadata.role}/${userData._id}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            withCredentials: true,
+          }
         )
         setVideos(response.data.videos)
       } catch (err) {
