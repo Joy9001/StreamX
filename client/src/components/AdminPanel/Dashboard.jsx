@@ -59,9 +59,9 @@ function Dashboard() {
     const fetchOwnerData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/ownerProfile`
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/owners `
         )
-        const chartData = processRegistrationData(response.data)
+        const chartData = processRegistrationData(response.data.owners)
         setOwnerStats(chartData)
         setLoading((prev) => ({ ...prev, owners: false }))
       } catch (err) {
@@ -77,9 +77,9 @@ function Dashboard() {
     const fetchEditorData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/editorGig`
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/editors`
         )
-        const chartData = processRegistrationData(response.data)
+        const chartData = processRegistrationData(response.data.editors)
         setEditorStats(chartData)
         setLoading((prev) => ({ ...prev, editors: false }))
       } catch (err) {
@@ -113,7 +113,7 @@ function Dashboard() {
     const fetchVideoData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/videos/all-videos`
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/videos`
         )
         const chartData = processRegistrationData(response.data)
         setVideoStats(chartData)

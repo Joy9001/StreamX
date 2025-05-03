@@ -51,7 +51,7 @@ export function Dashboard() {
 
         // Fetch all videos data
         const videosResponse = await axios.get(
-          'http://localhost:3000/api/videos/all-videos'
+          'http://localhost:3000/api/admin/videos'
         )
         console.log('videosData', videosResponse.data)
 
