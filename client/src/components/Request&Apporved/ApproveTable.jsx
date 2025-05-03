@@ -479,10 +479,9 @@ function ApproveTable() {
           <tbody className='h-full divide-y divide-gray-200 bg-white'>
             {receivedRequests.length > 0 ? (
               receivedRequests.map((request) => {
-                // For editors, the counterparty is in request.to
-                // For content owners, the counterparty is in request.from
-                const counterparty = isEditor ? request.to : request.from
-
+                console.log('req', request)
+                const counterparty = request.from
+                console.log('counterparty', counterparty)
                 return (
                   <tr
                     key={request._id}
@@ -557,7 +556,7 @@ function ApproveTable() {
                               initiateApproval(
                                 request._id,
                                 request.video._id,
-                                isEditor ? null : counterparty?._id
+                                isEditor ? null : counterparty?.id
                               )
                             }
                             className='flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 transition-colors hover:bg-green-100'

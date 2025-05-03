@@ -104,34 +104,22 @@ export const approveRequest = createAsyncThunk(
         price,
       } = requestData
 
-      // No need to fetch request details since we now pass the price directly
       const transactionAmount = price
-
-      // Update request status to approved
-      const response = await axios.patch(
-        `${import.meta.env.VITE_BACKEND_URL}/requests/${requestId}/status`,
-        { status: 'approved' },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-        }
-      )
 
       let walletTransactionResponse = null
       let videoResponse = null
+      let statusResponse = null
 
       // Update video ownership or editor access based on user role
       if (userRole === 'Owner') {
-        // Process wallet transaction - deduct from owner (userData._id) and add to editor (toId)
+        // Process wallet transaction first
         walletTransactionResponse = await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/api/wallet/transfer`,
           {
-            fromUserId: userData._id,
-            toUserId: toId,
+            fromWalletId: userData._id,
+            toWalletId: toId,
             amount: transactionAmount,
+            requestId: requestId,
             description: `Payment for video editing service`,
           },
           {
@@ -148,7 +136,7 @@ export const approveRequest = createAsyncThunk(
           `${import.meta.env.VITE_BACKEND_URL}/api/videos/update-ownership`,
           {
             videoId: videoId,
-            role: 'owner',
+            role: userRole,
             userId: toId,
           },
           {
@@ -160,8 +148,21 @@ export const approveRequest = createAsyncThunk(
           }
         )
 
+        // Update request status only after successful payment and ownership transfer
+        statusResponse = await axios.patch(
+          `${import.meta.env.VITE_BACKEND_URL}/requests/${requestId}/status`,
+          { status: 'approved' },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+          }
+        )
+
         return {
-          request: response.data,
+          request: statusResponse.data,
           video: videoResponse.data,
           transaction: walletTransactionResponse.data,
         }
@@ -170,7 +171,7 @@ export const approveRequest = createAsyncThunk(
           `${import.meta.env.VITE_BACKEND_URL}/api/videos/update-ownership`,
           {
             videoId: videoId,
-            role: 'editor',
+            role: userRole,
             userId: userData._id,
           },
           {
@@ -181,10 +182,24 @@ export const approveRequest = createAsyncThunk(
             withCredentials: true,
           }
         )
-        return { request: response.data, video: videoResponse.data }
+
+        // For editors, update status after video ownership update
+        statusResponse = await axios.patch(
+          `${import.meta.env.VITE_BACKEND_URL}/requests/${requestId}/status`,
+          { status: 'approved' },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+          }
+        )
+
+        return { request: statusResponse.data, video: videoResponse.data }
       }
 
-      return { request: response.data }
+      return { request: statusResponse.data }
     } catch (error) {
       console.error('Error in approveRequest:', error)
       return rejectWithValue(

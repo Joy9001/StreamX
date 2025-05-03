@@ -15,6 +15,7 @@ import requestRouter from './routes/request.route.js'
 import userRouter from './routes/user.route.js'
 import videoRouter from './routes/video.route.js'
 import ytRouter from './routes/yt.route.js'
+import walletRouter from './routes/wallet.route.js'
 dotenv.config()
 
 const PORT = process.env.PORT || 3000
@@ -74,6 +75,7 @@ app.use('/api/admin', adminRouter)
 app.use('/editor_gig', editorGigRoute)
 app.use('/editorProfile', editorProfileRouter)
 app.use('/user', userRouter)
+app.use('/api/wallet', walletRouter)
 
 //? Error handling middleware
 app.use((req, res, next) => {
