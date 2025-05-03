@@ -1,19 +1,23 @@
-import express from 'express'
-import { EditorData } from '../controllers/editorData.controller.js'
-import { Editor_gig_cont, getEditorGigByEmail, updateEditorGigByEmail } from '../controllers/editorGig.controller.js'
+import { Router } from 'express'
 import {
-	Editor_gig_plans,
+	createEditorGig,
+	getEditorGigByEmail,
+	getEditorGigData,
+	updateEditorGigByEmail,
+} from '../controllers/editorGig.controller.js'
+import {
+	getEditorGigPlans,
 	getEditorGigPlansByEmail,
+	updateEditorGigPlans,
 	updateEditorGigPlansByEmail,
 } from '../controllers/editorPlan.controller.js'
-import { EditorPlansData } from '../controllers/editorPlans.controller.js'
 
-const router = express.Router()
+const router = Router()
 
-router.post('/', Editor_gig_cont)
-router.get('/', EditorData)
-router.get('/plans', EditorPlansData)
-router.post('/plan', Editor_gig_plans)
+router.post('/', createEditorGig)
+router.get('/', getEditorGigData)
+router.get('/plans', getEditorGigPlans)
+router.post('/plan', updateEditorGigPlans)
 router.get('/email/:email', getEditorGigByEmail)
 router.get('/plans/email/:email', getEditorGigPlansByEmail)
 router.patch('/email/:email', updateEditorGigByEmail)

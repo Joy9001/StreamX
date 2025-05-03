@@ -1,12 +1,12 @@
-import Editor_Gig from '../models/editorGig.model.js'
-import editor_plans from '../models/editorGigPlans.model.js'
+import EditorGig from '../models/editorGig.model.js'
+import EditorGigPlans from '../models/editorGigPlans.model.js'
 
-export const Editor_gig_plans = async (req, res) => {
+export const updateEditorGigPlans = async (req, res) => {
 	try {
 		const { email, basic, standard, premium } = req.body
 
 		// Check if the editor with the provided email exists
-		const existingEditor = await Editor_Gig.findOne({ email })
+		const existingEditor = await EditorGig.findOne({ email })
 		if (!existingEditor) {
 			return res.status(404).json({
 				success: false,
@@ -14,7 +14,7 @@ export const Editor_gig_plans = async (req, res) => {
 			})
 		}
 
-		const updatedPlan = await editor_plans.findOneAndUpdate(
+		const updatedPlan = await EditorGigPlans.findOneAndUpdate(
 			{ email },
 			{ basic, standard, premium }, // Update
 			{ new: true, upsert: true }
@@ -41,7 +41,7 @@ export const getEditorGigPlansByEmail = async (req, res) => {
 		const { email } = req.params
 
 		// Find the editor's gig plans
-		let editorPlans = await editor_plans.findOne({ email })
+		let editorPlans = await EditorGigPlans.findOne({ email })
 
 		// If no plans exist, create default plans
 		if (!editorPlans) {
@@ -67,7 +67,7 @@ export const getEditorGigPlansByEmail = async (req, res) => {
 				},
 			}
 
-			editorPlans = await editor_plans.create(defaultPlans)
+			editorPlans = await EditorGigPlans.create(defaultPlans)
 
 			return res.status(201).json({
 				success: true,
@@ -98,7 +98,7 @@ export const updateEditorGigPlansByEmail = async (req, res) => {
 		const { basic, standard, premium } = req.body
 
 		// Find and update the plans
-		const updatedPlans = await editor_plans.findOneAndUpdate(
+		const updatedPlans = await EditorGigPlans.findOneAndUpdate(
 			{ email },
 			{ basic, standard, premium },
 			{ new: true, upsert: true, runValidators: true }
@@ -116,5 +116,19 @@ export const updateEditorGigPlansByEmail = async (req, res) => {
 			message: 'Error updating editor gig plans',
 			error: error.message,
 		})
+	}
+}
+
+export const getEditorGigPlans = async (req, res) => {
+	try {
+		const EditorPlanData = await EditorGigPlans.find()
+		if (!EditorPlanData) {
+			return res.status(404).json({ message: 'No editor data found' })
+		}
+		console.log('Data retrieved successfully')
+		res.status(200).json(EditorPlanData)
+	} catch (err) {
+		console.log('Error:', err)
+		res.status(500).json({ error: err.message })
 	}
 }
