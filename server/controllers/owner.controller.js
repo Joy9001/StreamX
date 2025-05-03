@@ -163,16 +163,16 @@ export const getHiredEditors = async (req, res) => {
 }
 
 export const getOwnerNameById = async (req, res) => {
-  try {
-    const { id } = req.params
-    const owner = await Owner.findById(id)
+	try {
+		const { id } = req.params
+		const owner = await Owner.findById(id)
 
-    if (!owner) {
-      return res.status(404).json({ message: 'Owner not found' })
-    }
+		if (!owner) {
+			return res.status(404).json({ message: 'Owner not found' })
+		}
 
-    res.status(200).json({ name: owner.username })
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching owner name', error })
-  }
+		res.status(200).json({ name: owner.username })
+	} catch (error) {
+		res.status(500).json({ message: 'Error fetching owner name', error })
+	}
 }

@@ -7,18 +7,18 @@
 - title
 - description
 - thumbnails
-  - key [default, medium, high, standard, maxres]
-    - url
-    - width
-    - height
+    - key [default, medium, high, standard, maxres]
+        - url
+        - width
+        - height
 - channelTitle
 - tags []
 - categoryId
 - liveBroadcastContent
 - defaultLanguage
 - localized
-  - title
-  - description
+    - title
+    - description
 - defaultAudioLanguage
 
 ```json

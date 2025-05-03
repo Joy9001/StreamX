@@ -158,50 +158,50 @@ export const updateOwnerProfile = async (req, res) => {
 // Controller for updating basic profile info (name, bio, photo)
 export const updateBasicProfile = async (req, res) => {
 	try {
-		const { name, bio } = req.body;
-		const { id } = req.params;
-		const { file } = req;
+		const { name, bio } = req.body
+		const { id } = req.params
+		const { file } = req
 
-		let findOwner = await Owner.findOne({ _id: id });
-		console.log('findOwner in updateBasicProfile', findOwner);
+		let findOwner = await Owner.findOne({ _id: id })
+		console.log('findOwner in updateBasicProfile', findOwner)
 		if (!findOwner) {
-			return res.status(404).json({ message: 'Owner not found' });
+			return res.status(404).json({ message: 'Owner not found' })
 		}
 
 		// Update name and bio if provided
-		if (name) findOwner.username = name;
-		if (bio) findOwner.bio = bio;
+		if (name) findOwner.username = name
+		if (bio) findOwner.bio = bio
 
 		// Handle profile photo update if a new file is provided
 		if (file) {
 			// Delete old profile photo if it exists
 			if (findOwner.profilephoto) {
 				try {
-					const oldFileRef = ref(storage, findOwner.profilephoto);
-					await deleteObject(oldFileRef);
+					const oldFileRef = ref(storage, findOwner.profilephoto)
+					await deleteObject(oldFileRef)
 				} catch (error) {
-					console.log('Error deleting old profile photo:', error);
+					console.log('Error deleting old profile photo:', error)
 				}
 			}
 
 			// Upload new profile photo
-			const fileRef = ref(storage, `profilephoto/${file.originalname}`);
-			const uploadTask = uploadBytesResumable(fileRef, file.buffer);
-			await uploadTask;
-			const downloadURL = await getDownloadURL(fileRef);
-			findOwner.profilephoto = downloadURL;
+			const fileRef = ref(storage, `profilephoto/${file.originalname}`)
+			const uploadTask = uploadBytesResumable(fileRef, file.buffer)
+			await uploadTask
+			const downloadURL = await getDownloadURL(fileRef)
+			findOwner.profilephoto = downloadURL
 		}
 
-		await findOwner.save();
+		await findOwner.save()
 		res.status(200).json({
 			message: 'Profile updated successfully',
-			owner: findOwner
-		});
+			owner: findOwner,
+		})
 	} catch (error) {
-		console.error('Error updating profile:', error);
+		console.error('Error updating profile:', error)
 		res.status(500).json({
 			message: 'Error updating profile',
-			error: error.message
-		});
+			error: error.message,
+		})
 	}
-};
+}
