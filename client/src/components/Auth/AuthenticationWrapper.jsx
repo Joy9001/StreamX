@@ -6,16 +6,18 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 const AuthenticationWrapper = ({ children }) => {
-  const { isAuthenticated, user, getAccessTokenSilently } = useAuth0()
+  const { isAuthenticated, user, getAccessTokenSilently, isLoading } =
+    useAuth0()
   const userData = useSelector((state) => state.user.userData)
   const dispatch = useDispatch()
+  const isEmpty = (obj) => Object.keys(obj).length === 0
 
   useEffect(() => {
     async function fetchUserData() {
       console.log('isAuthenticated:', isAuthenticated)
       console.log('userData:', userData)
       console.log('user:', user)
-      if (isAuthenticated && JSON.stringify(userData) === '{}') {
+      if (isAuthenticated && isEmpty(userData)) {
         console.log('Fetching user metadata...')
         try {
           const accessToken = await getAccessTokenSilently()
@@ -47,10 +49,20 @@ const AuthenticationWrapper = ({ children }) => {
       }
     }
 
-    fetchUserData()
-  }, [isAuthenticated, userData, user, dispatch, getAccessTokenSilently])
+    if (!isLoading) fetchUserData()
+  }, [
+    isAuthenticated,
+    userData,
+    user,
+    dispatch,
+    getAccessTokenSilently,
+    isLoading,
+  ])
 
-  return children
+  if (!isEmpty(userData)) {
+    console.log('userData after fetchUserData', userData)
+    return children
+  }
 }
 
 AuthenticationWrapper.propTypes = {
