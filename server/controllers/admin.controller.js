@@ -49,7 +49,6 @@ export const getAllRequests = async (req, res) => {
 				path: 'video_id',
 				select: 'url metaData',
 			})
-			.select('from_id to_id video_id description price status createdAt updatedAt')
 			.lean()
 
 		if (!requests || requests.length === 0) {
@@ -84,6 +83,7 @@ export const getAllRequests = async (req, res) => {
 				if (!from || !to) return null
 
 				return {
+					_id: r._id,
 					request_id: r._id,
 					from: { id: r.from_id, name: from.name, role: from.kind },
 					to: { id: r.to_id, name: to.name, role: to.kind },
@@ -136,7 +136,7 @@ export const getAllVideos = async (req, res) => {
 						name: video.ownerId.username,
 						email: video.ownerId.email,
 						profilephoto: video.ownerId.profilephoto,
-					}
+				  }
 				: { name: 'N/A' },
 			editor: video.editorId
 				? {
@@ -144,7 +144,7 @@ export const getAllVideos = async (req, res) => {
 						name: video.editorId.name,
 						email: video.editorId.email,
 						profilephoto: video.editorId.profilephoto,
-					}
+				  }
 				: { name: 'N/A' },
 
 			metadata: {
