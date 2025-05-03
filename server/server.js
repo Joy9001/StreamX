@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 import express from 'express'
 import morgan from 'morgan'
 import connectMongo from './db/connectMongo.db.js'
-import { connectRedis } from './helpers/redis.helper.js'
+import cacheService from './services/cache.service.js'
 import { authCheck } from './middlewares/auth0.middleware.js'
 import adminRouter from './routes/admin.route.js'
 import auth0Router from './routes/auth0.route.js'
@@ -104,7 +104,7 @@ app.listen(PORT, () => {
 	connectMongo().then(() => {
 		console.log('MongoDB connected')
 	})
-	connectRedis().then(() => {
-		console.log('Redis connected')
+	cacheService.connect().then(() => {
+		console.log('Cache service connected')
 	})
 })
