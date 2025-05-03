@@ -303,59 +303,65 @@ export const deleteRequest = async (req, res) => {
 
 export const getAllUpdatedRequests = async (req, res) => {
 	try {
-		// Fetch all requests with populated video data
-		const requests = await Request.find().populate({
-			path: 'video_id',
-			select: 'url metaData',
+		const requests = await Request.find()
+			.populate({
+				path: 'video_id',
+				select: 'url metaData',
+			})
+			.lean()
+
+		if (!requests || requests.length === 0) {
+			return res.status(200).json({
+				success: true,
+				requests: [],
+			})
+		}
+
+		const userIds = new Set()
+		requests.forEach((request) => {
+			if (request.from_id) userIds.add(request.from_id.toString())
+			if (request.to_id) userIds.add(request.to_id.toString())
 		})
+		const uniqueUserIds = Array.from(userIds)
+
+		const [owners, editors] = await Promise.all([
+			Owner.find({ _id: { $in: uniqueUserIds } })
+				.select('username _id')
+				.lean(),
+			Editor.find({ _id: { $in: uniqueUserIds } })
+				.select('name _id')
+				.lean(),
+		])
+
+		const userMap = new Map()
+		owners.forEach((owner) => userMap.set(owner._id.toString(), { ...owner, kind: 'Owner' }))
+		editors.forEach((editor) => userMap.set(editor._id.toString(), { ...editor, kind: 'Editor' }))
 
 		let processedRequests = []
 
-		// Process each request
 		for (const request of requests) {
-			// Find owner (from_id)
-			let from
-			let fromUser
-			fromUser = await Owner.findById(request.from_id)
-			from = 'Owner'
-			if (!fromUser) {
-				fromUser = await Editor.findById(request.from_id)
-				from = 'Editor'
-			}
-			if (!fromUser) {
+			const fromUser = userMap.get(request.from_id?.toString())
+			const toUser = userMap.get(request.to_id?.toString())
+
+			if (!fromUser || !toUser) {
+				console.warn(`Skipping request ${request._id} due to missing user data.`)
 				continue
 			}
 
-			// Find editor (to_id)
-			let toUser
-			let to
-			toUser = await Editor.findById(request.to_id)
-			to = 'Editor'
-			if (!toUser) {
-				toUser = await Owner.findById(request.to_id)
-				to = 'Owner'
-			}
-			if (!toUser) {
-				continue
-			}
-
-			// Skip if neither owner nor editor is found
-			if (!fromUser && !toUser) continue
-
-			// Construct response object
 			const processedRequest = {
 				request_id: request._id,
 				from: {
 					id: request.from_id,
-					name: from === 'Owner' ? fromUser.username : fromUser.name,
+					name: fromUser.kind === 'Owner' ? fromUser.username : fromUser.name,
 				},
 				to: {
 					id: request.to_id,
-					name: to === 'Owner' ? toUser.username : toUser.name,
+					name: toUser.kind === 'Owner' ? toUser.username : toUser.name,
 				},
 				video: {
 					url: request.video_id?.url || '',
 					title: request.video_id?.metaData?.name || '',
+					_id: request.video_id?._id,
 				},
 				description: request.description,
 				price: request.price,
@@ -364,7 +370,6 @@ export const getAllUpdatedRequests = async (req, res) => {
 				updatedAt: request.updatedAt,
 			}
 
-			console.log('Processed request:', processedRequest)
 			processedRequests.push(processedRequest)
 		}
 
