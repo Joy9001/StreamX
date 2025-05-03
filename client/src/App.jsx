@@ -22,18 +22,19 @@ function App() {
   const userData = useSelector((state) => state.user.userData)
   const isAdmin = userData?.user_metadata?.role === 'Admin'
   const [isReady, setIsReady] = useState(false)
+  const isUserValid = isAuthenticated && !isEmpty(userData)
 
   // Wait for authentication to complete before rendering routes
   useEffect(() => {
-    if (!isLoading && !isEmpty(userData)) {
+    if (!isLoading && (isEmpty(userData) === false || !isAuthenticated)) {
       setIsReady(true)
     }
-  }, [isLoading, userData])
+  }, [isLoading, isAuthenticated, userData])
 
   const router = createBrowserRouter([
     {
       path: '/',
-      element: isAuthenticated ? (
+      element: isUserValid ? (
         isAdmin ? (
           <Navigate to='/admin-panel' replace />
         ) : (
@@ -45,7 +46,7 @@ function App() {
     },
     {
       path: '/profile/owner',
-      element: isAuthenticated ? (
+      element: isUserValid ? (
         isAdmin ? (
           <Navigate to='/admin-panel' replace />
         ) : (
@@ -57,7 +58,7 @@ function App() {
     },
     {
       path: '/profile/editor',
-      element: isAuthenticated ? (
+      element: isUserValid ? (
         isAdmin ? (
           <Navigate to='/admin-panel' replace />
         ) : (
@@ -69,7 +70,7 @@ function App() {
     },
     {
       path: '/gig-profile',
-      element: isAuthenticated ? (
+      element: isUserValid ? (
         isAdmin ? (
           <Navigate to='/admin-panel' replace />
         ) : (
@@ -81,7 +82,7 @@ function App() {
     },
     {
       path: '/storage',
-      element: isAuthenticated ? (
+      element: isUserValid ? (
         isAdmin ? (
           <Navigate to='/admin-panel' replace />
         ) : (
@@ -93,7 +94,7 @@ function App() {
     },
     {
       path: '/req-n-approve',
-      element: isAuthenticated ? (
+      element: isUserValid ? (
         isAdmin ? (
           <Navigate to='/admin-panel' replace />
         ) : (
@@ -105,7 +106,7 @@ function App() {
     },
     {
       path: '/payments',
-      element: isAuthenticated ? (
+      element: isUserValid ? (
         isAdmin ? (
           <Navigate to='/admin-panel' replace />
         ) : (
@@ -117,7 +118,7 @@ function App() {
     },
     {
       path: '/hire-editors',
-      element: isAuthenticated ? (
+      element: isUserValid ? (
         isAdmin ? (
           <Navigate to='/admin-panel' replace />
         ) : (
@@ -129,7 +130,7 @@ function App() {
     },
     {
       path: '/admin-panel',
-      element: isAuthenticated ? (
+      element: isUserValid ? (
         isAdmin ? (
           <AdminPanel />
         ) : (
@@ -141,7 +142,7 @@ function App() {
     },
     {
       path: '/admin-panel/owners',
-      element: isAuthenticated ? (
+      element: isUserValid ? (
         isAdmin ? (
           <OwnerDashboard />
         ) : (
@@ -153,7 +154,7 @@ function App() {
     },
     {
       path: '/admin-panel/editors',
-      element: isAuthenticated ? (
+      element: isUserValid ? (
         isAdmin ? (
           <EditorDashboard />
         ) : (
@@ -165,7 +166,7 @@ function App() {
     },
     {
       path: '/admin-panel/videos',
-      element: isAuthenticated ? (
+      element: isUserValid ? (
         isAdmin ? (
           <VideosDashboard />
         ) : (
@@ -177,7 +178,7 @@ function App() {
     },
     {
       path: '/admin-panel/requests',
-      element: isAuthenticated ? (
+      element: isUserValid ? (
         isAdmin ? (
           <AdminRequestsDashboard />
         ) : (
