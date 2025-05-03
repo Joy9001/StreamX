@@ -14,8 +14,8 @@ import ownerRouter from './routes/owner.route.js'
 import requestRouter from './routes/request.route.js'
 import userRouter from './routes/user.route.js'
 import videoRouter from './routes/video.route.js'
-import ytRouter from './routes/yt.route.js'
 import walletRouter from './routes/wallet.route.js'
+import ytRouter from './routes/yt.route.js'
 dotenv.config()
 
 const PORT = process.env.PORT || 3000
@@ -72,7 +72,7 @@ app.use('/api/videos', videoRouter)
 app.use('/api/yt', ytRouter)
 app.use('/api', ownerRouter)
 app.use('/api/admin', adminRouter)
-app.use('/editor_gig', editorGigRoute)
+app.use('/editorGig', editorGigRoute)
 app.use('/editorProfile', editorProfileRouter)
 app.use('/user', userRouter)
 app.use('/api/wallet', walletRouter)
