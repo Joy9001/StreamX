@@ -8,7 +8,21 @@ import cacheService from '../services/cache.service.js'
 
 export const getAllOwners = async (req, res) => {
 	try {
+		const cacheKey = cacheService.generateKey('owner', { key: 'all' })
+
+		const cachedOwners = await cacheService.get(cacheKey)
+		if (cachedOwners) {
+			return res.status(200).json({
+				success: true,
+				message: 'Owners retrieved successfully from cache',
+				owners: cachedOwners,
+			})
+		}
+
 		const owners = await Owner.find({}, 'username email profilephoto ytChannelname')
+
+		await cacheService.set(cacheKey, owners, cacheService.TTL.LIST)
+
 		return res.status(200).json({
 			success: true,
 			message: 'Owners retrieved successfully',
@@ -26,7 +40,21 @@ export const getAllOwners = async (req, res) => {
 
 export const getAllEditors = async (req, res) => {
 	try {
+		const cacheKey = cacheService.generateKey('editor', { key: 'all' })
+
+		const cachedEditors = await cacheService.get(cacheKey)
+		if (cachedEditors) {
+			return res.status(200).json({
+				success: true,
+				message: 'Editors retrieved successfully from cache',
+				editors: cachedEditors,
+			})
+		}
+
 		const editors = await Editor.find({}, 'name email profilephoto')
+
+		await cacheService.set(cacheKey, editors, cacheService.TTL.LIST)
+
 		return res.status(200).json({
 			success: true,
 			message: 'Editors retrieved successfully',
@@ -44,6 +72,20 @@ export const getAllEditors = async (req, res) => {
 
 export const getAllRequests = async (req, res) => {
 	try {
+		// Generate cache key for requests
+		const cacheKey = cacheService.generateKey('request', { key: 'all' })
+
+		// Try to get cached requests
+		const cachedRequests = await cacheService.get(cacheKey)
+		if (cachedRequests) {
+			return res.status(200).json({
+				success: true,
+				message: 'Requests retrieved successfully from cache',
+				requests: cachedRequests,
+			})
+		}
+
+		// If not in cache, fetch from database
 		const requests = await Request.find()
 			.populate({
 				path: 'video_id',
@@ -101,6 +143,9 @@ export const getAllRequests = async (req, res) => {
 			})
 			.filter(Boolean)
 
+		// Store processed requests in cache
+		await cacheService.set(cacheKey, processedRequests, cacheService.TTL.LIST)
+
 		return res.status(200).json({ success: true, requests: processedRequests })
 	} catch (error) {
 		console.error('Error in getAllRequests:', error)
@@ -136,7 +181,7 @@ export const getAllVideos = async (req, res) => {
 						name: video.ownerId.username,
 						email: video.ownerId.email,
 						profilephoto: video.ownerId.profilephoto,
-				  }
+					}
 				: { name: 'N/A' },
 			editor: video.editorId
 				? {
@@ -144,7 +189,7 @@ export const getAllVideos = async (req, res) => {
 						name: video.editorId.name,
 						email: video.editorId.email,
 						profilephoto: video.editorId.profilephoto,
-				  }
+					}
 				: { name: 'N/A' },
 
 			metadata: {

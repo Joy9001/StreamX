@@ -93,6 +93,38 @@ export class CacheService {
 
 		// Remove duplicates and delete
 		await this.delete([...new Set(keysToDelete)])
+		console.log('Cache invalidated for video:', video)
+	}
+
+	async invalidateOwnerCaches(ownerId) {
+		if (!ownerId) return
+		const keysToDelete = []
+		// keys from admin controller
+		keysToDelete.push(this.generateKey('owner', { key: 'all' }))
+
+		await this.delete([...new Set(keysToDelete)])
+		console.log('Cache invalidated for owner:', ownerId)
+	}
+
+	async invalidateEditorCaches(editorId) {
+		if (!editorId) return
+		const keysToDelete = []
+		// keys from admin controller
+		keysToDelete.push(this.generateKey('editor', { key: 'all' }))
+
+		await this.delete([...new Set(keysToDelete)])
+		console.log('Cache invalidated for editor:', editorId)
+	}
+
+	async invalidateRequestCaches(requestId) {
+		if (!requestId) return
+		const keysToDelete = []
+
+		//keys from admin controller
+		keysToDelete.push(this.generateKey('request', { key: 'all' }))
+
+		await this.delete([...new Set(keysToDelete)])
+		console.log('Cache invalidated for request:', requestId)
 	}
 
 	getClient() {
