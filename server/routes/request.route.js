@@ -5,7 +5,6 @@ import {
 	changePrice,
 	createRequest,
 	deleteRequest,
-	getAllRequests,
 	getRequestMessages,
 	getRequestsByFromId,
 	getRequestsByFromToId,
@@ -17,9 +16,6 @@ const router = express.Router()
 
 // Create a new request
 router.post('/create', createRequest)
-
-// Get all requests
-router.get('/', getAllRequests)
 
 // Get requests by owner/editor ID
 router.get('/to-id/:to_id', getRequestsByToId)

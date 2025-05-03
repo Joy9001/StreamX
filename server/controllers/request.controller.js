@@ -34,17 +34,6 @@ export const createRequest = async (req, res) => {
 	}
 }
 
-// Get all requests
-export const getAllRequests = async (req, res) => {
-	try {
-		const requests = await Request.find()
-		res.status(200).json(requests)
-	} catch (error) {
-		console.error('Error fetching requests:', error)
-		res.status(500).json({ message: 'Error fetching requests', error: error.message })
-	}
-}
-
 // Get requests by owner ID
 export const getRequestsByToId = async (req, res) => {
 	try {
