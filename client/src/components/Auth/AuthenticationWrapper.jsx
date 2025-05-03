@@ -1,4 +1,5 @@
 import { setUserData } from '@/store/slices/userSlice'
+import { isEmpty } from '@/utils/utils'
 import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
 import PropTypes from 'prop-types'
@@ -10,7 +11,6 @@ const AuthenticationWrapper = ({ children }) => {
     useAuth0()
   const userData = useSelector((state) => state.user.userData)
   const dispatch = useDispatch()
-  const isEmpty = (obj) => Object.keys(obj).length === 0
 
   useEffect(() => {
     async function fetchUserData() {
@@ -59,10 +59,7 @@ const AuthenticationWrapper = ({ children }) => {
     isLoading,
   ])
 
-  if (!isEmpty(userData)) {
-    console.log('userData after fetchUserData', userData)
-    return children
-  }
+  return children
 }
 
 AuthenticationWrapper.propTypes = {

@@ -15,6 +15,7 @@ import Profile from './components/OwnerProfile/Profile.jsx'
 import Payment from './components/Payments/Payment.jsx'
 import RequestApprove from './components/Request&Apporved/Raas.jsx'
 import Storage from './components/Storage/Storage.jsx'
+import { isEmpty } from './utils/utils.js'
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth0()
@@ -24,10 +25,10 @@ function App() {
 
   // Wait for authentication to complete before rendering routes
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !isEmpty(userData)) {
       setIsReady(true)
     }
-  }, [isLoading])
+  }, [isLoading, userData])
 
   const router = createBrowserRouter([
     {
