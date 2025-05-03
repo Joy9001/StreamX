@@ -45,9 +45,9 @@ export function Dashboard() {
 
         // Fetch editors data
         const editorsResponse = await axios.get(
-          'http://localhost:3000/editorProfile'
+          'http://localhost:3000/editorGig'
         )
-        console.log('editorData', editorsResponse.data)
+        console.log('editorGigData', editorsResponse.data)
 
         // Fetch all videos data
         const videosResponse = await axios.get(

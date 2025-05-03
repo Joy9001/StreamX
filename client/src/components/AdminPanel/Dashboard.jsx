@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import AdminNav from './AdminNav'
 import axios from 'axios'
+import { useEffect, useState } from 'react'
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from 'recharts'
+import AdminNav from './AdminNav'
 
 function Dashboard() {
   const [ownerStats, setOwnerStats] = useState([])
@@ -77,7 +77,7 @@ function Dashboard() {
     const fetchEditorData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/editorProfile`
+          `${import.meta.env.VITE_BACKEND_URL}/editorGig`
         )
         const chartData = processRegistrationData(response.data)
         setEditorStats(chartData)
