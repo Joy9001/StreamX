@@ -96,13 +96,26 @@ export class CacheService {
 		console.log('Cache invalidated for video:', video)
 	}
 
-	async invalidateOwnerCaches(ownerId) {
-		const keysToDelete = []
-		// keys from admin controller
-		keysToDelete.push(this.generateKey('owner', { key: 'all' }))
+	async invalidateOwnerCaches({ ownerId, email }) {
+		const keysToDelete = [this.generateKey('allOwners'), this.generateKey('owner', { key: 'all' })]
 
-		await this.delete([...new Set(keysToDelete)])
-		console.log('Cache invalidated for owner:', ownerId)
+		if (ownerId != null) {
+			const idStr = ownerId.toString()
+			keysToDelete.push(
+				this.generateKey('ownerProfile', { id: idStr }),
+				this.generateKey('ownerName', { id: idStr }),
+				this.generateKey('hiredEditors', { ownerId: idStr })
+			)
+		}
+
+		if (email) {
+			keysToDelete.push(this.generateKey('ownerByEmail', { email }))
+		}
+
+		const uniqueKeys = [...new Set(keysToDelete)].filter(Boolean)
+
+		await this.delete(uniqueKeys)
+		console.log(`Owner caches invalidated for: ${ownerId || email || 'general lists'}`, uniqueKeys)
 	}
 
 	async invalidateEditorCaches({ editorId, email }) {
