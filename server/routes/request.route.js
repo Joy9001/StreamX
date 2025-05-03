@@ -5,9 +5,7 @@ import {
 	changePrice,
 	createRequest,
 	deleteRequest,
-	getAdminRequests,
 	getAllRequests,
-	getAllUpdatedRequests,
 	getRequestMessages,
 	getRequestsByFromId,
 	getRequestsByFromToId,
@@ -23,16 +21,11 @@ router.post('/create', createRequest)
 // Get all requests
 router.get('/', getAllRequests)
 
-router.get('/all', getAllUpdatedRequests)
-
 // Get requests by owner/editor ID
 router.get('/to-id/:to_id', getRequestsByToId)
 
 // Get requests by owner/editor ID
 router.get('/from-id/:from_id', getRequestsByFromId)
-
-// Get admin requests
-router.get('/admin', getAdminRequests)
 
 // Update request status
 router.patch('/:id/status', updateRequestStatus)
