@@ -113,6 +113,15 @@ export class CacheService {
 		console.log('Cache invalidated for editor:', editorId)
 	}
 
+	async invalidateAdminCaches(adminId) {
+		const keysToDelete = []
+		// keys from admin controller
+		keysToDelete.push(this.generateKey('admin', { key: 'all' }))
+
+		await this.delete([...new Set(keysToDelete)])
+		console.log('Cache invalidated for admin:', adminId)
+	}
+
 	async invalidateRequestCaches(requestId) {
 		const keysToDelete = []
 
