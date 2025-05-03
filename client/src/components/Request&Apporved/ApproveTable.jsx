@@ -188,17 +188,11 @@ function ApproveTable() {
 
       // If the action was successful and we have transaction data, refresh the wallet balance
       if (
-        !resultAction.error &&
+        approveRequest.fulfilled.match(resultAction) &&
         resultAction.payload?.transaction &&
         !isEditor
       ) {
-        // Refresh wallet balance
-        dispatch(
-          fetchWalletBalance({
-            id: userId,
-            accessToken,
-          })
-        )
+        dispatch(fetchWalletBalance({ id: userId, accessToken }))
       }
     } catch (error) {
       console.error('Error approving request:', error)
