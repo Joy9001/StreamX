@@ -1,5 +1,6 @@
 import EditorGig from '../models/editorGig.model.js'
 import EditorGigPlans from '../models/editorGigPlans.model.js'
+import cacheService from '../services/cache.service.js'
 
 export const updateEditorGigPlans = async (req, res) => {
 	try {
@@ -20,6 +21,8 @@ export const updateEditorGigPlans = async (req, res) => {
 			{ new: true, upsert: true }
 		)
 
+		await cacheService.invalidateEditorPlanCaches(email)
+
 		res.status(201).json({
 			success: true,
 			data: updatedPlan,
@@ -37,11 +40,23 @@ export const updateEditorGigPlans = async (req, res) => {
 
 // Get editor gig plans by email
 export const getEditorGigPlansByEmail = async (req, res) => {
-	try {
-		const { email } = req.params
+	const { email } = req.params
+	const cacheKey = cacheService.generateKey('editorPlans', { email })
 
-		// Find the editor's gig plans
+	try {
+		const cachedPlans = await cacheService.get(cacheKey)
+		if (cachedPlans) {
+			return res.status(200).json({
+				success: true,
+				data: cachedPlans,
+				message: 'Editor gig plans retrieved successfully from cache!',
+			})
+		}
+
+		// Cache miss: Find the editor's gig plans
 		let editorPlans = await EditorGigPlans.findOne({ email })
+		let statusCode = 200
+		let message = 'Editor gig plans retrieved successfully!'
 
 		// If no plans exist, create default plans
 		if (!editorPlans) {
@@ -68,18 +83,16 @@ export const getEditorGigPlansByEmail = async (req, res) => {
 			}
 
 			editorPlans = await EditorGigPlans.create(defaultPlans)
-
-			return res.status(201).json({
-				success: true,
-				data: editorPlans,
-				message: 'Default gig plans created successfully!',
-			})
+			statusCode = 201
+			message = 'Default gig plans created successfully!'
 		}
 
-		res.status(200).json({
+		await cacheService.set(cacheKey, editorPlans, cacheService.TTL.DEFAULT)
+
+		res.status(statusCode).json({
 			success: true,
 			data: editorPlans,
-			message: 'Editor gig plans retrieved successfully!',
+			message: message,
 		})
 	} catch (error) {
 		console.error('Error in getEditorGigPlansByEmail:', error)
@@ -93,16 +106,18 @@ export const getEditorGigPlansByEmail = async (req, res) => {
 
 // Update editor gig plans by email
 export const updateEditorGigPlansByEmail = async (req, res) => {
-	try {
-		const { email } = req.params
-		const { basic, standard, premium } = req.body
+	const { email } = req.params
+	const { basic, standard, premium } = req.body
 
+	try {
 		// Find and update the plans
 		const updatedPlans = await EditorGigPlans.findOneAndUpdate(
 			{ email },
 			{ basic, standard, premium },
 			{ new: true, upsert: true, runValidators: true }
 		)
+
+		await cacheService.invalidateEditorPlanCaches(email)
 
 		res.status(200).json({
 			success: true,
@@ -120,15 +135,28 @@ export const updateEditorGigPlansByEmail = async (req, res) => {
 }
 
 export const getEditorGigPlans = async (req, res) => {
+	const cacheKey = cacheService.generateKey('editorPlans', { key: 'all' })
+
 	try {
-		const EditorPlanData = await EditorGigPlans.find()
-		if (!EditorPlanData) {
-			return res.status(404).json({ message: 'No editor data found' })
+		const cachedData = await cacheService.get(cacheKey)
+		if (cachedData) {
+			console.log('All editor plan data retrieved successfully from cache')
+			return res.status(200).json(cachedData)
 		}
-		console.log('Data retrieved successfully')
-		res.status(200).json(EditorPlanData)
+
+		// Cache miss: Fetch from DB
+		const editorPlanData = await EditorGigPlans.find()
+		if (!editorPlanData || editorPlanData.length === 0) {
+			await cacheService.set(cacheKey, [], cacheService.TTL.LIST)
+			return res.status(404).json({ message: 'No editor plan data found' })
+		}
+
+		await cacheService.set(cacheKey, editorPlanData, cacheService.TTL.LIST)
+
+		console.log('All editor plan data retrieved successfully from DB')
+		res.status(200).json(editorPlanData)
 	} catch (err) {
-		console.log('Error:', err)
+		console.log('Error fetching all editor plans:', err)
 		res.status(500).json({ error: err.message })
 	}
 }

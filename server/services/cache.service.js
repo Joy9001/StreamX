@@ -141,6 +141,15 @@ export class CacheService {
 		console.log(`Cache invalidated for editor gig: ${email}`)
 	}
 
+	async invalidateEditorPlanCaches(email) {
+		const keysToDelete = [
+			this.generateKey('editorPlans', { email }),
+			this.generateKey('editorPlans', { key: 'all' }),
+		]
+		await this.delete([...new Set(keysToDelete)])
+		console.log(`Cache invalidated for editor plans and related gigs: ${email}`)
+	}
+
 	getClient() {
 		return this.client
 	}
