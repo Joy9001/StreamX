@@ -95,9 +95,10 @@ function Dashboard() {
     const fetchRequestData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/requests`
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/requests`
         )
-        const chartData = processRegistrationData(response.data)
+        console.log('requests', response.data.requests)
+        const chartData = processRegistrationData(response.data.requests)
         setRequestStats(chartData)
         setLoading((prev) => ({ ...prev, requests: false }))
       } catch (err) {
