@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import express from 'express'
 import morgan from 'morgan'
 import connectMongo from './db/connectMongo.db.js'
+import { connectRedis } from './helpers/redis.helper.js'
 import { authCheck } from './middlewares/auth0.middleware.js'
 import adminRouter from './routes/admin.route.js'
 import auth0Router from './routes/auth0.route.js'
@@ -14,7 +15,6 @@ import requestRouter from './routes/request.route.js'
 import userRouter from './routes/user.route.js'
 import videoRouter from './routes/video.route.js'
 import ytRouter from './routes/yt.route.js'
-
 dotenv.config()
 
 const PORT = process.env.PORT || 3000
@@ -101,5 +101,8 @@ app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`)
 	connectMongo().then(() => {
 		console.log('MongoDB connected')
+	})
+	connectRedis().then(() => {
+		console.log('Redis connected')
 	})
 })

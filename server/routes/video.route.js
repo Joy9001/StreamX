@@ -1,15 +1,11 @@
 import { Router } from 'express'
-import { getAllVideos } from '../controllers/getAllVideos.controller.js'
 import {
 	deleteController,
-	downloadController,
 	getAllController,
-	getVideoNameById,
-	getVideosByEditorId,
+	getAllVideos,
 	recentController,
 	storageUsageController,
-	updateEditor,
-	updateOwner,
+	updateVideoOwnership,
 	uploadController,
 } from '../controllers/video.controller.js'
 import { upload } from '../middlewares/multer.middleware.js'
@@ -28,20 +24,16 @@ const logRequest = (req, res, next) => {
 	next()
 }
 
-// Route to get all videos for admin dashboard
 router.get('/all-videos', getAllVideos)
-
 router.get('/all/:role/:userId', getAllController)
 router.get('/recent/:role/:userId', recentController)
-router.get('/editor/:editorId', getVideosByEditorId)
-router.post('/upload/:role/:userId', upload.single('file'), uploadController)
-router.delete('/delete/:role', deleteController)
-router.get('/download/:id', downloadController)
-router.get('/name/:videoId', getVideoNameById)
 router.get('/storage-usages/:role/:userId', storageUsageController)
 
-router.patch('/:videoId/editor', updateEditor)
-router.patch('/:videoId/owner', updateOwner)
+router.post('/upload', upload.single('file'), uploadController)
+
+router.patch('/update-ownership', updateVideoOwnership)
+
+router.delete('/delete', deleteController)
 
 //? Router-level middleware
 router.use(logRequest)

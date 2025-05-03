@@ -1,56 +1,82 @@
 import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import { StatusCodes } from 'http-status-codes'
 import { storage } from '../helpers/firebase.helper.js'
+import { CACHE_TTL, deleteFromCache, getCacheKey, getFromCache, setToCache } from '../helpers/redis.helper.js'
 import Editor from '../models/editor.models.js'
 import Owner from '../models/owner.model.js'
 import Video from '../models/video.model.js'
-// import Admin from '../models/admin.model.js'
+
+const invalidateVideoCaches = async (video) => {
+	if (!video) return
+	const keysToDelete = []
+	const videoId = video._id.toString()
+
+	// Keys related to lists the video might appear in
+	if (video.ownerId) {
+		const ownerId = video.ownerId.toString()
+		keysToDelete.push(getCacheKey('allVideos', { role: 'Owner', userId: ownerId }))
+		keysToDelete.push(getCacheKey('recentVideos', { role: 'Owner', userId: ownerId }))
+		keysToDelete.push(getCacheKey('storageUsage', { role: 'Owner', userId: ownerId }))
+	}
+	if (video.editorId) {
+		const editorId = video.editorId.toString()
+		keysToDelete.push(getCacheKey('allVideos', { role: 'Editor', userId: editorId }))
+		keysToDelete.push(getCacheKey('recentVideos', { role: 'Editor', userId: editorId }))
+		keysToDelete.push(getCacheKey('videosByEditor', { editorId }))
+		keysToDelete.push(getCacheKey('storageUsage', { role: 'Editor', userId: editorId }))
+	}
+
+	// Admin lists
+	keysToDelete.push(getCacheKey('allVideos', { role: 'Admin' }))
+	keysToDelete.push(getCacheKey('allVideosAdmin', {}))
+
+	// Remove duplicates and delete
+	await deleteFromCache([...new Set(keysToDelete)])
+}
 
 const getAllController = async (req, res) => {
 	const { userId, role } = req.params
-	console.log('getAllController', userId, role)
-	let videos
+	const cacheKey = getCacheKey('allVideos', { role, userId })
 
 	try {
+		// Check cache first
+		const cachedVideos = await getFromCache(cacheKey)
+		if (cachedVideos) {
+			console.log(`Cache hit for ${cacheKey}`)
+			return res.status(StatusCodes.OK).json({ videos: cachedVideos })
+		}
+		console.log(`Cache miss for ${cacheKey}`)
+
+		// Fetch from DB if not in cache
+		let videos
 		if (role === 'Owner') {
 			videos = await Video.find({ ownerId: userId }).lean()
 		} else if (role === 'Editor') {
 			videos = await Video.find({ editorId: userId }).lean()
 		} else if (role === 'Admin') {
+			// Use the dedicated getAllVideos function for Admin to simplify logic here?
+			// Or keep it separate if params differ. For now, keep as is.
 			videos = await Video.find().lean()
+		} else {
+			return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid role specified' })
 		}
 
-		if (!videos) {
-			return res.status(StatusCodes.NOT_FOUND).json({ message: 'No videos found' })
+		if (!videos || videos.length === 0) {
+			await setToCache(cacheKey, [], CACHE_TTL.LIST)
+			return res.status(StatusCodes.OK).json({ videos: [] })
 		}
 
-		// find owner of videos
-		// let owner
-		// if (role === 'Owner') {
-		// 	owner = await Owner.findOne({ _id: userId }).lean()
-		// } else if (role === 'Editor') {
-		// 	owner = await Editor.findOne({ _id: userId }).lean()
-		// }
+		const editorIds = videos.map((video) => video.editorId).filter(Boolean)
+		const ownerIds = videos.map((video) => video.ownerId).filter(Boolean)
 
-		// if (!owner) {
-		// 	return res.status(StatusCodes.NOT_FOUND).json({ message: 'Owner not found' })
-		// }
-
-		console.log('videos in getAllController', videos)
-		const editorIds = videos.map((video) => video.editorId)
-		console.log('editorIds in getAllController', editorIds)
-		const editors = await Editor.find({ _id: { $in: editorIds } })
-		console.log('editors in getAllController', editors)
-
-		const ownerIds = videos.map((video) => video.ownerId)
-		console.log('ownerIds in getAllController', ownerIds)
-		const owners = await Owner.find({ _id: { $in: ownerIds } })
-		console.log('owners in getAllController', owners)
+		const [editors, owners] = await Promise.all([
+			Editor.find({ _id: { $in: editorIds } }).lean(),
+			Owner.find({ _id: { $in: ownerIds } }).lean(),
+		])
 
 		const videosData = videos.map((video) => {
-			// console.log('video', { ...video })
-			const editor = editors.find((editor) => editor._id.equals(video.editorId))
-			const owner = owners.find((owner) => owner._id.equals(video.ownerId))
+			const editor = editors.find((e) => e._id.equals(video.editorId))
+			const owner = owners.find((o) => o._id.equals(video.ownerId))
 			return {
 				owner: owner ? owner.username : '',
 				ownerPic: owner ? owner.profilephoto : '',
@@ -60,9 +86,12 @@ const getAllController = async (req, res) => {
 			}
 		})
 
+		// Store in cache
+		await setToCache(cacheKey, videosData, CACHE_TTL.LIST)
+
 		return res.status(StatusCodes.OK).json({ videos: videosData })
 	} catch (error) {
-		console.log('Error in getAllController', error)
+		console.error('Error in getAllController', error)
 		return res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)
 			.json({ message: 'Failed to get videos', error: error.message })
@@ -70,10 +99,8 @@ const getAllController = async (req, res) => {
 }
 
 const uploadController = async (req, res) => {
-	console.log(req.file)
-	console.log('body', req.body)
 	const { file } = req
-	const { userId, role } = req.params
+	const { userId, role } = req.body
 
 	console.log('file in uploadController: ', file)
 	console.log('userId in uploadController: ', userId)
@@ -82,33 +109,22 @@ const uploadController = async (req, res) => {
 	}
 
 	try {
-		const filename = file.originalname || `video-${Date.now()}`
-
-		let findVideo
-		if (role === 'Owner') {
-			findVideo = await Video.findOne({ metaData: { name: filename }, ownerId: userId })
-		} else if (role === 'Editor') {
-			findVideo = await Video.findOne({ metaData: { name: filename }, editorId: userId })
-		}
-
-		if (findVideo) {
-			filename = `${filename}-${Date.now()}`
-		}
+		const filename = `${file.originalname || 'video'}-${Date.now()}`
 
 		const metadata = {
 			encoding: file.encoding,
 			contentType: file.mimetype,
 			size: file.size,
 		}
-		const storageRef = ref(storage, `videos/${userId}/${filename}`)
-		const uploadTask = uploadBytesResumable(storageRef, file.buffer, metadata)
 
-		//TODO: Add event listeners to uploadTask
-		// Now, we will just wait for the upload to complete
+		const safeFilename = encodeURIComponent(filename)
+		const storageRef = ref(storage, `videos/${userId}/${safeFilename}`)
+		const uploadTask = uploadBytesResumable(storageRef, file.buffer, metadata)
 
 		await uploadTask
 		const downloadURL = await getDownloadURL(storageRef)
 		const vidMetaData = uploadTask.snapshot.metadata
+		vidMetaData.name = filename
 
 		let newVideo
 		if (role === 'Owner') {
@@ -124,46 +140,77 @@ const uploadController = async (req, res) => {
 				url: downloadURL,
 				metaData: vidMetaData,
 			})
+		} else {
+			return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid role for upload' })
 		}
 
 		const savedVideo = await newVideo.save()
 
 		if (!savedVideo) {
-			return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Failed to save video' })
+			// Clean up uploaded file if DB save fails? (More robust error handling)
+			try {
+				await deleteObject(storageRef)
+				console.log(`Firebase object deleted due to DB save failure: ${storageRef.fullPath}`)
+			} catch (deleteError) {
+				console.error(
+					`Failed to delete Firebase object after DB save failure: ${storageRef.fullPath}`,
+					deleteError
+				)
+			}
+			return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Failed to save video metadata' })
 		}
 
 		console.log('savedVideo', { ...savedVideo._doc })
 
-		// find owner of videos
+		await invalidateVideoCaches(savedVideo)
+
 		let user
 		if (role === 'Owner') {
-			user = await Owner.findOne({ _id: userId }).lean()
+			user = await Owner.findById(userId).lean()
 		} else if (role === 'Editor') {
-			user = await Editor.findOne({ _id: userId }).lean()
+			user = await Editor.findById(userId).lean()
 		}
 
 		if (!user) {
-			return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' })
+			console.error(`User not found after video upload: role=${role}, userId=${userId}`)
 		}
 
-		let videoData
-		if (role === 'Owner') {
+		let videoData = { ...savedVideo._doc }
+		if (role === 'Owner' && user) {
 			videoData = {
+				...videoData,
 				owner: user.username,
 				ownerPic: user.profilephoto,
-				...savedVideo._doc,
+				editor: '', // Editor might be assigned later
+				editorPic: '',
 			}
-		} else if (role === 'Editor') {
+		} else if (role === 'Editor' && user) {
+			// Need owner info if available
+			let owner = null
+			if (savedVideo.ownerId) {
+				owner = await Owner.findById(savedVideo.ownerId).lean()
+			}
 			videoData = {
+				...videoData,
+				owner: owner ? owner.username : '',
+				ownerPic: owner ? owner.profilephoto : '',
 				editor: user.name,
 				editorPic: user.profilephoto,
-				...savedVideo._doc,
 			}
 		}
 
 		return res.status(StatusCodes.OK).json({ message: 'File uploaded successfully', url: downloadURL, videoData })
 	} catch (error) {
-		console.log('Error in uploadController', error)
+		console.error('Error in uploadController', error)
+		// Attempt to clean up Firebase storage if an error occurred mid-process
+		if (error.storageRef) {
+			try {
+				await deleteObject(error.storageRef)
+				console.log(`Firebase object deleted due to error: ${error.storageRef.fullPath}`)
+			} catch (deleteError) {
+				console.error(`Failed to delete Firebase object after error: ${error.storageRef.fullPath}`, deleteError)
+			}
+		}
 		return res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)
 			.json({ message: 'Failed to upload file', error: error.message })
@@ -171,298 +218,301 @@ const uploadController = async (req, res) => {
 }
 
 const deleteController = async (req, res) => {
-	const { role } = req.params
-	const { id, userId } = req.body
+	const { id, userId, role } = req.body
 	console.log('/delete: ', req.body)
+
+	if (!id || !userId || !role) {
+		return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Missing required parameters (id, userId, role)' })
+	}
+
+	let video = null
+
 	try {
-		let video
 		if (role === 'Owner') {
 			video = await Video.findOne({ _id: id, ownerId: userId }).lean()
 		} else if (role === 'Editor') {
 			video = await Video.findOne({ _id: id, editorId: userId }).lean()
+		} else if (role === 'Admin') {
+			// Admins can delete any video, but we still need the video details
+			video = await Video.findById(id).lean()
+		} else {
+			return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid role' })
 		}
 
 		if (!video) {
-			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
+			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found or user lacks permission' })
 		}
 
-		const storageRef = ref(storage, `videos/${userId}/${video.metaData.name}`)
-		await deleteObject(storageRef)
+		const storagePath =
+			video.storagePath || `videos/${video.ownerId || video.editorId}/${encodeURIComponent(video.metaData.name)}`
+		const storageRef = ref(storage, storagePath)
 
-		await Video.findOneAndDelete({ _id: id })
+		try {
+			await deleteObject(storageRef)
+			console.log(`Firebase object deleted: ${storagePath}`)
+		} catch (storageError) {
+			if (storageError.code !== 'storage/object-not-found') {
+				console.error(
+					`Error deleting from Firebase Storage (but continuing to DB delete): ${storagePath}`,
+					storageError
+				)
+			} else {
+				console.warn(
+					`Firebase object not found during delete (expected if already deleted or path mismatch): ${storagePath}`
+				)
+			}
+		}
+
+		const deleteResult = await Video.deleteOne({ _id: id })
+
+		if (deleteResult.deletedCount === 0) {
+			console.warn(`Video not found in DB for deletion (ID: ${id}), possibly already deleted.`)
+			await invalidateVideoCaches(video)
+			return res
+				.status(StatusCodes.OK)
+				.json({ message: 'Video deletion processed (DB entry may have been already removed)' })
+		}
+
+		console.log(`Video deleted from DB: ${id}`)
+
+		await invalidateVideoCaches(video)
+
 		return res.status(StatusCodes.OK).json({ message: 'Video deleted successfully' })
 	} catch (error) {
-		console.log('Error in deleteController', error)
+		console.error('Error in deleteController main block:', error)
 		return res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)
 			.json({ message: 'Failed to delete video', error: error.message })
 	}
 }
 
-const downloadController = async (req, res) => {
-	const { id } = req.params
-
-	try {
-		const video = await Video.findOne({ _id: id }).lean()
-
-		if (!video) {
-			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
-		}
-
-		return res.status(StatusCodes.OK).download(video.url)
-	} catch (error) {
-		console.log('Error in downloadController', error)
-		return res
-			.status(StatusCodes.INTERNAL_SERVER_ERROR)
-			.json({ message: 'Failed to download video', error: error.message })
-	}
-}
-
 const recentController = async (req, res) => {
 	const { userId, role } = req.params
+	const cacheKey = getCacheKey('recentVideos', { role, userId })
+
 	try {
+		const cachedVideos = await getFromCache(cacheKey)
+		if (cachedVideos) {
+			console.log(`Cache hit for ${cacheKey}`)
+			return res.status(StatusCodes.OK).json({ videos: cachedVideos })
+		}
+		console.log(`Cache miss for ${cacheKey}`)
+
 		let videos
-		if (role === 'Owner') {
-			videos = await Video.find({ ownerId: userId }).sort({ createdAt: -1 }).limit(10)
-		} else if (role === 'Editor') {
-			videos = await Video.find({ editorId: userId }).sort({ createdAt: -1 }).limit(10)
+		const query = role === 'Owner' ? { ownerId: userId } : role === 'Editor' ? { editorId: userId } : {}
+		if (role !== 'Owner' && role !== 'Editor' && role !== 'Admin') {
+			return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid role specified' })
 		}
 
-		console.log('videos in recentController', videos)
-		if (!videos) {
-			return res.status(StatusCodes.NOT_FOUND).json({ message: 'No videos found' })
+		if (role === 'Admin') {
+			videos = await Video.find({}).sort({ createdAt: -1 }).limit(10).lean()
+		} else {
+			videos = await Video.find(query).sort({ createdAt: -1 }).limit(10).lean()
 		}
 
-		// find owner of videos
-		let user
-		if (role === 'Owner') {
-			user = await Owner.findOne({ _id: userId }).lean()
-		} else if (role === 'Editor') {
-			user = await Editor.findOne({ _id: userId }).lean()
+		if (!videos || videos.length === 0) {
+			await setToCache(cacheKey, [], CACHE_TTL.RECENT)
+			return res.status(StatusCodes.OK).json({ videos: [] })
 		}
 
-		if (!user) {
-			return res.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' })
-		}
+		const ownerIds = [...new Set(videos.map((v) => v.ownerId?.toString()).filter(Boolean))]
+		const editorIds = [...new Set(videos.map((v) => v.editorId?.toString()).filter(Boolean))]
 
-		const ownerIds = videos.map((video) => video.ownerId)
-		const owners = await Owner.find({ _id: { $in: ownerIds } })
+		const [owners, editors] = await Promise.all([
+			Owner.find({ _id: { $in: ownerIds } }).lean(),
+			Editor.find({ _id: { $in: editorIds } }).lean(),
+		])
 
-		const editorIds = videos.map((video) => video.editorId)
-		const editors = await Editor.find({ _id: { $in: editorIds } })
+		const ownerMap = new Map(owners.map((o) => [o._id.toString(), o]))
+		const editorMap = new Map(editors.map((e) => [e._id.toString(), e]))
 
 		const videosData = videos.map((video) => {
-			// console.log('video', { ...video })
-			let owner = owners.find((owner) => owner._id.equals(video.ownerId))
-			let editor = editors.find((editor) => editor._id.equals(video.editorId))
+			const owner = ownerMap.get(video.ownerId?.toString())
+			const editor = editorMap.get(video.editorId?.toString())
 			return {
+				...video,
 				owner: owner ? owner.username : '',
 				ownerPic: owner ? owner.profilephoto : '',
 				editor: editor ? editor.name : '',
 				editorPic: editor ? editor.profilephoto : '',
-				...video._doc,
 			}
 		})
 
+		await setToCache(cacheKey, videosData, CACHE_TTL.RECENT)
+
 		res.status(StatusCodes.OK).json({ videos: videosData })
 	} catch (error) {
-		console.log('Error in recentController', error)
-		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message })
-	}
-}
-
-// Get video name by ID
-const getVideoNameById = async (req, res) => {
-	try {
-		const { videoId } = req.params
-		const video = await Video.findById(videoId).select('metaData')
-
-		if (!video) {
-			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
-		}
-
-		const videoName = video.metaData.name || 'Untitled Video'
-		return res.status(StatusCodes.OK).json({ name: videoName })
-	} catch (error) {
-		console.error('Error fetching video name:', error)
-		return res
-			.status(StatusCodes.INTERNAL_SERVER_ERROR)
-			.json({ message: 'Failed to fetch video name', error: error.message })
-	}
-}
-
-// Update video owner
-const updateOwner = async (req, res) => {
-	try {
-		const { videoId } = req.params
-		const { owner_id } = req.body
-
-		console.log('Updating video owner:', {
-			videoId,
-			newOwnerId: owner_id,
-			body: req.body,
-		})
-
-		const updatedVideo = await Video.findByIdAndUpdate(videoId, { ownerId: owner_id }, { new: true })
-
-		if (!updatedVideo) {
-			console.log('Video not found:', videoId)
-			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
-		}
-
-		console.log('Video owner updated successfully:', updatedVideo)
-
-		await updatedVideo.save()
-		res.status(StatusCodes.OK).json(updatedVideo)
-	} catch (error) {
-		console.error('Error updating video owner:', error)
+		console.error('Error in recentController', error)
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-			message: 'Error updating video owner',
+			message: 'Failed to get recent videos',
 			error: error.message,
 		})
 	}
 }
 
-// Update video editor
-const updateEditor = async (req, res) => {
+const updateVideoOwnership = async (req, res) => {
+	const { videoId, userId, role } = req.body
+
+	if (!userId) {
+		return res.status(StatusCodes.BAD_REQUEST).json({ message: 'New user ID (userId) is required' })
+	}
+
+	if (role !== 'Owner' && role !== 'Editor') {
+		return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid role specified (must be Owner or Editor)' })
+	}
+
 	try {
-		const { videoId } = req.params
-		const { editorId } = req.body
-
-		console.log('Attempting to update video editor:', {
-			videoId,
-			newEditorId: editorId,
-			requestBody: req.body,
-		})
-
-		// First verify the video exists
-		const video = await Video.findById(videoId)
-		if (!video) {
-			console.log('Video not found:', videoId)
+		const videoBeforeUpdate = await Video.findById(videoId).lean()
+		if (!videoBeforeUpdate) {
 			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found' })
 		}
 
-		console.log('Current video state:', video)
+		let updateData = {}
+		if (role === 'Owner') {
+			updateData = { ownerId: userId }
+		} else if (role === 'Editor') {
+			updateData = {
+				editorId: userId || null,
+				editorAccess: true,
+			}
+		}
 
-		// Update only the editor fields
 		const updatedVideo = await Video.findByIdAndUpdate(
 			videoId,
-			{
-				$set: {
-					editorId: editorId,
-					editorAccess: true,
-				},
-			},
-			{
-				new: true,
-				runValidators: true,
-			}
-		)
+			{ $set: updateData },
+			{ new: true, runValidators: true }
+		).lean()
 
-		console.log('Video editor updated successfully:', updatedVideo)
+		if (!updatedVideo) {
+			console.log('Video not found during update:', videoId)
+			return res.status(StatusCodes.NOT_FOUND).json({ message: 'Video not found during update' })
+		}
+
+		console.log(`Video ${role.toLowerCase()} updated successfully:`, updatedVideo)
+
+		await invalidateVideoCaches(videoBeforeUpdate)
+		await invalidateVideoCaches(updatedVideo)
+
 		res.status(StatusCodes.OK).json(updatedVideo)
 	} catch (error) {
-		console.error('Error updating video editor:', error)
+		console.error(`Error updating video ${role.toLowerCase()}:`, error)
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-			message: 'Error updating video editor',
+			message: `Error updating video ${role.toLowerCase()}`,
 			error: error.message,
 			stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
 		})
 	}
 }
 
-// Get videos by editor ID
-const getVideosByEditorId = async (req, res) => {
-	try {
-		const { editorId } = req.params
-		console.log('Fetching videos for editor:', editorId)
-
-		const videos = await Video.find({ editorId: editorId }).lean()
-
-		if (!videos || videos.length === 0) {
-			return res.status(200).json([])
-		}
-
-		// Get unique owner IDs from videos
-		const ownerIds = [...new Set(videos.map((video) => video.ownerId))]
-
-		// Fetch owners and editors in parallel
-		const [owners, editor] = await Promise.all([
-			Owner.find({ _id: { $in: ownerIds } }).lean(),
-			Editor.findById(editorId),
-		])
-
-		// Map videos with owner and editor details
-		const videosWithDetails = videos.map((video) => {
-			const owner = owners.find((o) => o._id.equals(video.ownerId))
-			return {
-				...video,
-				metadata: {
-					fileName: video.metaData?.name || 'Untitled',
-					duration: video.metaData?.duration || '0:00',
-					fileSize: video.metaData?.size ? `${(video.metaData.size / (1024 * 1024)).toFixed(2)} MB` : '0 MB',
-					contentType: video.metaData?.contentType || 'video/mp4',
-				},
-				owner: {
-					name: owner?.username || 'Unknown',
-					email: owner?.email || '',
-					profilephoto: owner?.profilephoto || '',
-				},
-				editor: {
-					name: editor?.name || 'Unknown',
-					email: editor?.email || '',
-					profilephoto: editor?.profilephoto || '',
-				},
-			}
-		})
-
-		console.log(`Found ${videosWithDetails.length} videos for editor ${editorId}`)
-		res.status(200).json(videosWithDetails)
-	} catch (error) {
-		console.error('Error fetching videos by editor:', error)
-		res.status(500).json({ message: 'Error fetching videos', error: error.message })
-	}
-}
-
 const storageUsageController = async (req, res) => {
 	const { role, userId } = req.params
+	const cacheKey = getCacheKey('storageUsage', { role, userId })
 
 	try {
+		// Check cache first
+		const cachedUsage = await getFromCache(cacheKey)
+		if (cachedUsage !== null) {
+			// Check for null, as 0 is a valid usage
+			console.log(`Cache hit for ${cacheKey}`)
+			return res.status(StatusCodes.OK).json({ storageUsage: cachedUsage })
+		}
+		console.log(`Cache miss for ${cacheKey}`)
+
 		let videos
-		if (role === 'Owner') {
-			videos = await Video.find({ ownerId: userId }).lean()
-		} else if (role === 'Editor') {
-			videos = await Video.find({ editorId: userId }).lean()
+		const query = role === 'Owner' ? { ownerId: userId } : role === 'Editor' ? { editorId: userId } : {}
+		if (role !== 'Owner' && role !== 'Editor' && role !== 'Admin') {
+			return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid role specified' })
+		}
+		// Admin storage usage? Might be too heavy. Calculate only for Owner/Editor for now.
+		if (role === 'Admin') {
+			return res
+				.status(StatusCodes.BAD_REQUEST)
+				.json({ message: 'Storage usage calculation not supported for Admin role' })
 		}
 
-		if (!videos) {
-			return res.status(StatusCodes.NOT_FOUND).json({ message: 'No videos found' })
-		}
+		videos = await Video.find(query).select('metaData.size').lean() // Select only size
+
+		// No need to return 404 if no videos, usage is just 0
+		// if (!videos) { ... }
 
 		const storageUsage = videos.reduce((totalSize, video) => {
 			const fileSize = video.metaData?.size || 0
 			return totalSize + fileSize
 		}, 0)
 
+		// Store in cache
+		await setToCache(cacheKey, storageUsage, CACHE_TTL.DEFAULT)
+
 		console.log('storageUsage in storageUsageController: ', storageUsage)
 		return res.status(StatusCodes.OK).json({ storageUsage })
 	} catch (error) {
-		console.log('Error in storageUsageController: ', error)
+		console.error('Error in storageUsageController: ', error)
 		return res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)
 			.json({ message: 'Failed to get storage usage', error: error.message })
 	}
 }
 
+const getAllVideos = async (req, res) => {
+	const cacheKey = getCacheKey('allVideosAdmin', {})
+
+	try {
+		const cachedVideos = await getFromCache(cacheKey)
+		if (cachedVideos) {
+			console.log(`Cache hit for ${cacheKey}`)
+			return res.status(StatusCodes.OK).json(cachedVideos)
+		}
+		console.log(`Cache miss for ${cacheKey}`)
+
+		// Get all videos and populate owner and editor details
+		const videos = await Video.find()
+			.populate('ownerId', 'username email profilephoto')
+			.populate('editorId', 'name email profilephoto')
+			.sort({ createdAt: -1 })
+			.lean()
+
+		const formattedVideos = videos.map((video) => ({
+			...video,
+			owner: video.ownerId
+				? {
+						id: video.ownerId._id,
+						name: video.ownerId.username,
+						email: video.ownerId.email,
+						profilephoto: video.ownerId.profilephoto,
+					}
+				: { name: 'N/A' },
+			editor: video.editorId
+				? {
+						id: video.editorId._id,
+						name: video.editorId.name,
+						email: video.editorId.email,
+						profilephoto: video.editorId.profilephoto,
+					}
+				: { name: 'N/A' },
+
+			metadata: {
+				fileName: video.metaData?.name || 'Untitled',
+				fileSize: video.metaData?.size ? `${(video.metaData.size / (1024 * 1024)).toFixed(2)} MB` : '0 MB',
+				contentType: video.metaData?.contentType || 'video/mp4',
+			},
+		}))
+
+		// Store in cache
+		await setToCache(cacheKey, formattedVideos, CACHE_TTL.LIST) // Use list TTL
+
+		res.status(StatusCodes.OK).json(formattedVideos)
+	} catch (error) {
+		console.error('Error fetching all videos (admin):', error)
+		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error fetching videos', error: error.message }) // Use 500
+	}
+}
+
 export {
 	deleteController,
-	downloadController,
 	getAllController,
-	getVideoNameById,
-	getVideosByEditorId,
+	getAllVideos,
 	recentController,
 	storageUsageController,
-	updateEditor,
-	updateOwner,
+	updateVideoOwnership,
 	uploadController,
 }
