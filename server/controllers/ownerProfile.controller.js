@@ -1,6 +1,7 @@
 import { deleteObject, getDownloadURL, listAll, ref, uploadBytesResumable } from 'firebase/storage'
 import { storage } from '../helpers/firebase.helper.js'
 import Owner from '../models/owner.model.js'
+import cacheService from '../services/cache.service.js'
 
 // Controller for creating a new profile
 export const createOwnerProfile = async (req, res) => {
@@ -50,6 +51,8 @@ export const createOwnerProfile = async (req, res) => {
 		findOwner.profilephoto = downloadURL
 
 		findOwner = await findOwner.save()
+
+		await cacheService.invalidateOwnerCaches({ ownerId: id })
 
 		// const newOwner = new Owner({
 		//     username,
@@ -146,6 +149,8 @@ export const updateOwnerProfile = async (req, res) => {
 
 		await owner.save()
 
+		await cacheService.invalidateOwnerCaches({ ownerId: id })
+
 		res.status(200).json({
 			message: 'Profile successfully updated!',
 			owner,
@@ -193,6 +198,9 @@ export const updateBasicProfile = async (req, res) => {
 		}
 
 		await findOwner.save()
+
+		await cacheService.invalidateOwnerCaches({ ownerId: id })
+
 		res.status(200).json({
 			message: 'Profile updated successfully',
 			owner: findOwner,
