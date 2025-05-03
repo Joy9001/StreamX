@@ -68,18 +68,17 @@ export class CacheService {
 
 	// Video-specific cache operations
 	async invalidateVideoCaches(video) {
-		if (!video) return
 		const keysToDelete = []
 
 		// Keys related to lists the video might appear in
-		if (video.ownerId) {
+		if (video?.ownerId) {
 			const ownerId = video.ownerId.toString()
 			keysToDelete.push(this.generateKey('allVideos', { role: 'Owner', userId: ownerId }))
 			keysToDelete.push(this.generateKey('recentVideos', { role: 'Owner', userId: ownerId }))
 			keysToDelete.push(this.generateKey('storageUsage', { role: 'Owner', userId: ownerId }))
 		}
 
-		if (video.editorId) {
+		if (video?.editorId) {
 			const editorId = video.editorId.toString()
 			keysToDelete.push(this.generateKey('allVideos', { role: 'Editor', userId: editorId }))
 			keysToDelete.push(this.generateKey('recentVideos', { role: 'Editor', userId: editorId }))
@@ -97,7 +96,6 @@ export class CacheService {
 	}
 
 	async invalidateOwnerCaches(ownerId) {
-		if (!ownerId) return
 		const keysToDelete = []
 		// keys from admin controller
 		keysToDelete.push(this.generateKey('owner', { key: 'all' }))
@@ -107,7 +105,6 @@ export class CacheService {
 	}
 
 	async invalidateEditorCaches(editorId) {
-		if (!editorId) return
 		const keysToDelete = []
 		// keys from admin controller
 		keysToDelete.push(this.generateKey('editor', { key: 'all' }))
@@ -117,7 +114,6 @@ export class CacheService {
 	}
 
 	async invalidateRequestCaches(requestId) {
-		if (!requestId) return
 		const keysToDelete = []
 
 		//keys from admin controller
