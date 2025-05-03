@@ -8,6 +8,7 @@ import Admin from '../models/admin.model.js'
 import Owner from '../models/owner.model.js'
 import Request from '../models/request.model.js'
 import Video from '../models/video.model.js'
+import cacheService from '../services/cache.service.js'
 
 const uploadController = async (req, res) => {
 	try {
@@ -179,6 +180,9 @@ const uploadController = async (req, res) => {
 		let updatedVideo = await findVideo.save()
 		console.log('Updated video data:', updatedVideo)
 
+		// Invalidate cache for the updated video
+		await cacheService.invalidateVideoCaches(updatedVideo)
+
 		res.status(StatusCodes.OK).json({ response, message: 'Video uploaded to YouTube', updatedVideo })
 	} catch (error) {
 		console.log('Error in yt uploadController:', error)
@@ -246,6 +250,10 @@ const reqAdminController = async (req, res) => {
 
 		await newRequest.save()
 		console.log('requst created', newRequest)
+
+		// Invalidate caches
+		await cacheService.invalidateVideoCaches(findVideo)
+		await cacheService.invalidateRequestCaches(newRequest)
 
 		res.status(StatusCodes.OK).json({ message: 'Request sent to admin' })
 	} catch (error) {
