@@ -84,6 +84,7 @@ export class CacheService {
 			keysToDelete.push(this.generateKey('recentVideos', { role: 'Editor', userId: editorId }))
 			keysToDelete.push(this.generateKey('videosByEditor', { editorId }))
 			keysToDelete.push(this.generateKey('storageUsage', { role: 'Editor', userId: editorId }))
+			keysToDelete.push(this.generateKey('hiredByOwners', { editorId })) // Add hiredByOwners invalidation
 		}
 
 		// Admin lists
@@ -104,13 +105,22 @@ export class CacheService {
 		console.log('Cache invalidated for owner:', ownerId)
 	}
 
-	async invalidateEditorCaches(editorId) {
+	async invalidateEditorCaches({ editorId, email }) {
 		const keysToDelete = []
 		// keys from admin controller
 		keysToDelete.push(this.generateKey('editor', { key: 'all' }))
 
+		// Specific editor caches if identifiers are provided
+		if (editorId) {
+			keysToDelete.push(this.generateKey('editorName', { editorId }))
+			keysToDelete.push(this.generateKey('hiredByOwners', { editorId }))
+		}
+		if (email) {
+			keysToDelete.push(this.generateKey('editor', { email }))
+		}
+
 		await this.delete([...new Set(keysToDelete)])
-		console.log('Cache invalidated for editor:', editorId)
+		console.log(`Cache invalidated for editor: ${editorId || email}`)
 	}
 
 	async invalidateAdminCaches(adminId) {
@@ -142,10 +152,12 @@ export class CacheService {
 	}
 
 	async invalidateEditorPlanCaches(email) {
-		const keysToDelete = [
-			this.generateKey('editorPlans', { email }),
-			this.generateKey('editorPlans', { key: 'all' }),
-		]
+		const keysToDelete = [this.generateKey('editorPlans', { key: 'all' })]
+
+		if (email) {
+			keysToDelete.push(this.generateKey('editorPlans', { email }))
+			keysToDelete.push(this.generateKey('editorGigs', { email }))
+		}
 		await this.delete([...new Set(keysToDelete)])
 		console.log(`Cache invalidated for editor plans and related gigs: ${email}`)
 	}
