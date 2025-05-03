@@ -67,7 +67,7 @@ export class CacheService {
 	}
 
 	// Video-specific cache operations
-	async invalidateVideoRelatedCaches(video) {
+	async invalidateVideoCaches(video) {
 		if (!video) return
 		const keysToDelete = []
 
@@ -89,7 +89,7 @@ export class CacheService {
 
 		// Admin lists
 		keysToDelete.push(this.generateKey('allVideos', { role: 'Admin' }))
-		keysToDelete.push(this.generateKey('allVideosAdmin', {}))
+		keysToDelete.push(this.generateKey('videos', { key: 'all' }))
 
 		// Remove duplicates and delete
 		await this.delete([...new Set(keysToDelete)])

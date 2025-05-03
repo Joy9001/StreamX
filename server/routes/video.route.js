@@ -2,7 +2,6 @@ import { Router } from 'express'
 import {
 	deleteController,
 	getAllController,
-	getAllVideos,
 	recentController,
 	storageUsageController,
 	updateVideoOwnership,
@@ -24,7 +23,6 @@ const logRequest = (req, res, next) => {
 	next()
 }
 
-router.get('/all-videos', getAllVideos)
 router.get('/all/:role/:userId', getAllController)
 router.get('/recent/:role/:userId', recentController)
 router.get('/storage-usages/:role/:userId', storageUsageController)

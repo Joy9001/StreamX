@@ -1,7 +1,10 @@
+import { StatusCodes } from 'http-status-codes'
 import Admin from '../models/admin.model.js'
 import Editor from '../models/editor.models.js'
 import Owner from '../models/owner.model.js'
 import Request from '../models/request.model.js'
+import Video from '../models/video.model.js'
+import cacheService from '../services/cache.service.js'
 
 export const getAllOwners = async (req, res) => {
 	try {
@@ -106,5 +109,57 @@ export const getAllRequests = async (req, res) => {
 			message: 'Error fetching requests',
 			error: error.message,
 		})
+	}
+}
+
+export const getAllVideos = async (req, res) => {
+	const cacheKey = cacheService.generateKey('video', { key: 'all' })
+
+	try {
+		const cachedVideos = await cacheService.get(cacheKey)
+		if (cachedVideos) {
+			return res.status(StatusCodes.OK).json(cachedVideos)
+		}
+
+		// Get all videos and populate owner and editor details
+		const videos = await Video.find()
+			.populate('ownerId', 'username email profilephoto')
+			.populate('editorId', 'name email profilephoto')
+			.sort({ createdAt: -1 })
+			.lean()
+
+		const formattedVideos = videos.map((video) => ({
+			...video,
+			owner: video.ownerId
+				? {
+						id: video.ownerId._id,
+						name: video.ownerId.username,
+						email: video.ownerId.email,
+						profilephoto: video.ownerId.profilephoto,
+					}
+				: { name: 'N/A' },
+			editor: video.editorId
+				? {
+						id: video.editorId._id,
+						name: video.editorId.name,
+						email: video.editorId.email,
+						profilephoto: video.editorId.profilephoto,
+					}
+				: { name: 'N/A' },
+
+			metadata: {
+				fileName: video.metaData?.name || 'Untitled',
+				fileSize: video.metaData?.size ? `${(video.metaData.size / (1024 * 1024)).toFixed(2)} MB` : '0 MB',
+				contentType: video.metaData?.contentType || 'video/mp4',
+			},
+		}))
+
+		// Store in cache
+		await cacheService.set(cacheKey, formattedVideos, cacheService.TTL.LIST) // Use list TTL
+
+		res.status(StatusCodes.OK).json(formattedVideos)
+	} catch (error) {
+		console.error('Error fetching all videos (admin):', error)
+		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error fetching videos', error: error.message }) // Use 500
 	}
 }
