@@ -479,7 +479,7 @@ const getAllVideos = async (req, res) => {
 						name: video.ownerId.username,
 						email: video.ownerId.email,
 						profilephoto: video.ownerId.profilephoto,
-					}
+				  }
 				: { name: 'N/A' },
 			editor: video.editorId
 				? {
@@ -487,7 +487,7 @@ const getAllVideos = async (req, res) => {
 						name: video.editorId.name,
 						email: video.editorId.email,
 						profilephoto: video.editorId.profilephoto,
-					}
+				  }
 				: { name: 'N/A' },
 
 			metadata: {
