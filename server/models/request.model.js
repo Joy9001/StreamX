@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
+import { model, Schema } from 'mongoose'
 
-const messageSchema = new mongoose.Schema(
+const messageSchema = new Schema(
 	{
 		sender_id: {
 			type: mongoose.Schema.Types.ObjectId,
@@ -27,7 +27,7 @@ const messageSchema = new mongoose.Schema(
 	{ _id: true }
 )
 
-const requestSchema = new mongoose.Schema(
+const requestSchema = new Schema(
 	{
 		to_id: {
 			type: mongoose.Schema.Types.ObjectId,
@@ -63,6 +63,6 @@ const requestSchema = new mongoose.Schema(
 	}
 )
 
-const Request = mongoose.model('Request', requestSchema)
+const Request = model('Request', requestSchema)
 
 export default Request

@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
+import { model, Schema } from 'mongoose'
 
-const EditorGig_Schema = mongoose.Schema({
+const editorGigSchema = new Schema({
 	name: {
 		type: String,
 		default: '-',
@@ -40,5 +40,5 @@ const EditorGig_Schema = mongoose.Schema({
 	},
 })
 
-const Editor_Gig = mongoose.model('EditorGig', EditorGig_Schema)
-export default Editor_Gig
+const EditorGig = model('EditorGig', editorGigSchema)
+export default EditorGig

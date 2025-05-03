@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
+import { model, Schema } from 'mongoose'
 
-const gTokenSchema = new mongoose.Schema({
+const gTokenSchema = new Schema({
 	accessToken: {
 		type: String,
 		default: '',
@@ -11,7 +11,7 @@ const gTokenSchema = new mongoose.Schema({
 	},
 })
 
-const ownerSchema = new mongoose.Schema({
+const ownerSchema = new Schema({
 	username: {
 		type: String,
 		required: true,
@@ -64,5 +64,5 @@ const ownerSchema = new mongoose.Schema({
 	},
 })
 
-const Owner = mongoose.model('Owner', ownerSchema)
+const Owner = model('Owner', ownerSchema)
 export default Owner
