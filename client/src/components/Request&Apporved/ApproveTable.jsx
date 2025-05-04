@@ -33,6 +33,8 @@ function ApproveTable() {
   const { receivedRequests, loading, error } = useSelector(
     (state) => state.requests
   )
+  console.log('receivedRequests', receivedRequests)
+
   const { messageCounts } = useSelector((state) => state.messages)
   const { userData } = useSelector((state) => state.user)
   const { walletBalance, loading: walletLoading } = useSelector(
@@ -52,8 +54,8 @@ function ApproveTable() {
     const fetchData = async () => {
       if (!userData) return
 
-      // Extract the MongoDB ID - depending on your data structure
-      const userId = userData._id || userData.sub || userData.id
+      const userId = userData._id
+      console.log('userId', userId)
 
       if (!userId) {
         console.error('No valid user ID found in userData:', userData)
@@ -132,22 +134,22 @@ function ApproveTable() {
     fetchBalance()
   }, [dispatch, getAccessTokenSilently, userData, isEditor])
 
-  const initiateApproval = (requestId, videoId, toId = null) => {
+  const initiateApproval = (requestId, videoId, fromId = null) => {
     // Get the request details from the receivedRequests array
     const request = receivedRequests.find((req) => req._id === requestId)
     if (!request) return
 
     // If the user is an owner, show the wallet balance confirmation
     if (!isEditor) {
-      setRequestToApprove({ requestId, videoId, toId, price: request.price })
+      setRequestToApprove({ requestId, videoId, fromId, price: request.price })
       setShowConfirmModal(true)
     } else {
       // Editors don't need wallet confirmation, proceed directly
-      handleApprove(requestId, videoId, toId, request.price)
+      handleApprove(requestId, videoId, fromId, request.price)
     }
   }
 
-  const handleApprove = async (requestId, videoId, toId = null, price = 0) => {
+  const handleApprove = async (requestId, videoId, fromId, price = 0) => {
     try {
       const accessToken = await getAccessTokenSilently()
       // Extract the correct user ID
@@ -161,7 +163,7 @@ function ApproveTable() {
       console.log(`${isEditor ? 'Editor' : ''} approving request:`, {
         requestId,
         videoId,
-        toId,
+        fromId,
         userId,
         price,
       })
@@ -169,17 +171,12 @@ function ApproveTable() {
       const approveData = {
         requestId,
         videoId,
+        fromId,
         userData: { ...userData, _id: userId },
         accessToken,
         userRole,
         price, // Include the price in the request data
       }
-
-      // Only add toId for non-editor roles
-      if (!isEditor && toId) {
-        approveData.toId = toId
-      }
-
       // Dispatch the approve action and handle the response
       const resultAction = await dispatch(approveRequest(approveData))
 
@@ -367,7 +364,7 @@ function ApproveTable() {
                 handleApprove(
                   requestToApprove.requestId,
                   requestToApprove.videoId,
-                  requestToApprove.toId,
+                  requestToApprove.fromId,
                   requestToApprove.price
                 )
               }
@@ -556,7 +553,7 @@ function ApproveTable() {
                               initiateApproval(
                                 request._id,
                                 request.video._id,
-                                isEditor ? null : counterparty?.id
+                                counterparty?.id
                               )
                             }
                             className='flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 transition-colors hover:bg-green-100'
