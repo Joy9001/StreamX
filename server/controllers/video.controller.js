@@ -371,7 +371,7 @@ const updateVideoOwnership = async (req, res) => {
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			message: `Error updating video ${role.toLowerCase()}`,
 			error: error.message,
-			stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+			stack: error.stack,
 		})
 	}
 }
