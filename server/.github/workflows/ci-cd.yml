@@ -2,11 +2,11 @@ name: StreamX Server CI/CD
 
 on:
     push:
-        branches: [main, develop]
+        branches: [main]
         paths:
             - 'server/**'
     pull_request:
-        branches: [main, develop]
+        branches: [main]
         paths:
             - 'server/**'
     workflow_dispatch:
