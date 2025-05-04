@@ -1,16 +1,19 @@
+import dotenv from 'dotenv'
 import swaggerJsdoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
 import {
-	requestDocs,
-	videoDocs,
-	editorDocs,
 	adminDocs,
-	userDocs,
 	auth0Docs,
+	editorDocs,
+	ownerDocs,
+	requestDocs,
+	userDocs,
+	videoDocs,
 	walletDocs,
 	ytDocs,
-	ownerDocs,
 } from './swagger.js'
+
+dotenv.config()
 
 // Define the Swagger configuration
 const swaggerOptions = {
@@ -28,7 +31,7 @@ const swaggerOptions = {
 		},
 		servers: [
 			{
-				url: 'http://localhost:3000',
+				url: process.env.SERVER_URL || 'http://localhost:3000',
 				description: 'Development server',
 			},
 		],

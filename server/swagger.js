@@ -1,5 +1,8 @@
+import dotenv from 'dotenv'
 import swaggerJsDoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
+
+dotenv.config()
 
 const options = {
 	definition: {
@@ -14,7 +17,7 @@ const options = {
 		},
 		servers: [
 			{
-				url: 'http://localhost:3000',
+				url: process.env.SERVER_URL || 'http://localhost:3000',
 				description: 'Development server',
 			},
 		],
@@ -2814,4 +2817,4 @@ const ownerDocs = {
 }
 
 // Export the documentation objects for use in the server setup
-export { requestDocs, videoDocs, editorDocs, adminDocs, userDocs, auth0Docs, walletDocs, ytDocs, ownerDocs }
+export { adminDocs, auth0Docs, editorDocs, ownerDocs, requestDocs, userDocs, videoDocs, walletDocs, ytDocs }
