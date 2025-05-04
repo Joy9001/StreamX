@@ -15,7 +15,7 @@ import requestRouter from './routes/request.route.js'
 import userRouter from './routes/user.route.js'
 import videoRouter from './routes/video.route.js'
 import walletRouter from './routes/wallet.route.js'
-import { specs, swaggerUi } from './docs/swagger.js'
+import { swaggerSpec, swaggerUi, swaggerUiOptions } from './swaggerConfig.js'
 import ytRouter from './routes/yt.route.js'
 dotenv.config()
 
@@ -64,7 +64,7 @@ app.use((req, res, next) => {
 })
 
 // Swagger documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }))
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions))
 
 app.get('/', (req, res) => {
 	res.send('Backend is up!')
