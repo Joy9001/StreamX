@@ -11,6 +11,7 @@ import {
 	getRequestsByToId,
 	updateRequestStatus,
 } from '../controllers/request.controller.js'
+import { getAllRequests } from '../controllers/admin.controller.js'
 
 const router = express.Router()
 
@@ -150,7 +151,7 @@ router.get('/', getAllRequests)
  *       500:
  *         description: Server error
  */
-router.get('/all', getAllUpdatedRequests)
+router.get('/all', getAllRequests)
 
 /**
  * @swagger
@@ -224,7 +225,7 @@ router.get('/from-id/:from_id', getRequestsByFromId)
  *       500:
  *         description: Server error
  */
-router.get('/admin', getAdminRequests)
+router.get('/admin', getAllRequests)
 
 /**
  * @swagger

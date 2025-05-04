@@ -7,6 +7,7 @@ import {
 	updateVideoOwnership,
 	uploadController,
 } from '../controllers/video.controller.js'
+import { getAllVideos } from '../controllers/admin.controller.js'
 import { upload } from '../middlewares/multer.middleware.js'
 
 const router = Router()
@@ -79,6 +80,7 @@ const logRequest = (req, res, next) => {
  *       500:
  *         description: Server error
  */
+router.get('/all-videos', getAllVideos)
 
 /**
  * @swagger

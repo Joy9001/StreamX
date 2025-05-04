@@ -1,9 +1,13 @@
 import express from 'express'
-import deleteEditorByEmail from '../controllers/deleteEditor.controller.js'
-import { createEditorProfile, getEditorNameById, getHiredByOwners } from '../controllers/editorProfile.controller.js'
-import updateEditor from '../controllers/editorProfileEdit.controller.js'
-import { EditorData } from '../controllers/getEditor.controller.js'
-import GetEditorByEmail from '../controllers/getEditorUsingMail.controller.js'
+import {
+	createEditorProfile,
+	getEditorNameById,
+	getHiredByOwners,
+	deleteEditorByEmail,
+	updateEditor,
+	getEditorByEmail,
+} from '../controllers/editorProfile.controller.js'
+import { getAllEditors } from '../controllers/admin.controller.js'
 
 const router = express.Router()
 
@@ -115,6 +119,7 @@ router.post('/', createEditorProfile)
  *       500:
  *         description: Server error
  */
+router.get('/', getAllEditors)
 
 /**
  * @swagger

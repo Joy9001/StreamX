@@ -271,18 +271,16 @@ router.post('/transfer', transferMoney)
  *         schema:
  *           type: string
  *           enum: [owner, editor, admin]
- *         description: Wallet type
+ *         description: Type of wallets to retrieve
  *     responses:
  *       200:
- *         description: List of wallets of specified type
+ *         description: List of wallets by type
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Wallet'
- *       400:
- *         description: Invalid wallet type
  *       500:
  *         description: Server error
  */

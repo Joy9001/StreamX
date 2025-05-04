@@ -1,18 +1,18 @@
-import { Router } from 'express'
+import express from 'express'
 import {
 	createEditorGig,
-	getEditorGigByEmail,
 	getEditorGigData,
+	getEditorGigByEmail,
 	updateEditorGigByEmail,
 } from '../controllers/editorGig.controller.js'
 import {
-	getEditorGigPlans,
-	getEditorGigPlansByEmail,
 	updateEditorGigPlans,
+	getEditorGigPlansByEmail,
 	updateEditorGigPlansByEmail,
+	getEditorGigPlans,
 } from '../controllers/editorPlan.controller.js'
 
-const router = Router()
+const router = express.Router()
 
 /**
  * @swagger
@@ -42,14 +42,6 @@ const router = Router()
  *         revisions:
  *           type: number
  *           description: Number of revisions offered
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: When the gig was created
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           description: When the gig was last updated
  *     EditorGigPlan:
  *       type: object
  *       properties:
@@ -61,39 +53,22 @@ const router = Router()
  *           description: ID of the editor
  *         basicTitle:
  *           type: string
- *           description: Title for basic plan
  *         basicDescription:
  *           type: string
- *           description: Description for basic plan
  *         basicPrice:
  *           type: number
- *           description: Price for basic plan
  *         standardTitle:
  *           type: string
- *           description: Title for standard plan
  *         standardDescription:
  *           type: string
- *           description: Description for standard plan
  *         standardPrice:
  *           type: number
- *           description: Price for standard plan
  *         premiumTitle:
  *           type: string
- *           description: Title for premium plan
  *         premiumDescription:
  *           type: string
- *           description: Description for premium plan
  *         premiumPrice:
  *           type: number
- *           description: Price for premium plan
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: When the plans were created
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           description: When the plans were last updated
  */
 
 /**
@@ -107,38 +82,10 @@ const router = Router()
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               editorId:
- *                 type: string
- *                 description: ID of the editor
- *               title:
- *                 type: string
- *                 description: Title of the gig
- *               description:
- *                 type: string
- *                 description: Description of the gig
- *               price:
- *                 type: number
- *                 description: Price of the gig
- *               deliveryTime:
- *                 type: number
- *                 description: Delivery time in days
- *               revisions:
- *                 type: number
- *                 description: Number of revisions offered
- *             required:
- *               - editorId
- *               - title
- *               - description
- *               - price
+ *             $ref: '#/components/schemas/EditorGig'
  *     responses:
  *       201:
  *         description: Editor gig created successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/EditorGig'
  *       400:
  *         description: Invalid request data
  *       500:
@@ -155,12 +102,6 @@ router.post('/', createEditorGig)
  *     responses:
  *       200:
  *         description: List of all editor gigs
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/EditorGig'
  *       500:
  *         description: Server error
  */
@@ -175,12 +116,6 @@ router.get('/', getEditorGigData)
  *     responses:
  *       200:
  *         description: List of all editor gig plans
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/EditorGigPlan'
  *       500:
  *         description: Server error
  */
@@ -197,47 +132,10 @@ router.get('/plans', getEditorGigPlans)
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               editorId:
- *                 type: string
- *                 description: ID of the editor
- *               basicTitle:
- *                 type: string
- *                 description: Title for basic plan
- *               basicDescription:
- *                 type: string
- *                 description: Description for basic plan
- *               basicPrice:
- *                 type: number
- *                 description: Price for basic plan
- *               standardTitle:
- *                 type: string
- *                 description: Title for standard plan
- *               standardDescription:
- *                 type: string
- *                 description: Description for standard plan
- *               standardPrice:
- *                 type: number
- *                 description: Price for standard plan
- *               premiumTitle:
- *                 type: string
- *                 description: Title for premium plan
- *               premiumDescription:
- *                 type: string
- *                 description: Description for premium plan
- *               premiumPrice:
- *                 type: number
- *                 description: Price for premium plan
- *             required:
- *               - editorId
+ *             $ref: '#/components/schemas/EditorGigPlan'
  *     responses:
  *       201:
  *         description: Editor gig plans created successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/EditorGigPlan'
  *       400:
  *         description: Invalid request data
  *       500:
@@ -257,14 +155,9 @@ router.post('/plan', updateEditorGigPlans)
  *         required: true
  *         schema:
  *           type: string
- *         description: Editor's email address
  *     responses:
  *       200:
  *         description: Editor gig details
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/EditorGig'
  *       404:
  *         description: Editor gig not found
  *       500:
@@ -284,14 +177,9 @@ router.get('/email/:email', getEditorGigByEmail)
  *         required: true
  *         schema:
  *           type: string
- *         description: Editor's email address
  *     responses:
  *       200:
  *         description: Editor gig plans
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/EditorGigPlan'
  *       404:
  *         description: Editor gig plans not found
  *       500:
@@ -311,36 +199,15 @@ router.get('/plans/email/:email', getEditorGigPlansByEmail)
  *         required: true
  *         schema:
  *           type: string
- *         description: Editor's email address
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *                 description: Updated title
- *               description:
- *                 type: string
- *                 description: Updated description
- *               price:
- *                 type: number
- *                 description: Updated price
- *               deliveryTime:
- *                 type: number
- *                 description: Updated delivery time
- *               revisions:
- *                 type: number
- *                 description: Updated revisions
+ *             $ref: '#/components/schemas/EditorGig'
  *     responses:
  *       200:
  *         description: Editor gig updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/EditorGig'
  *       404:
  *         description: Editor gig not found
  *       500:
@@ -360,48 +227,15 @@ router.patch('/email/:email', updateEditorGigByEmail)
  *         required: true
  *         schema:
  *           type: string
- *         description: Editor's email address
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               basicTitle:
- *                 type: string
- *                 description: Updated title for basic plan
- *               basicDescription:
- *                 type: string
- *                 description: Updated description for basic plan
- *               basicPrice:
- *                 type: number
- *                 description: Updated price for basic plan
- *               standardTitle:
- *                 type: string
- *                 description: Updated title for standard plan
- *               standardDescription:
- *                 type: string
- *                 description: Updated description for standard plan
- *               standardPrice:
- *                 type: number
- *                 description: Updated price for standard plan
- *               premiumTitle:
- *                 type: string
- *                 description: Updated title for premium plan
- *               premiumDescription:
- *                 type: string
- *                 description: Updated description for premium plan
- *               premiumPrice:
- *                 type: number
- *                 description: Updated price for premium plan
+ *             $ref: '#/components/schemas/EditorGigPlan'
  *     responses:
  *       200:
  *         description: Editor gig plans updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/EditorGigPlan'
  *       404:
  *         description: Editor gig plans not found
  *       500:

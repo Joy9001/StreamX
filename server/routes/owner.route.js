@@ -303,7 +303,7 @@ router.put('/owner/profile/settings/:id', upload.single('file'), updateOwnerProf
  * @swagger
  * /api/owner/profile/basic/{id}:
  *   patch:
- *     summary: Update owner's basic profile
+ *     summary: Update owner's basic profile information
  *     tags: [Owners]
  *     parameters:
  *       - in: path
@@ -322,10 +322,10 @@ router.put('/owner/profile/settings/:id', upload.single('file'), updateOwnerProf
  *               file:
  *                 type: string
  *                 format: binary
- *                 description: Updated profile photo
- *               username:
+ *                 description: Profile photo
+ *               firstName:
  *                 type: string
- *               bio:
+ *               lastName:
  *                 type: string
  *     responses:
  *       200:
@@ -341,7 +341,7 @@ router.patch('/owner/profile/basic/:id', upload.single('file'), updateBasicProfi
  * @swagger
  * /api/hired-editors/{ownerId}:
  *   get:
- *     summary: Get editors hired by an owner
+ *     summary: Get all editors hired by an owner
  *     tags: [Owners]
  *     parameters:
  *       - in: path
@@ -353,6 +353,22 @@ router.patch('/owner/profile/basic/:id', upload.single('file'), updateBasicProfi
  *     responses:
  *       200:
  *         description: List of hired editors
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   editorId:
+ *                     type: string
+ *                     description: Editor ID
+ *                   username:
+ *                     type: string
+ *                     description: Editor username
+ *                   profilephoto:
+ *                     type: string
+ *                     description: URL to editor's profile photo
  *       404:
  *         description: Owner not found
  *       500:
