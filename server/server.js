@@ -2,9 +2,9 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
+import fs from 'fs'
 import morgan from 'morgan'
 import connectMongo from './db/connectMongo.db.js'
-import cacheService from './services/cache.service.js'
 import { authCheck } from './middlewares/auth0.middleware.js'
 import adminRouter from './routes/admin.route.js'
 import auth0Router from './routes/auth0.route.js'
@@ -15,8 +15,9 @@ import requestRouter from './routes/request.route.js'
 import userRouter from './routes/user.route.js'
 import videoRouter from './routes/video.route.js'
 import walletRouter from './routes/wallet.route.js'
-import { swaggerSpec, swaggerUi, swaggerUiOptions } from './swaggerConfig.js'
 import ytRouter from './routes/yt.route.js'
+import cacheService from './services/cache.service.js'
+import { swaggerSpec, swaggerUi, swaggerUiOptions } from './swaggerConfig.js'
 dotenv.config()
 
 const PORT = process.env.PORT || 3000
@@ -24,7 +25,9 @@ const PORT = process.env.PORT || 3000
 const app = express()
 
 //? Third-party middleware
-app.use(morgan('dev'))
+app.use(morgan('[:date[iso]] ":method :url" :status (:response-time ms) | :remote-addr | :res[content-length] bytes', {
+	stream: fs.createWriteStream('./access.log', { flags: 'a' })
+}))
 app.use(cookieParser())
 app.use(
 	cors({
