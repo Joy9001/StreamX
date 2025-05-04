@@ -2,7 +2,6 @@ import { Router } from 'express'
 import {
 	deleteController,
 	getAllController,
-	getAllVideos,
 	recentController,
 	storageUsageController,
 	updateVideoOwnership,
@@ -80,7 +79,6 @@ const logRequest = (req, res, next) => {
  *       500:
  *         description: Server error
  */
-router.get('/all-videos', getAllVideos)
 
 /**
  * @swagger

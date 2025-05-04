@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
+import { useRef, useState } from 'react'
 
 function EditGig({ onClose, editorData, editorPlans }) {
   const { getAccessTokenSilently } = useAuth0()
@@ -130,7 +130,7 @@ function EditGig({ onClose, editorData, editorPlans }) {
 
       // Update editor gig
       await axios.patch(
-        `${import.meta.env.VITE_BACKEND_URL}/editor_gig/email/${formData.email}`,
+        `${import.meta.env.VITE_BACKEND_URL}/editorGig/email/${formData.email}`,
         editorGigData,
         {
           headers: {
@@ -141,7 +141,7 @@ function EditGig({ onClose, editorData, editorPlans }) {
 
       // Update plans
       await axios.patch(
-        `${import.meta.env.VITE_BACKEND_URL}/editor_gig/plans/email/${formData.email}`,
+        `${import.meta.env.VITE_BACKEND_URL}/editorGig/plans/email/${formData.email}`,
         plansData,
         {
           headers: {

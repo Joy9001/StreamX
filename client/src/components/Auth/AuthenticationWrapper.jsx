@@ -1,4 +1,5 @@
 import { setUserData } from '@/store/slices/userSlice'
+import { isEmpty } from '@/utils/utils'
 import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
 import PropTypes from 'prop-types'
@@ -6,7 +7,8 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 const AuthenticationWrapper = ({ children }) => {
-  const { isAuthenticated, user, getAccessTokenSilently } = useAuth0()
+  const { isAuthenticated, user, getAccessTokenSilently, isLoading } =
+    useAuth0()
   const userData = useSelector((state) => state.user.userData)
   const dispatch = useDispatch()
 
@@ -15,7 +17,7 @@ const AuthenticationWrapper = ({ children }) => {
       console.log('isAuthenticated:', isAuthenticated)
       console.log('userData:', userData)
       console.log('user:', user)
-      if (isAuthenticated && JSON.stringify(userData) === '{}') {
+      if (isAuthenticated && isEmpty(userData)) {
         console.log('Fetching user metadata...')
         try {
           const accessToken = await getAccessTokenSilently()
@@ -47,8 +49,15 @@ const AuthenticationWrapper = ({ children }) => {
       }
     }
 
-    fetchUserData()
-  }, [isAuthenticated, userData, user, dispatch, getAccessTokenSilently])
+    if (!isLoading) fetchUserData()
+  }, [
+    isAuthenticated,
+    userData,
+    user,
+    dispatch,
+    getAccessTokenSilently,
+    isLoading,
+  ])
 
   return children
 }

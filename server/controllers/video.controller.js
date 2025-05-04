@@ -1,51 +1,25 @@
 import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import { StatusCodes } from 'http-status-codes'
 import { storage } from '../helpers/firebase.helper.js'
-import { CACHE_TTL, deleteFromCache, getCacheKey, getFromCache, setToCache } from '../helpers/redis.helper.js'
 import Editor from '../models/editor.models.js'
 import Owner from '../models/owner.model.js'
 import Video from '../models/video.model.js'
+import cacheService from '../services/cache.service.js'
 
 const invalidateVideoCaches = async (video) => {
-	if (!video) return
-	const keysToDelete = []
-	const videoId = video._id.toString()
-
-	// Keys related to lists the video might appear in
-	if (video.ownerId) {
-		const ownerId = video.ownerId.toString()
-		keysToDelete.push(getCacheKey('allVideos', { role: 'Owner', userId: ownerId }))
-		keysToDelete.push(getCacheKey('recentVideos', { role: 'Owner', userId: ownerId }))
-		keysToDelete.push(getCacheKey('storageUsage', { role: 'Owner', userId: ownerId }))
-	}
-	if (video.editorId) {
-		const editorId = video.editorId.toString()
-		keysToDelete.push(getCacheKey('allVideos', { role: 'Editor', userId: editorId }))
-		keysToDelete.push(getCacheKey('recentVideos', { role: 'Editor', userId: editorId }))
-		keysToDelete.push(getCacheKey('videosByEditor', { editorId }))
-		keysToDelete.push(getCacheKey('storageUsage', { role: 'Editor', userId: editorId }))
-	}
-
-	// Admin lists
-	keysToDelete.push(getCacheKey('allVideos', { role: 'Admin' }))
-	keysToDelete.push(getCacheKey('allVideosAdmin', {}))
-
-	// Remove duplicates and delete
-	await deleteFromCache([...new Set(keysToDelete)])
+	await cacheService.invalidateVideoCaches(video)
 }
 
 const getAllController = async (req, res) => {
 	const { userId, role } = req.params
-	const cacheKey = getCacheKey('allVideos', { role, userId })
+	const cacheKey = cacheService.generateKey('allVideos', { role, userId })
 
 	try {
 		// Check cache first
-		const cachedVideos = await getFromCache(cacheKey)
+		const cachedVideos = await cacheService.get(cacheKey)
 		if (cachedVideos) {
-			console.log(`Cache hit for ${cacheKey}`)
 			return res.status(StatusCodes.OK).json({ videos: cachedVideos })
 		}
-		console.log(`Cache miss for ${cacheKey}`)
 
 		// Fetch from DB if not in cache
 		let videos
@@ -62,7 +36,7 @@ const getAllController = async (req, res) => {
 		}
 
 		if (!videos || videos.length === 0) {
-			await setToCache(cacheKey, [], CACHE_TTL.LIST)
+			await cacheService.set(cacheKey, [], cacheService.TTL.LIST)
 			return res.status(StatusCodes.OK).json({ videos: [] })
 		}
 
@@ -87,7 +61,7 @@ const getAllController = async (req, res) => {
 		})
 
 		// Store in cache
-		await setToCache(cacheKey, videosData, CACHE_TTL.LIST)
+		await cacheService.set(cacheKey, videosData, cacheService.TTL.LIST)
 
 		return res.status(StatusCodes.OK).json({ videos: videosData })
 	} catch (error) {
@@ -288,15 +262,13 @@ const deleteController = async (req, res) => {
 
 const recentController = async (req, res) => {
 	const { userId, role } = req.params
-	const cacheKey = getCacheKey('recentVideos', { role, userId })
+	const cacheKey = cacheService.generateKey('recentVideos', { role, userId })
 
 	try {
-		const cachedVideos = await getFromCache(cacheKey)
+		const cachedVideos = await cacheService.get(cacheKey)
 		if (cachedVideos) {
-			console.log(`Cache hit for ${cacheKey}`)
 			return res.status(StatusCodes.OK).json({ videos: cachedVideos })
 		}
-		console.log(`Cache miss for ${cacheKey}`)
 
 		let videos
 		const query = role === 'Owner' ? { ownerId: userId } : role === 'Editor' ? { editorId: userId } : {}
@@ -311,7 +283,7 @@ const recentController = async (req, res) => {
 		}
 
 		if (!videos || videos.length === 0) {
-			await setToCache(cacheKey, [], CACHE_TTL.RECENT)
+			await cacheService.set(cacheKey, [], cacheService.TTL.RECENT)
 			return res.status(StatusCodes.OK).json({ videos: [] })
 		}
 
@@ -338,7 +310,7 @@ const recentController = async (req, res) => {
 			}
 		})
 
-		await setToCache(cacheKey, videosData, CACHE_TTL.RECENT)
+		await cacheService.set(cacheKey, videosData, cacheService.TTL.RECENT)
 
 		res.status(StatusCodes.OK).json({ videos: videosData })
 	} catch (error) {
@@ -406,17 +378,15 @@ const updateVideoOwnership = async (req, res) => {
 
 const storageUsageController = async (req, res) => {
 	const { role, userId } = req.params
-	const cacheKey = getCacheKey('storageUsage', { role, userId })
+	const cacheKey = cacheService.generateKey('storageUsage', { role, userId })
 
 	try {
 		// Check cache first
-		const cachedUsage = await getFromCache(cacheKey)
+		const cachedUsage = await cacheService.get(cacheKey)
 		if (cachedUsage !== null) {
 			// Check for null, as 0 is a valid usage
-			console.log(`Cache hit for ${cacheKey}`)
 			return res.status(StatusCodes.OK).json({ storageUsage: cachedUsage })
 		}
-		console.log(`Cache miss for ${cacheKey}`)
 
 		let videos
 		const query = role === 'Owner' ? { ownerId: userId } : role === 'Editor' ? { editorId: userId } : {}
@@ -441,7 +411,7 @@ const storageUsageController = async (req, res) => {
 		}, 0)
 
 		// Store in cache
-		await setToCache(cacheKey, storageUsage, CACHE_TTL.DEFAULT)
+		await cacheService.set(cacheKey, storageUsage, cacheService.TTL.DEFAULT)
 
 		console.log('storageUsage in storageUsageController: ', storageUsage)
 		return res.status(StatusCodes.OK).json({ storageUsage })
@@ -453,64 +423,9 @@ const storageUsageController = async (req, res) => {
 	}
 }
 
-const getAllVideos = async (req, res) => {
-	const cacheKey = getCacheKey('allVideosAdmin', {})
-
-	try {
-		const cachedVideos = await getFromCache(cacheKey)
-		if (cachedVideos) {
-			console.log(`Cache hit for ${cacheKey}`)
-			return res.status(StatusCodes.OK).json(cachedVideos)
-		}
-		console.log(`Cache miss for ${cacheKey}`)
-
-		// Get all videos and populate owner and editor details
-		const videos = await Video.find()
-			.populate('ownerId', 'username email profilephoto')
-			.populate('editorId', 'name email profilephoto')
-			.sort({ createdAt: -1 })
-			.lean()
-
-		const formattedVideos = videos.map((video) => ({
-			...video,
-			owner: video.ownerId
-				? {
-						id: video.ownerId._id,
-						name: video.ownerId.username,
-						email: video.ownerId.email,
-						profilephoto: video.ownerId.profilephoto,
-				  }
-				: { name: 'N/A' },
-			editor: video.editorId
-				? {
-						id: video.editorId._id,
-						name: video.editorId.name,
-						email: video.editorId.email,
-						profilephoto: video.editorId.profilephoto,
-				  }
-				: { name: 'N/A' },
-
-			metadata: {
-				fileName: video.metaData?.name || 'Untitled',
-				fileSize: video.metaData?.size ? `${(video.metaData.size / (1024 * 1024)).toFixed(2)} MB` : '0 MB',
-				contentType: video.metaData?.contentType || 'video/mp4',
-			},
-		}))
-
-		// Store in cache
-		await setToCache(cacheKey, formattedVideos, CACHE_TTL.LIST) // Use list TTL
-
-		res.status(StatusCodes.OK).json(formattedVideos)
-	} catch (error) {
-		console.error('Error fetching all videos (admin):', error)
-		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error fetching videos', error: error.message }) // Use 500
-	}
-}
-
 export {
 	deleteController,
 	getAllController,
-	getAllVideos,
 	recentController,
 	storageUsageController,
 	updateVideoOwnership,

@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
+import { model, Schema } from 'mongoose'
 
-const editor_gig_plans = mongoose.Schema({
+const editorGigPlans = Schema({
 	email: {
 		type: String,
 		required: true,
@@ -71,5 +71,5 @@ const editor_gig_plans = mongoose.Schema({
 	},
 })
 
-const editor_plans = mongoose.model('editor_gig_plans', editor_gig_plans)
-export default editor_plans
+const EditorGigPlans = model('EditorGigPlans', editorGigPlans)
+export default EditorGigPlans

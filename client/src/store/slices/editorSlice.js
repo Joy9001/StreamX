@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 
 // Async thunks for API calls
@@ -7,7 +7,7 @@ export const fetchEditors = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/editor_gig`
+        `${import.meta.env.VITE_BACKEND_URL}/editorGig`
       )
       return response.data || []
     } catch (error) {
@@ -21,7 +21,7 @@ export const fetchEditorPlans = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/editor_gig/plans`
+        `${import.meta.env.VITE_BACKEND_URL}/editorGig/plans`
       )
       return response.data || []
     } catch (error) {

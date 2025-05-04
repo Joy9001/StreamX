@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 import express from 'express'
 import morgan from 'morgan'
 import connectMongo from './db/connectMongo.db.js'
-import { connectRedis } from './helpers/redis.helper.js'
+import cacheService from './services/cache.service.js'
 import { authCheck } from './middlewares/auth0.middleware.js'
 import adminRouter from './routes/admin.route.js'
 import auth0Router from './routes/auth0.route.js'
@@ -14,9 +14,9 @@ import ownerRouter from './routes/owner.route.js'
 import requestRouter from './routes/request.route.js'
 import userRouter from './routes/user.route.js'
 import videoRouter from './routes/video.route.js'
-import ytRouter from './routes/yt.route.js'
 import walletRouter from './routes/wallet.route.js'
 import { specs, swaggerUi } from './docs/swagger.js'
+import ytRouter from './routes/yt.route.js'
 dotenv.config()
 
 const PORT = process.env.PORT || 3000
@@ -76,7 +76,7 @@ app.use('/api/videos', videoRouter)
 app.use('/api/yt', ytRouter)
 app.use('/api', ownerRouter)
 app.use('/api/admin', adminRouter)
-app.use('/editor_gig', editorGigRoute)
+app.use('/editorGig', editorGigRoute)
 app.use('/editorProfile', editorProfileRouter)
 app.use('/user', userRouter)
 app.use('/api/wallet', walletRouter)
@@ -108,7 +108,7 @@ app.listen(PORT, () => {
 	connectMongo().then(() => {
 		console.log('MongoDB connected')
 	})
-	connectRedis().then(() => {
-		console.log('Redis connected')
+	cacheService.connect().then(() => {
+		console.log('Cache service connected')
 	})
 })

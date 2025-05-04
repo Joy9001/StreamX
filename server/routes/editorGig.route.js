@@ -1,14 +1,18 @@
-import express from 'express'
-import { EditorData } from '../controllers/editorData.controller.js'
-import { Editor_gig_cont, getEditorGigByEmail, updateEditorGigByEmail } from '../controllers/editorGig.controller.js'
+import { Router } from 'express'
 import {
-	Editor_gig_plans,
+	createEditorGig,
+	getEditorGigByEmail,
+	getEditorGigData,
+	updateEditorGigByEmail,
+} from '../controllers/editorGig.controller.js'
+import {
+	getEditorGigPlans,
 	getEditorGigPlansByEmail,
+	updateEditorGigPlans,
 	updateEditorGigPlansByEmail,
 } from '../controllers/editorPlan.controller.js'
-import { EditorPlansData } from '../controllers/editorPlans.controller.js'
 
-const router = express.Router()
+const router = Router()
 
 /**
  * @swagger
@@ -140,7 +144,7 @@ const router = express.Router()
  *       500:
  *         description: Server error
  */
-router.post('/', Editor_gig_cont)
+router.post('/', createEditorGig)
 
 /**
  * @swagger
@@ -160,7 +164,7 @@ router.post('/', Editor_gig_cont)
  *       500:
  *         description: Server error
  */
-router.get('/', EditorData)
+router.get('/', getEditorGigData)
 
 /**
  * @swagger
@@ -180,7 +184,7 @@ router.get('/', EditorData)
  *       500:
  *         description: Server error
  */
-router.get('/plans', EditorPlansData)
+router.get('/plans', getEditorGigPlans)
 
 /**
  * @swagger
@@ -239,7 +243,7 @@ router.get('/plans', EditorPlansData)
  *       500:
  *         description: Server error
  */
-router.post('/plan', Editor_gig_plans)
+router.post('/plan', updateEditorGigPlans)
 
 /**
  * @swagger

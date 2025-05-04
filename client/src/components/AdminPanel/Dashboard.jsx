@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import AdminNav from './AdminNav'
 import axios from 'axios'
+import { useEffect, useState } from 'react'
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from 'recharts'
+import AdminNav from './AdminNav'
 
 function Dashboard() {
   const [ownerStats, setOwnerStats] = useState([])
@@ -59,9 +59,9 @@ function Dashboard() {
     const fetchOwnerData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/ownerProfile`
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/owners `
         )
-        const chartData = processRegistrationData(response.data)
+        const chartData = processRegistrationData(response.data.owners)
         setOwnerStats(chartData)
         setLoading((prev) => ({ ...prev, owners: false }))
       } catch (err) {
@@ -77,9 +77,9 @@ function Dashboard() {
     const fetchEditorData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/editorProfile`
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/editors`
         )
-        const chartData = processRegistrationData(response.data)
+        const chartData = processRegistrationData(response.data.editors)
         setEditorStats(chartData)
         setLoading((prev) => ({ ...prev, editors: false }))
       } catch (err) {
@@ -95,9 +95,10 @@ function Dashboard() {
     const fetchRequestData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/requests`
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/requests`
         )
-        const chartData = processRegistrationData(response.data)
+        console.log('requests', response.data.requests)
+        const chartData = processRegistrationData(response.data.requests)
         setRequestStats(chartData)
         setLoading((prev) => ({ ...prev, requests: false }))
       } catch (err) {
@@ -113,7 +114,7 @@ function Dashboard() {
     const fetchVideoData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/videos/all-videos`
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/videos`
         )
         const chartData = processRegistrationData(response.data)
         setVideoStats(chartData)

@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
+import { Schema, model } from 'mongoose'
 
-const editorSchema = new mongoose.Schema(
+const editorSchema = new Schema(
 	{
 		name: {
 			type: String,
@@ -39,5 +39,5 @@ const editorSchema = new mongoose.Schema(
 	{ timestamps: true }
 )
 
-const Editor = mongoose.model('Editor', editorSchema)
+const Editor = model('Editor', editorSchema)
 export default Editor

@@ -23,10 +23,10 @@ import {
   Clock,
   ListFilter,
   Trash2,
-  XCircle,
-  Youtube,
   User,
   Users,
+  XCircle,
+  Youtube,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -52,13 +52,18 @@ export function AdminRequestsDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [requestsResponse, adminRequestsResponse] = await Promise.all([
-          axios.get('http://localhost:3000/requests/all'),
-          axios.get('http://localhost:3000/requests/admin'),
-        ])
+        const requestsResponse = await axios.get(
+          'http://localhost:3000/api/admin/requests'
+        )
+
+        const adminRequests = requestsResponse.data.requests.filter(
+          (request) => request.to.role === 'Admin'
+        )
+        console.log('requestsResponse', requestsResponse)
+        console.log('adminRequestsResponse', adminRequests)
 
         setRequestData(requestsResponse.data.requests)
-        setAdminRequestData(adminRequestsResponse.data.requests)
+        setAdminRequestData(adminRequests)
         setLoading(false)
       } catch (err) {
         console.error('Error fetching request data:', err)

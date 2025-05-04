@@ -2,6 +2,7 @@ import { findUserByEmail } from '../helpers/auth0.helper.js'
 import Admin from '../models/admin.model.js'
 import Editor from '../models/editor.models.js'
 import Owner from '../models/owner.model.js'
+import cacheService from '../services/cache.service.js'
 
 export const auth0CreateController = async (req, res) => {
 	try {
@@ -37,6 +38,7 @@ export const auth0CreateController = async (req, res) => {
 							},
 						}
 					)
+					await cacheService.invalidateOwnerCaches(findOwner._id)
 					message = 'Owner Updated'
 				}
 				console.log(message)
@@ -50,6 +52,7 @@ export const auth0CreateController = async (req, res) => {
 				providerSub: providerSub,
 			})
 			await owner.save()
+			await cacheService.invalidateOwnerCaches(owner._id)
 			console.log('Owner created successfully')
 			return res.status(200).json({
 				message: 'Owner created successfully',
@@ -68,6 +71,7 @@ export const auth0CreateController = async (req, res) => {
 				let message = 'Editor already exists'
 				if (findEditor.providerSub !== providerSub) {
 					await Editor.findOneAndUpdate({ email: user.email }, { providerSub: providerSub })
+					await cacheService.invalidateEditorCaches(findEditor._id)
 					message = 'Editor Updated'
 				}
 				console.log(message)
@@ -87,6 +91,7 @@ export const auth0CreateController = async (req, res) => {
 				providerSub: providerSub,
 			})
 			await editor.save()
+			await cacheService.invalidateEditorCaches(editor._id)
 			console.log('Editor created successfully')
 			return res.status(200).json({ message: 'Editor created successfully', user: { ...user, _id: editor._id } })
 		} else if (user.user_metadata.role === 'Admin') {
@@ -99,6 +104,7 @@ export const auth0CreateController = async (req, res) => {
 				let message = 'Admin already exists'
 				if (findAdmin.providerSub !== providerSub) {
 					await Admin.findOneAndUpdate({ email: user.email }, { providerSub: providerSub })
+					await cacheService.invalidateAdminCaches(findAdmin._id)
 					message = 'Admin Updated'
 				}
 				console.log(message)
@@ -119,6 +125,7 @@ export const auth0CreateController = async (req, res) => {
 				providerSub: providerSub,
 			})
 			await admin.save()
+			await cacheService.invalidateAdminCaches(admin._id)
 			console.log('Admin created successfully')
 			return res.status(200).json({ message: 'Admin created successfully', user: { ...user, _id: admin._id } })
 		} else {

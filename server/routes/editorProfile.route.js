@@ -115,7 +115,6 @@ router.post('/', createEditorProfile)
  *       500:
  *         description: Server error
  */
-router.get('/', EditorData)
 
 /**
  * @swagger
@@ -172,7 +171,7 @@ router.get('/name/:editorId', getEditorNameById)
  *       500:
  *         description: Server error
  */
-router.get('/:email', GetEditorByEmail)
+router.get('/:email', getEditorByEmail)
 
 /**
  * @swagger

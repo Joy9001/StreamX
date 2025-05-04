@@ -5,11 +5,11 @@ import {
 	getAllOwners,
 	getHiredEditors,
 	getOwnerByEmail,
+	getOwnerNameById,
 	getOwnerProfile,
 	updateOwner,
-	getOwnerNameById,
 } from '../controllers/owner.controller.js'
-import { createOwnerProfile, updateOwnerProfile, updateBasicProfile } from '../controllers/profileSetting.controller.js'
+import { createOwnerProfile, updateBasicProfile, updateOwnerProfile } from '../controllers/ownerProfile.controller.js'
 import { upload } from '../middlewares/multer.middleware.js'
 
 const router = express.Router()

@@ -27,7 +27,7 @@ function GigProfile() {
 
         // Fetch editor gig data
         const gigResponse = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/editor_gig/email/${user.email}`,
+          `${import.meta.env.VITE_BACKEND_URL}/editorGig/email/${user.email}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -37,7 +37,7 @@ function GigProfile() {
 
         // Fetch editor plans data
         const plansResponse = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/editor_gig/plans/email/${user.email}`,
+          `${import.meta.env.VITE_BACKEND_URL}/editorGig/plans/email/${user.email}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
