@@ -1,21 +1,20 @@
-import { useState, useEffect, useRef } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 import { useAuth0 } from '@auth0/auth0-react'
 import { format } from 'date-fns'
 import {
-  MessageSquare,
-  Send,
-  Clock,
   AlertCircle,
-  X,
-  User,
-  Plus,
+  Clock,
+  MessageSquare,
   RefreshCw,
+  Send,
+  X,
 } from 'lucide-react'
+import PropTypes from 'prop-types'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import {
+  clearMessages,
   fetchRequestMessages,
   sendMessage,
-  clearMessages,
 } from '../../store/slices/messageSlice'
 
 const MessageThread = ({
@@ -79,27 +78,36 @@ const MessageThread = ({
   }
 
   // Fetch messages when thread is opened
-  const loadMessages = async (initialCheck = false) => {
-    if (!requestId) return
+  const loadMessages = useCallback(
+    async (initialCheck = false) => {
+      if (!requestId) return
 
-    try {
-      const accessToken = await getAccessTokenSilently()
-      const response = await dispatch(
-        fetchRequestMessages({ requestId, accessToken })
-      ).unwrap()
-      if (initialCheck) {
-        setHasCheckedMessages(true)
-        if (response && response.messages) {
-          setLocalMessageCount(response.messages.length)
+      try {
+        const accessToken = await getAccessTokenSilently()
+        const response = await dispatch(
+          fetchRequestMessages({ requestId, accessToken })
+        ).unwrap()
+        if (initialCheck) {
+          setHasCheckedMessages(true)
+          if (response && response.messages) {
+            setLocalMessageCount(response.messages.length)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching messages:', error)
+        if (initialCheck) {
+          setHasCheckedMessages(true)
         }
       }
-    } catch (error) {
-      console.error('Error fetching messages:', error)
-      if (initialCheck) {
-        setHasCheckedMessages(true)
-      }
-    }
-  }
+    },
+    [
+      requestId,
+      getAccessTokenSilently,
+      dispatch,
+      setHasCheckedMessages,
+      setLocalMessageCount,
+    ]
+  )
 
   // Handle refresh button click
   const handleRefresh = async () => {
@@ -126,7 +134,7 @@ const MessageThread = ({
     if (isViewOnly && !hasCheckedMessages && requestId) {
       loadMessages(true)
     }
-  }, [isViewOnly, requestId, hasCheckedMessages])
+  }, [isViewOnly, requestId, hasCheckedMessages, loadMessages])
 
   // Load messages when thread is opened
   useEffect(() => {
@@ -140,7 +148,7 @@ const MessageThread = ({
         dispatch(clearMessages(requestId))
       }
     }
-  }, [isOpen, requestId, dispatch])
+  }, [isOpen, requestId, dispatch, loadMessages])
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -194,6 +202,7 @@ const MessageThread = ({
     try {
       return format(new Date(timestamp), 'MMM d, h:mm a')
     } catch (error) {
+      console.error('Error formatting timestamp:', error)
       return 'Unknown time'
     }
   }
@@ -376,6 +385,13 @@ const MessageThread = ({
       )}
     </div>
   )
+}
+
+MessageThread.propTypes = {
+  requestId: PropTypes.string.isRequired,
+  onClose: PropTypes.func,
+  requestStatus: PropTypes.oneOf(['pending', 'approved', 'rejected']),
+  messageCount: PropTypes.number,
 }
 
 export default MessageThread
