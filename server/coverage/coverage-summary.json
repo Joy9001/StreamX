@@ -1,28 +1,28 @@
 {
     "total": {
         "lines": {
-            "total": 468,
-            "covered": 349,
+            "total": 801,
+            "covered": 601,
             "skipped": 0,
-            "pct": 74.57
+            "pct": 75.03
         },
         "statements": {
-            "total": 485,
-            "covered": 358,
+            "total": 820,
+            "covered": 612,
             "skipped": 0,
-            "pct": 73.81
+            "pct": 74.63
         },
         "functions": {
-            "total": 41,
-            "covered": 31,
+            "total": 63,
+            "covered": 50,
             "skipped": 0,
-            "pct": 75.6
+            "pct": 79.36
         },
         "branches": {
-            "total": 269,
-            "covered": 153,
+            "total": 402,
+            "covered": 230,
             "skipped": 0,
-            "pct": 56.87
+            "pct": 57.21
         },
         "branchesTrue": {
             "total": 0,
@@ -83,6 +83,32 @@
             "pct": 80
         }
     },
+    "/home/joy04/Documents/Web-Dev/PROJECT/StreamX/server/controllers/editorProfile.controller.js": {
+        "lines": {
+            "total": 102,
+            "covered": 102,
+            "skipped": 0,
+            "pct": 100
+        },
+        "functions": {
+            "total": 9,
+            "covered": 9,
+            "skipped": 0,
+            "pct": 100
+        },
+        "statements": {
+            "total": 103,
+            "covered": 103,
+            "skipped": 0,
+            "pct": 100
+        },
+        "branches": {
+            "total": 27,
+            "covered": 25,
+            "skipped": 0,
+            "pct": 92.59
+        }
+    },
     "/home/joy04/Documents/Web-Dev/PROJECT/StreamX/server/controllers/owner.controller.js": {
         "lines": {
             "total": 155,
@@ -107,6 +133,32 @@
             "covered": 51,
             "skipped": 0,
             "pct": 57.95
+        }
+    },
+    "/home/joy04/Documents/Web-Dev/PROJECT/StreamX/server/controllers/request.controller.js": {
+        "lines": {
+            "total": 231,
+            "covered": 150,
+            "skipped": 0,
+            "pct": 64.93
+        },
+        "functions": {
+            "total": 13,
+            "covered": 10,
+            "skipped": 0,
+            "pct": 76.92
+        },
+        "statements": {
+            "total": 232,
+            "covered": 151,
+            "skipped": 0,
+            "pct": 65.08
+        },
+        "branches": {
+            "total": 106,
+            "covered": 52,
+            "skipped": 0,
+            "pct": 49.05
         }
     },
     "/home/joy04/Documents/Web-Dev/PROJECT/StreamX/server/controllers/video.controller.js": {
