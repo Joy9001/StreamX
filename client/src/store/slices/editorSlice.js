@@ -56,9 +56,27 @@ export const sendBookingRequest = createAsyncThunk(
   'editors/sendBookingRequest',
   async ({ requestData, token }, { rejectWithValue }) => {
     try {
+      // First fetch the editor profile to get the to_id
+      const editorProfileResponse = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/editorProfile/${requestData.to_email}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      // Add to_id to the requestData
+      const updatedRequestData = {
+        ...requestData,
+        to_id: editorProfileResponse.data._id,
+      }
+
+      // Now send the booking request with the updated data
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/requests/create`,
-        requestData,
+        updatedRequestData,
         {
           headers: {
             Authorization: `Bearer ${token}`,

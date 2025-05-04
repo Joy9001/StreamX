@@ -1,25 +1,24 @@
-import React, { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 import { useAuth0 } from '@auth0/auth0-react'
-import locationIcon from '../../assets/location.svg'
-import languageIcon from '../../assets/language.svg'
-import starIcon from '../../assets/star.svg'
+import { useDispatch, useSelector } from 'react-redux'
 import crossIcon from '../../assets/cross.svg'
+import languageIcon from '../../assets/language.svg'
+import locationIcon from '../../assets/location.svg'
+import starIcon from '../../assets/star.svg'
 import tickIcon from '../../assets/tick.svg'
-import Drawer from '../Drawer.jsx'
-import BookNowModal from './BookNowModal.jsx'
 import {
+  resetBookingForm,
+  sendBookingRequest,
+  setCustomPrice,
+  setProjectDescription,
   setSelectedEditor,
   setSelectedPlan,
   setSelectedVideo,
-  setProjectDescription,
   setShowCustomPrice,
-  setCustomPrice,
   toggleDrawer,
   toggleModel,
-  resetBookingForm,
-  sendBookingRequest,
 } from '../../store/slices/editorSlice'
+import Drawer from '../Drawer.jsx'
+import BookNowModal from './BookNowModal.jsx'
 
 function Card({ editor, userData }) {
   const dispatch = useDispatch()
@@ -133,7 +132,7 @@ function Card({ editor, userData }) {
       const token = await getAccessTokenSilently()
 
       const requestData = {
-        to_id: selectedEditor._id,
+        to_email: selectedEditor.email,
         video_id: selectedVideo._id,
         from_id: userData._id,
         description: projectDescription.trim(),
