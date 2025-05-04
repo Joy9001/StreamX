@@ -1,5 +1,5 @@
 import { getEditorIdByGigId } from '../helpers/editor.helper.js'
-import Editor from '../models/editor.models.js'
+import Editor from '../models/editor.model.js'
 import Owner from '../models/owner.model.js'
 import Request from '../models/request.model.js'
 import cacheService from '../services/cache.service.js'

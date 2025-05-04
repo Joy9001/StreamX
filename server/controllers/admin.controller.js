@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import Admin from '../models/admin.model.js'
-import Editor from '../models/editor.models.js'
+import Editor from '../models/editor.model.js'
 import Owner from '../models/owner.model.js'
 import Request from '../models/request.model.js'
 import Video from '../models/video.model.js'
@@ -181,7 +181,7 @@ export const getAllVideos = async (req, res) => {
 						name: video.ownerId.username,
 						email: video.ownerId.email,
 						profilephoto: video.ownerId.profilephoto,
-					}
+				  }
 				: { name: 'N/A' },
 			editor: video.editorId
 				? {
@@ -189,7 +189,7 @@ export const getAllVideos = async (req, res) => {
 						name: video.editorId.name,
 						email: video.editorId.email,
 						profilephoto: video.editorId.profilephoto,
-					}
+				  }
 				: { name: 'N/A' },
 
 			metadata: {

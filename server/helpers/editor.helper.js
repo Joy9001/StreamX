@@ -1,4 +1,4 @@
-import Editor from '../models/editor.models.js'
+import Editor from '../models/editor.model.js'
 import EditorGig from '../models/editorGig.model.js'
 
 export const findEditorByGigId = async (editorGigId) => {

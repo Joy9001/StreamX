@@ -1,6 +1,6 @@
 import { findUserByEmail } from '../helpers/auth0.helper.js'
 import Admin from '../models/admin.model.js'
-import Editor from '../models/editor.models.js'
+import Editor from '../models/editor.model.js'
 import Owner from '../models/owner.model.js'
 import cacheService from '../services/cache.service.js'
 
