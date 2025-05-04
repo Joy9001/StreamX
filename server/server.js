@@ -2,7 +2,6 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
-import fs from 'fs'
 import morgan from 'morgan'
 import connectMongo from './db/connectMongo.db.js'
 import { authCheck } from './middlewares/auth0.middleware.js'
@@ -25,11 +24,7 @@ const PORT = process.env.PORT || 3000
 const app = express()
 
 //? Third-party middleware
-app.use(
-	morgan('[:date[iso]] ":method :url" :status (:response-time ms) | :remote-addr | :res[content-length] bytes', {
-		stream: fs.createWriteStream('./access.log', { flags: 'a' }),
-	})
-)
+app.use(morgan('dev'))
 app.use(cookieParser())
 app.use(
 	cors({
