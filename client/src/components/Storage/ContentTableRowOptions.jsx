@@ -2,9 +2,11 @@ import { setDrawerOpen } from '@/store/slices/uiSlice'
 import { setAllVideos, setRecentVideos } from '@/store/slices/videoSlice'
 import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
+import { IndianRupeeIcon } from 'lucide-react'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 
 function ContentTableRowOptions({ video }) {
   const dispatch = useDispatch()
@@ -398,7 +400,10 @@ function ContentTableRowOptions({ video }) {
                       {ownerRequests.map((request) => (
                         <tr key={request._id}>
                           <td>{request.description}</td>
-                          <td>${request.price.toFixed(2)}</td>
+                          <td className="flex items-center">
+                            <IndianRupeeIcon className='h-4 w-4' />
+                            <span className="ml-1">{request.price.toFixed(2)}</span>
+                          </td>
                           <td>
                             <button
                               className='btn btn-primary btn-sm'
