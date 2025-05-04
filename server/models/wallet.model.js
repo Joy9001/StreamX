@@ -8,7 +8,7 @@ const walletSchema = new Schema({
 	},
 	type: {
 		type: String,
-		enum: ['Editor', 'Owner'],
+		enum: ['Editor', 'Owner', 'Admin'],
 		required: true,
 	},
 	balance: {
