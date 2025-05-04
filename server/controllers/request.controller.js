@@ -1,4 +1,3 @@
-import { getEditorIdByGigId } from '../helpers/editor.helper.js'
 import Editor from '../models/editor.model.js'
 import Owner from '../models/owner.model.js'
 import Request from '../models/request.model.js'
@@ -7,17 +6,12 @@ import cacheService from '../services/cache.service.js'
 // Create a new request
 export const createRequest = async (req, res) => {
 	try {
-		const { to_id, video_id, from_id, description, price, status, requesterKind } = req.body
-
-		let toId = to_id
-
-		if (requesterKind == 'Owner') {
-			toId = (await getEditorIdByGigId(to_id)) || to_id
-		}
+		const { to_id, video_id, from_id, description, price, status } = req.body
+		console.log('req.body', req.body)
 
 		// Create new request
 		const newRequest = new Request({
-			to_id: toId,
+			to_id,
 			video_id,
 			from_id,
 			description,
