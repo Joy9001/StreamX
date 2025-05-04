@@ -36,12 +36,11 @@ export const createRequest = async (req, res) => {
 // Get requests by owner ID
 export const getRequestsByToId = async (req, res) => {
 	try {
-		console.log('Received request params:', req.params)
 		const { to_id } = req.params
 		console.log('Searching for requests with to_id:', to_id)
 
 		// Check cache first
-		const cacheKey = cacheService.generateKey('requests', { to_id })
+		const cacheKey = cacheService.generateKey('requestsTo', { to_id })
 		const cachedRequests = await cacheService.get(cacheKey)
 
 		if (cachedRequests) {
@@ -152,7 +151,7 @@ export const getRequestsByFromId = async (req, res) => {
 		console.log('Searching for requests with from_id:', from_id)
 
 		// Check cache first
-		const cacheKey = cacheService.generateKey('requests', { from_id })
+		const cacheKey = cacheService.generateKey('requestsFrom', { from_id })
 		const cachedRequests = await cacheService.get(cacheKey)
 
 		if (cachedRequests) {
