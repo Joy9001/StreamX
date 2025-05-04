@@ -1,22 +1,6 @@
 import { NavLink } from 'react-router-dom'
 
 function Home() {
-  // const [user, setUser] = useState(null)
-
-  // const getUser = async () => {
-  //   try {
-  //     const url = 'http://localhost:3000/auth/login/success'
-  //     const { data } = await axios.get(url, { withCredentials: true })
-  //     setUser(data.user._json)
-  //   } catch (err) {
-  //     console.log(err)
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   getUser()
-  // }, [])
-
   return (
     <div data-theme='pastel' className='min-h-screen bg-base-200'>
       <h1>Home Page</h1>

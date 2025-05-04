@@ -53,7 +53,7 @@ export function AdminRequestsDashboard() {
     const fetchData = async () => {
       try {
         const requestsResponse = await axios.get(
-          'http://localhost:3000/api/admin/requests'
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/requests`
         )
 
         const adminRequests = requestsResponse.data.requests.filter(
@@ -77,7 +77,9 @@ export function AdminRequestsDashboard() {
 
   const handleDelete = async (requestId) => {
     try {
-      await axios.delete(`http://localhost:3000/requests/delete/${requestId}`)
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/requests/delete/${requestId}`
+      )
       // Update the local state to remove the deleted request
       setRequestData((prevData) =>
         prevData.filter((request) => request.request_id !== requestId)
@@ -103,7 +105,7 @@ export function AdminRequestsDashboard() {
 
       // Make the upload request - no need to send video data for admin role
       const response = await axios.post(
-        `http://localhost:3000/api/yt/upload/Admin/${request.to.id}/${request.video.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/yt/upload/Admin/${request.to.id}/${request.video.id}`
       )
 
       // Remove loading toast

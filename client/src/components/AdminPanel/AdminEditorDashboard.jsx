@@ -45,13 +45,13 @@ export function Dashboard() {
 
         // Fetch editors data
         const editorsResponse = await axios.get(
-          'http://localhost:3000/editorGig'
+          `${import.meta.env.VITE_BACKEND_URL}/editorGig`
         )
         console.log('editorGigData', editorsResponse.data)
 
         // Fetch all videos data
         const videosResponse = await axios.get(
-          'http://localhost:3000/api/admin/videos'
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/videos`
         )
         console.log('videosData', videosResponse.data)
 
@@ -105,7 +105,7 @@ export function Dashboard() {
   const handleEditClick = async (editor) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/editorProfile/${editor.email}`
+        `${import.meta.env.VITE_BACKEND_URL}/editorProfile/${editor.email}`
       )
       setCurrentEditor(response.data)
       setIsCreating(false)
@@ -130,7 +130,7 @@ export function Dashboard() {
     if (isCreating) {
       try {
         const response = await axios.post(
-          'http://localhost:3000/editorProfile',
+          `${import.meta.env.VITE_BACKEND_URL}/editorProfile`,
           newEditorData
         )
         setEditorData((prevData) => [...prevData, response.data])
@@ -142,7 +142,7 @@ export function Dashboard() {
     } else {
       try {
         const response = await axios.put(
-          `http://localhost:3000/editorProfile/${currentEditor.email}`,
+          `${import.meta.env.VITE_BACKEND_URL}/editorProfile/${currentEditor.email}`,
           newEditorData
         )
         setEditorData((prevData) =>
@@ -161,7 +161,9 @@ export function Dashboard() {
 
   const deleteEditor = async (email) => {
     try {
-      await axios.delete(`http://localhost:3000/editorProfile/${email}`)
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/editorProfile/${email}`
+      )
       console.log(`Editor with email ${email} deleted successfully.`)
       setEditorData((prevData) =>
         prevData.filter((editor) => editor.email !== email)

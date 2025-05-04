@@ -43,13 +43,13 @@ export function Dashboard() {
 
         // Fetch owners data
         const ownersResponse = await axios.get(
-          'http://localhost:3000/api/ownerProfile'
+          `${import.meta.env.VITE_BACKEND_URL}/api/ownerProfile`
         )
         console.log('ownerData', ownersResponse.data)
 
         // Fetch all videos data
         const videosResponse = await axios.get(
-          'http://localhost:3000/api/admin/videos'
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/videos`
         )
         console.log('videosData', videosResponse.data)
 
@@ -103,7 +103,7 @@ export function Dashboard() {
   const handleEditClick = async (owner) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/ownerProfile/${owner.email}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/ownerProfile/${owner.email}`
       )
       // Convert storage limit from KB to GB for the form
       const ownerData = response.data
@@ -130,7 +130,7 @@ export function Dashboard() {
     if (isCreating) {
       try {
         const response = await axios.post(
-          'http://localhost:3000/api/ownerProfile',
+          `${import.meta.env.VITE_BACKEND_URL}/api/ownerProfile`,
           newOwnerData
         )
         setOwnerData((prevData) => [...prevData, response.data])
@@ -142,7 +142,7 @@ export function Dashboard() {
     } else {
       try {
         const response = await axios.patch(
-          `http://localhost:3000/api/ownerProfile/${currentOwner.email}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/ownerProfile/${currentOwner.email}`,
           newOwnerData
         )
         setOwnerData((prevData) =>
@@ -161,7 +161,9 @@ export function Dashboard() {
 
   const deleteOwner = async (email) => {
     try {
-      await axios.delete(`http://localhost:3000/api/ownerProfile/${email}`)
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/api/ownerProfile/${email}`
+      )
       console.log(`Owner with email ${email} deleted successfully.`)
       setOwnerData((prevData) =>
         prevData.filter((owner) => owner.email !== email)
