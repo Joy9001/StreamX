@@ -25,9 +25,11 @@ const PORT = process.env.PORT || 3000
 const app = express()
 
 //? Third-party middleware
-app.use(morgan('[:date[iso]] ":method :url" :status (:response-time ms) | :remote-addr | :res[content-length] bytes', {
-	stream: fs.createWriteStream('./access.log', { flags: 'a' })
-}))
+app.use(
+	morgan('[:date[iso]] ":method :url" :status (:response-time ms) | :remote-addr | :res[content-length] bytes', {
+		stream: fs.createWriteStream('./access.log', { flags: 'a' }),
+	})
+)
 app.use(cookieParser())
 app.use(
 	cors({
@@ -102,7 +104,7 @@ app.use((err, req, res, next) => {
 		status: 'error',
 		statusCode,
 		message,
-		stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+		stack: error.stack,
 	})
 })
 
