@@ -16,6 +16,7 @@ import userRouter from './routes/user.route.js'
 import videoRouter from './routes/video.route.js'
 import ytRouter from './routes/yt.route.js'
 import walletRouter from './routes/wallet.route.js'
+import { specs, swaggerUi } from './docs/swagger.js'
 dotenv.config()
 
 const PORT = process.env.PORT || 3000
@@ -61,6 +62,9 @@ app.use((req, res, next) => {
 	console.log(`[${req.requestTime}] ${req.method} ${req.originalUrl} from ${req.ip}`)
 	next()
 })
+
+// Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }))
 
 app.get('/', (req, res) => {
 	res.send('Backend is up!')
