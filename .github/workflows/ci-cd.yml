@@ -51,10 +51,6 @@ jobs:
           touch .env
           echo "REDIS_URL=redis://localhost:6379" >> .env
           echo "PORT=3000" >> .env
-          echo "MONGO_DB_URI=${{ secrets.MONGO_DB_URI }}" >> .env
-          echo "AUTH0_AUDIENCE=${{ secrets.AUTH0_AUDIENCE }}" >> .env
-          echo "AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }}" >> .env
-          echo "TOKEN_SECRET=${{ secrets.TOKEN_SECRET }}" >> .env
 
       - name: Run tests
         run: npm run tests
