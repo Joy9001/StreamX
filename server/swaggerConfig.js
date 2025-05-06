@@ -58,7 +58,7 @@ const swaggerOptions = {
 			...ownerDocs.paths,
 		},
 	},
-	apis: [], // We're using the imported documentation objects instead of scanning files
+	apis: [],
 }
 
 // Generate the Swagger specification
