@@ -47,31 +47,57 @@ function Card({ editor, userData }) {
     dispatch(toggleModel(true))
   }
 
-  const plans = editor.plans
-    ? {
-        Basic: {
-          price: `₹${editor.plans[0].basic.price}`,
-          description: editor.plans[0].basic.desc,
-          delivery: `${editor.plans[0].basic.deliveryTime} day delivery`,
-          revisions: 'Unlimited revisions',
-          availableSkills: editor.plans[0].basic.ServiceOptions,
-        },
-        Standard: {
-          price: `₹${editor.plans[0].standard.price}`,
-          description: editor.plans[0].standard.desc,
-          delivery: `${editor.plans[0].standard.deliveryTime} day delivery`,
-          revisions: 'Unlimited revisions',
-          availableSkills: editor.plans[0].standard.ServiceOptions,
-        },
-        Premium: {
-          price: `₹${editor.plans[0].premium.price}`,
-          description: editor.plans[0].premium.desc,
-          delivery: `${editor.plans[0].premium.deliveryTime} day delivery`,
-          revisions: 'Unlimited revisions',
-          availableSkills: editor.plans[0].premium.ServiceOptions,
-        },
-      }
-    : {}
+  const plans =
+    editor.plans && editor.plans.length > 0
+      ? {
+          Basic: {
+            price: `₹${editor.plans[0].basic.price || 0}`,
+            description:
+              editor.plans[0].basic.desc || 'No description available',
+            delivery: `${editor.plans[0].basic.deliveryTime || 'N/A'} day delivery`,
+            revisions: 'Unlimited revisions',
+            availableSkills: editor.plans[0].basic.ServiceOptions || [],
+          },
+          Standard: {
+            price: `₹${editor.plans[0].standard.price || 0}`,
+            description:
+              editor.plans[0].standard.desc || 'No description available',
+            delivery: `${editor.plans[0].standard.deliveryTime || 'N/A'} day delivery`,
+            revisions: 'Unlimited revisions',
+            availableSkills: editor.plans[0].standard.ServiceOptions || [],
+          },
+          Premium: {
+            price: `₹${editor.plans[0].premium.price || 0}`,
+            description:
+              editor.plans[0].premium.desc || 'No description available',
+            delivery: `${editor.plans[0].premium.deliveryTime || 'N/A'} day delivery`,
+            revisions: 'Unlimited revisions',
+            availableSkills: editor.plans[0].premium.ServiceOptions || [],
+          },
+        }
+      : {
+          Basic: {
+            price: '₹0',
+            description: 'No plan available',
+            delivery: 'N/A',
+            revisions: 'N/A',
+            availableSkills: [],
+          },
+          Standard: {
+            price: '₹0',
+            description: 'No plan available',
+            delivery: 'N/A',
+            revisions: 'N/A',
+            availableSkills: [],
+          },
+          Premium: {
+            price: '₹0',
+            description: 'No plan available',
+            delivery: 'N/A',
+            revisions: 'N/A',
+            availableSkills: [],
+          },
+        }
 
   const services = ['React', 'JavaScript', 'Tailwind CSS', 'Node.js', 'MongoDB']
 
