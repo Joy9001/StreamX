@@ -8,13 +8,13 @@ export const createEditorProfile = async (req, res) => {
 	const { name, email, phone, location, image, software, specializations } = req.body
 
 	try {
-		const existingEditor = await EditorGig.findOne({ email })
+		const existingEditor = await Editor.findOne({ email })
 		console.log('existingEditor:', existingEditor)
 		if (existingEditor) {
 			return res.status(400).json({ message: 'Editor with this email already exists.' })
 		}
 
-		const newEditor = new EditorGig({
+		const newEditor = new Editor({
 			name,
 			email,
 			phone,
@@ -26,7 +26,7 @@ export const createEditorProfile = async (req, res) => {
 
 		await newEditor.save()
 
-		await cacheService.invalidateEditorGigCaches(email)
+		await cacheService.invalidateEditorCaches(email)
 
 		res.status(201).json(newEditor)
 	} catch (error) {
@@ -94,9 +94,7 @@ export const getHiredByOwners = async (req, res) => {
 			return res.status(200).json([])
 		}
 
-		let ownerIds = findVideos
-			.filter(video => video.ownerId)
-			.map((video) => video.ownerId)
+		let ownerIds = findVideos.filter((video) => video.ownerId).map((video) => video.ownerId)
 		ownerIds = [...new Set(ownerIds.map((id) => id.toString()))]
 
 		if (ownerIds.length === 0) {
