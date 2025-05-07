@@ -958,35 +958,6 @@ const videoDocs = {
 		},
 	},
 	paths: {
-		'/api/videos/all-videos': {
-			get: {
-				summary: 'Get all videos (admin access)',
-				tags: ['Videos'],
-				responses: {
-					200: {
-						description: 'List of all videos',
-						content: {
-							'application/json': {
-								schema: {
-									type: 'object',
-									properties: {
-										videos: {
-											type: 'array',
-											items: {
-												$ref: '#/components/schemas/Video',
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-					500: {
-						description: 'Server error',
-					},
-				},
-			},
-		},
 		'/api/videos/all/{role}/{userId}': {
 			get: {
 				summary: 'Get all videos for a user based on role',
