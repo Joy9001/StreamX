@@ -105,7 +105,7 @@ export function AdminRequestsDashboard() {
 
       // Make the upload request - no need to send video data for admin role
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/yt/upload/Admin/${request.to.id}/${request.video.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/yt/upload/Admin/${request.to.id}/${request.video._id}`
       )
 
       // Remove loading toast
