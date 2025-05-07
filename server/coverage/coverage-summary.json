@@ -1,0 +1,45 @@
+{
+	"total": {
+		"lines": { "total": 801, "covered": 601, "skipped": 0, "pct": 75.03 },
+		"statements": { "total": 820, "covered": 612, "skipped": 0, "pct": 74.63 },
+		"functions": { "total": 63, "covered": 50, "skipped": 0, "pct": 79.36 },
+		"branches": { "total": 400, "covered": 230, "skipped": 0, "pct": 57.5 },
+		"branchesTrue": { "total": 0, "covered": 0, "skipped": 0, "pct": "Unknown" }
+	},
+	"/home/joy04/Documents/Web-Dev/PROJECT/StreamX/server/controllers/admin.controller.js": {
+		"lines": { "total": 59, "covered": 45, "skipped": 0, "pct": 76.27 },
+		"functions": { "total": 10, "covered": 5, "skipped": 0, "pct": 50 },
+		"statements": { "total": 64, "covered": 46, "skipped": 0, "pct": 71.87 },
+		"branches": { "total": 30, "covered": 17, "skipped": 0, "pct": 56.66 }
+	},
+	"/home/joy04/Documents/Web-Dev/PROJECT/StreamX/server/controllers/auth0.controller.js": {
+		"lines": { "total": 62, "covered": 62, "skipped": 0, "pct": 100 },
+		"functions": { "total": 5, "covered": 5, "skipped": 0, "pct": 100 },
+		"statements": { "total": 66, "covered": 66, "skipped": 0, "pct": 100 },
+		"branches": { "total": 20, "covered": 16, "skipped": 0, "pct": 80 }
+	},
+	"/home/joy04/Documents/Web-Dev/PROJECT/StreamX/server/controllers/editorProfile.controller.js": {
+		"lines": { "total": 102, "covered": 102, "skipped": 0, "pct": 100 },
+		"functions": { "total": 9, "covered": 9, "skipped": 0, "pct": 100 },
+		"statements": { "total": 103, "covered": 103, "skipped": 0, "pct": 100 },
+		"branches": { "total": 27, "covered": 25, "skipped": 0, "pct": 92.59 }
+	},
+	"/home/joy04/Documents/Web-Dev/PROJECT/StreamX/server/controllers/owner.controller.js": {
+		"lines": { "total": 155, "covered": 116, "skipped": 0, "pct": 74.83 },
+		"functions": { "total": 8, "covered": 8, "skipped": 0, "pct": 100 },
+		"statements": { "total": 155, "covered": 116, "skipped": 0, "pct": 74.83 },
+		"branches": { "total": 88, "covered": 51, "skipped": 0, "pct": 57.95 }
+	},
+	"/home/joy04/Documents/Web-Dev/PROJECT/StreamX/server/controllers/request.controller.js": {
+		"lines": { "total": 230, "covered": 149, "skipped": 0, "pct": 64.78 },
+		"functions": { "total": 13, "covered": 10, "skipped": 0, "pct": 76.92 },
+		"statements": { "total": 231, "covered": 150, "skipped": 0, "pct": 64.93 },
+		"branches": { "total": 106, "covered": 52, "skipped": 0, "pct": 49.05 }
+	},
+	"/home/joy04/Documents/Web-Dev/PROJECT/StreamX/server/controllers/video.controller.js": {
+		"lines": { "total": 193, "covered": 127, "skipped": 0, "pct": 65.8 },
+		"functions": { "total": 18, "covered": 13, "skipped": 0, "pct": 72.22 },
+		"statements": { "total": 201, "covered": 131, "skipped": 0, "pct": 65.17 },
+		"branches": { "total": 129, "covered": 69, "skipped": 0, "pct": 53.48 }
+	}
+}

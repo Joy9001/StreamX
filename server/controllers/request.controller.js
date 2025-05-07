@@ -1,5 +1,4 @@
-import { getEditorIdByGigId } from '../helpers/editor.helper.js'
-import Editor from '../models/editor.models.js'
+import Editor from '../models/editor.model.js'
 import Owner from '../models/owner.model.js'
 import Request from '../models/request.model.js'
 import cacheService from '../services/cache.service.js'
@@ -7,17 +6,12 @@ import cacheService from '../services/cache.service.js'
 // Create a new request
 export const createRequest = async (req, res) => {
 	try {
-		const { to_id, video_id, from_id, description, price, status, requesterKind } = req.body
-
-		let toId = to_id
-
-		if (requesterKind == 'Owner') {
-			toId = (await getEditorIdByGigId(to_id)) || to_id
-		}
+		const { to_id, video_id, from_id, description, price, status } = req.body
+		console.log('req.body', req.body)
 
 		// Create new request
 		const newRequest = new Request({
-			to_id: toId,
+			to_id,
 			video_id,
 			from_id,
 			description,
@@ -42,12 +36,11 @@ export const createRequest = async (req, res) => {
 // Get requests by owner ID
 export const getRequestsByToId = async (req, res) => {
 	try {
-		console.log('Received request params:', req.params)
 		const { to_id } = req.params
 		console.log('Searching for requests with to_id:', to_id)
 
 		// Check cache first
-		const cacheKey = cacheService.generateKey('requests', { to_id })
+		const cacheKey = cacheService.generateKey('requestsTo', { to_id })
 		const cachedRequests = await cacheService.get(cacheKey)
 
 		if (cachedRequests) {
@@ -158,7 +151,7 @@ export const getRequestsByFromId = async (req, res) => {
 		console.log('Searching for requests with from_id:', from_id)
 
 		// Check cache first
-		const cacheKey = cacheService.generateKey('requests', { from_id })
+		const cacheKey = cacheService.generateKey('requestsFrom', { from_id })
 		const cachedRequests = await cacheService.get(cacheKey)
 
 		if (cachedRequests) {

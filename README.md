@@ -104,7 +104,6 @@
 
     ```bash
     # In client/.env
-    VITE_API_URL=http://localhost:5173
     VITE_AUTH0_DOMAIN=your_auth0_domain
     VITE_AUTH0_CLIENT_ID=your_auth0_client_id
     VITE_AUTH0_AUDIENCE=your_auth0_audience

@@ -78,7 +78,7 @@ export function Dashboard() {
 
         // Fetch videos
         const videosResponse = await axios.get(
-          `http://localhost:3000/api/videos/all/Admin/${userData._id}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/videos/all/Admin/${userData._id}`
         )
         console.log('Videos:', videosResponse.data.videos)
         setVideoData(videosResponse.data.videos)
@@ -86,7 +86,7 @@ export function Dashboard() {
         // Fetch owners
         dispatch(setOwnersLoading(true))
         const ownersResponse = await axios.get(
-          'http://localhost:3000/api/admin/owners'
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/owners`
         )
         dispatch(setOwners(ownersResponse.data.owners))
         dispatch(setOwnersLoading(false))
@@ -94,7 +94,7 @@ export function Dashboard() {
         // Fetch editors
         dispatch(setEditorsLoading(true))
         const editorsResponse = await axios.get(
-          'http://localhost:3000/api/admin/editors'
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/editors`
         )
         dispatch(setEditors(editorsResponse.data.editors))
         dispatch(setEditorsLoading(false))

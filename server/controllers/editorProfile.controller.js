@@ -1,4 +1,4 @@
-import Editor from '../models/editor.models.js'
+import Editor from '../models/editor.model.js'
 import EditorGig from '../models/editorGig.model.js'
 import Owner from '../models/owner.model.js'
 import Video from '../models/video.model.js'
@@ -94,7 +94,9 @@ export const getHiredByOwners = async (req, res) => {
 			return res.status(200).json([])
 		}
 
-		let ownerIds = findVideos.map((video) => video.ownerId)
+		let ownerIds = findVideos
+			.filter(video => video.ownerId)
+			.map((video) => video.ownerId)
 		ownerIds = [...new Set(ownerIds.map((id) => id.toString()))]
 
 		if (ownerIds.length === 0) {

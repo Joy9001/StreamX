@@ -1,15 +1,14 @@
 import { config } from 'dotenv'
-import fs from 'fs'
 import { google } from 'googleapis'
-import { dirname, join } from 'path'
+import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 
 config()
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-const secretPath = join(__dirname, '..', process.env.GOOGLE_CLIENT_SECRET_PATH)
-const OAuth2Data = JSON.parse(fs.readFileSync(secretPath, 'utf8'))
+const base64Data = process.env.GOOGLE_CLIENT_SECRET_BASE64
+const OAuth2Data = JSON.parse(Buffer.from(base64Data, 'base64').toString('utf8'))
 console.log('OAuth2Data', OAuth2Data)
 
 const CLIENT_ID = OAuth2Data.web.client_id

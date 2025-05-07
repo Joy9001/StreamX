@@ -1,7 +1,7 @@
 import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import { StatusCodes } from 'http-status-codes'
 import { storage } from '../helpers/firebase.helper.js'
-import Editor from '../models/editor.models.js'
+import Editor from '../models/editor.model.js'
 import Owner from '../models/owner.model.js'
 import Video from '../models/video.model.js'
 import cacheService from '../services/cache.service.js'
@@ -324,6 +324,7 @@ const recentController = async (req, res) => {
 
 const updateVideoOwnership = async (req, res) => {
 	const { videoId, userId, role } = req.body
+	console.log('Request data for video ownership update:', req.body)
 
 	if (!userId) {
 		return res.status(StatusCodes.BAD_REQUEST).json({ message: 'New user ID (userId) is required' })
@@ -371,7 +372,7 @@ const updateVideoOwnership = async (req, res) => {
 		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			message: `Error updating video ${role.toLowerCase()}`,
 			error: error.message,
-			stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+			stack: error.stack,
 		})
 	}
 }

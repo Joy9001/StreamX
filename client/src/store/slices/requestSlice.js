@@ -97,12 +97,13 @@ export const approveRequest = createAsyncThunk(
       const {
         requestId,
         videoId,
-        toId,
+        fromId,
         userData,
         accessToken,
         userRole,
         price,
       } = requestData
+      console.log('requestData', requestData)
 
       const transactionAmount = price
 
@@ -117,7 +118,7 @@ export const approveRequest = createAsyncThunk(
           `${import.meta.env.VITE_BACKEND_URL}/api/wallet/transfer`,
           {
             fromWalletId: userData._id,
-            toWalletId: toId,
+            toWalletId: fromId,
             amount: transactionAmount,
             requestId: requestId,
             description: `Payment for video editing service`,
@@ -137,7 +138,7 @@ export const approveRequest = createAsyncThunk(
           {
             videoId: videoId,
             role: userRole,
-            userId: toId,
+            userId: userData._id,
           },
           {
             headers: {
@@ -171,8 +172,8 @@ export const approveRequest = createAsyncThunk(
           `${import.meta.env.VITE_BACKEND_URL}/api/videos/update-ownership`,
           {
             videoId: videoId,
-            role: userRole,
-            userId: userData._id,
+            role: 'Owner',
+            userId: fromId,
           },
           {
             headers: {

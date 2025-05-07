@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: streamx-server
+        restart: unless-stopped
+        env_file: .env
+        ports:
+            - '3000:3000'
+        depends_on:
+            - redis
+        networks:
+            - streamx-network
+
+    redis:
+        image: redis
+        container_name: streamx-redis
+        restart: unless-stopped
+        # ports:
+        #     - '6379:6379'
+        networks:
+            - streamx-network
+        volumes:
+            - redis-data:/data
+        command: redis-server --appendonly yes
+
+networks:
+    streamx-network:
+        driver: bridge
+
+volumes:
+    redis-data:

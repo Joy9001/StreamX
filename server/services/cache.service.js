@@ -157,8 +157,11 @@ export class CacheService {
 
 				if (_id) keysToDelete.push(this.generateKey('requestMessages', { id: _id }))
 				if (to_id) keysToDelete.push(this.generateKey('requests', { to_id }))
+				if (to_id) keysToDelete.push(this.generateKey('requestsTo', { to_id }))
+
 				if (from_id) {
 					keysToDelete.push(this.generateKey('requests', { from_id }))
+					keysToDelete.push(this.generateKey('requestsFrom', { from_id }))
 					keysToDelete.push(this.generateKey('aggregateRequests', { fromId: from_id }))
 				}
 				if (to_id && from_id) {

@@ -171,4 +171,3 @@ node_modules/
 .prettierrc
 IMP.md
 .secrets/
-package-lock.json

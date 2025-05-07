@@ -1,26 +1,6 @@
 function Modal({ currentEditor, onClose, onSave }) {
   const handleEditorData = async (editorData) => {
-    // const method = currentEditor ? 'PUT' : 'POST'
-    // const endpoint = currentEditor
-    //   ? `http://localhost:3000/editorProfile/${editorData.email}`
-    //   : `http://localhost:3000/editorProfile`
-
     try {
-      //   const response = await fetch(endpoint, {
-      //     method,
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify(editorData),
-      //   })
-
-      //   console.log('Response:', response)
-      //   if (!response.ok) {
-      //     throw new Error('Failed to save editor data')
-      //   }
-
-      //   const data = await response.json()
-      //   console.log('Editor saved successfully:', data)
       onSave(editorData)
     } catch (error) {
       console.error('Error saving editor:', error)
