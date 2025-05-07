@@ -113,6 +113,9 @@ export const approveRequest = createAsyncThunk(
 
       // Update video ownership or editor access based on user role
       if (userRole === 'Owner') {
+        console.log(
+          'User is Owner, processing wallet transaction and video ownership update'
+        )
         // Process wallet transaction first
         walletTransactionResponse = await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/api/wallet/transfer`,
@@ -168,6 +171,9 @@ export const approveRequest = createAsyncThunk(
           transaction: walletTransactionResponse.data,
         }
       } else if (userRole === 'Editor') {
+        console.log(
+          'User is Editor, processing wallet transaction and video editor access update'
+        )
         videoResponse = await axios.patch(
           `${import.meta.env.VITE_BACKEND_URL}/api/videos/update-ownership`,
           {
