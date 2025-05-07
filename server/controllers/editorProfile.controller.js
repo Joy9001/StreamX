@@ -8,13 +8,13 @@ export const createEditorProfile = async (req, res) => {
 	const { name, email, phone, location, image, software, specializations } = req.body
 
 	try {
-		const existingEditor = await Editor.findOne({ email })
+		const existingEditor = await EditorGig.findOne({ email })
 		console.log('existingEditor:', existingEditor)
 		if (existingEditor) {
 			return res.status(400).json({ message: 'Editor with this email already exists.' })
 		}
 
-		const newEditor = new Editor({
+		const newEditor = new EditorGig({
 			name,
 			email,
 			phone,
@@ -26,7 +26,7 @@ export const createEditorProfile = async (req, res) => {
 
 		await newEditor.save()
 
-		await cacheService.invalidateEditorCaches(email)
+		await cacheService.invalidateEditorGigCaches(email)
 
 		res.status(201).json(newEditor)
 	} catch (error) {
