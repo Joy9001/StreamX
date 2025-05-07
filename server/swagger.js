@@ -459,54 +459,6 @@ const requestDocs = {
 				},
 			},
 		},
-		'/requests': {
-			get: {
-				summary: 'Get all requests',
-				tags: ['Requests'],
-				responses: {
-					200: {
-						description: 'List of all requests',
-						content: {
-							'application/json': {
-								schema: {
-									type: 'array',
-									items: {
-										$ref: '#/components/schemas/Request',
-									},
-								},
-							},
-						},
-					},
-					500: {
-						description: 'Server error',
-					},
-				},
-			},
-		},
-		'/requests/all': {
-			get: {
-				summary: 'Get all updated requests',
-				tags: ['Requests'],
-				responses: {
-					200: {
-						description: 'List of all updated requests',
-						content: {
-							'application/json': {
-								schema: {
-									type: 'array',
-									items: {
-										$ref: '#/components/schemas/Request',
-									},
-								},
-							},
-						},
-					},
-					500: {
-						description: 'Server error',
-					},
-				},
-			},
-		},
 		'/requests/to-id/{to_id}': {
 			get: {
 				summary: 'Get requests by recipient ID',
@@ -560,30 +512,6 @@ const requestDocs = {
 				responses: {
 					200: {
 						description: 'List of requests sent by the specified user',
-						content: {
-							'application/json': {
-								schema: {
-									type: 'array',
-									items: {
-										$ref: '#/components/schemas/Request',
-									},
-								},
-							},
-						},
-					},
-					500: {
-						description: 'Server error',
-					},
-				},
-			},
-		},
-		'/requests/admin': {
-			get: {
-				summary: 'Get admin requests',
-				tags: ['Requests'],
-				responses: {
-					200: {
-						description: 'List of admin requests',
 						content: {
 							'application/json': {
 								schema: {
