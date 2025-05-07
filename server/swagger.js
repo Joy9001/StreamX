@@ -2224,7 +2224,7 @@ const adminDocs = {
 		},
 	},
 	paths: {
-		'/admin/owners': {
+		'/api/admin/owners': {
 			get: {
 				summary: 'Get all owners (admin access)',
 				tags: ['Admin'],
@@ -2248,7 +2248,7 @@ const adminDocs = {
 				},
 			},
 		},
-		'/admin/editors': {
+		'/api/admin/editors': {
 			get: {
 				summary: 'Get all editors (admin access)',
 				tags: ['Admin'],
@@ -2272,7 +2272,7 @@ const adminDocs = {
 				},
 			},
 		},
-		'/admin/requests': {
+		'/api/admin/requests': {
 			get: {
 				summary: 'Get all requests (admin access)',
 				tags: ['Admin'],
@@ -2296,7 +2296,7 @@ const adminDocs = {
 				},
 			},
 		},
-		'/admin/videos': {
+		'/api/admin/videos': {
 			get: {
 				summary: 'Get all videos (admin access)',
 				tags: ['Admin'],
