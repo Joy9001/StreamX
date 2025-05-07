@@ -1126,13 +1126,9 @@ const videoDocs = {
 								schema: {
 									type: 'object',
 									properties: {
-										totalSize: {
+										storageUsage: {
 											type: 'number',
 											description: 'Total storage used in bytes',
-										},
-										videoCount: {
-											type: 'number',
-											description: 'Number of videos',
 										},
 									},
 								},
@@ -1141,9 +1137,38 @@ const videoDocs = {
 					},
 					400: {
 						description: 'Invalid role specified',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: {
+											type: 'string',
+											example: 'Invalid role specified',
+										},
+									},
+								},
+							},
+						},
 					},
 					500: {
 						description: 'Server error',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: {
+											type: 'string',
+											example: 'Failed to get storage usage',
+										},
+										error: {
+											type: 'string',
+										},
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -1174,6 +1199,7 @@ const videoDocs = {
 										description: 'Role of the user uploading',
 									},
 								},
+								required: ['file', 'userId', 'role'],
 							},
 						},
 					},
@@ -1184,16 +1210,95 @@ const videoDocs = {
 						content: {
 							'application/json': {
 								schema: {
-									$ref: '#/components/schemas/Video',
+									type: 'object',
+									properties: {
+										message: {
+											type: 'string',
+											example: 'File uploaded successfully',
+										},
+										url: {
+											type: 'string',
+											description: 'Download URL for the uploaded video',
+										},
+										videoData: {
+											type: 'object',
+											properties: {
+												_id: {
+													type: 'string',
+												},
+												ownerId: {
+													type: 'string',
+												},
+												editorId: {
+													type: 'string',
+												},
+												url: {
+													type: 'string',
+												},
+												metaData: {
+													type: 'object',
+												},
+												owner: {
+													type: 'string',
+												},
+												ownerPic: {
+													type: 'string',
+												},
+												editor: {
+													type: 'string',
+												},
+												editorPic: {
+													type: 'string',
+												},
+												createdAt: {
+													type: 'string',
+													format: 'date-time',
+												},
+												updatedAt: {
+													type: 'string',
+													format: 'date-time',
+												},
+											},
+										},
+									},
 								},
 							},
 						},
 					},
 					400: {
 						description: 'Invalid request or missing file',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: {
+											type: 'string',
+											example: 'No file uploaded',
+										},
+									},
+								},
+							},
+						},
 					},
 					500: {
 						description: 'Server error during upload',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: {
+											type: 'string',
+											example: 'Failed to upload file',
+										},
+										error: {
+											type: 'string',
+										},
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -1213,19 +1318,17 @@ const videoDocs = {
 										type: 'string',
 										description: 'ID of the video to update',
 									},
-									ownerId: {
+									userId: {
 										type: 'string',
-										description: 'New owner ID',
+										description: 'ID of the new user to assign (owner or editor)',
 									},
-									editorId: {
+									role: {
 										type: 'string',
-										description: 'New editor ID',
-									},
-									editorAccess: {
-										type: 'boolean',
-										description: 'Whether editor has access',
+										enum: ['Owner', 'Editor'],
+										description: 'Role to update (whether updating owner or editor)',
 									},
 								},
+								required: ['videoId', 'userId', 'role'],
 							},
 						},
 					},
@@ -1233,12 +1336,67 @@ const videoDocs = {
 				responses: {
 					200: {
 						description: 'Video ownership updated successfully',
+						content: {
+							'application/json': {
+								schema: {
+									$ref: '#/components/schemas/Video',
+								},
+							},
+						},
 					},
 					400: {
 						description: 'Invalid request or missing data',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: {
+											type: 'string',
+											example: 'New user ID (userId) is required',
+										},
+									},
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Video not found',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: {
+											type: 'string',
+											example: 'Video not found',
+										},
+									},
+								},
+							},
+						},
 					},
 					500: {
 						description: 'Server error',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: {
+											type: 'string',
+											example: 'Error updating video ownership',
+										},
+										error: {
+											type: 'string',
+										},
+										stack: {
+											type: 'string',
+										},
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -1254,11 +1412,21 @@ const videoDocs = {
 							schema: {
 								type: 'object',
 								properties: {
-									videoId: {
+									id: {
 										type: 'string',
 										description: 'ID of the video to delete',
 									},
+									userId: {
+										type: 'string',
+										description: 'ID of the user deleting the video',
+									},
+									role: {
+										type: 'string',
+										enum: ['Owner', 'Editor', 'Admin'],
+										description: 'Role of the user attempting to delete',
+									},
 								},
+								required: ['id', 'userId', 'role'],
 							},
 						},
 					},
@@ -1266,15 +1434,70 @@ const videoDocs = {
 				responses: {
 					200: {
 						description: 'Video deleted successfully',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: {
+											type: 'string',
+											example: 'Video deleted successfully',
+										},
+									},
+								},
+							},
+						},
 					},
 					400: {
-						description: 'Invalid request or missing video ID',
+						description: 'Missing required parameters',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: {
+											type: 'string',
+											example: 'Missing required parameters (id, userId, role)',
+										},
+									},
+								},
+							},
+						},
 					},
 					404: {
-						description: 'Video not found',
+						description: 'Video not found or user lacks permission',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: {
+											type: 'string',
+											example: 'Video not found or user lacks permission',
+										},
+									},
+								},
+							},
+						},
 					},
 					500: {
 						description: 'Server error during deletion',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: {
+											type: 'string',
+											example: 'Failed to delete video',
+										},
+										error: {
+											type: 'string',
+										},
+									},
+								},
+							},
+						},
 					},
 				},
 			},
