@@ -8,7 +8,7 @@ const mockOwnerModel = function () {
 	}
 }
 
-// Use variables to store the mock implementations
+// Use variables to store the mock
 const mockCacheService = {
 	generateKey: jest.fn(),
 	get: jest.fn(),
