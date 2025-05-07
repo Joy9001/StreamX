@@ -55,7 +55,7 @@ const requestDocs = {
 					},
 				},
 			},
-			RequestMessage: {
+			Message: {
 				type: 'object',
 				properties: {
 					_id: {
