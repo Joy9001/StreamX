@@ -172,8 +172,8 @@ export const approveRequest = createAsyncThunk(
           `${import.meta.env.VITE_BACKEND_URL}/api/videos/update-ownership`,
           {
             videoId: videoId,
-            role: 'Owner',
-            userId: fromId,
+            role: 'Editor',
+            userId: userData._id,
           },
           {
             headers: {
