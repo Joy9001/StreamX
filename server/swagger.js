@@ -3140,4 +3140,4 @@ const ownerDocs = {
 }
 
 // Export the documentation objects for use in the server setup
-export { adminDocs, auth0Docs, editorDocs, ownerDocs, requestDocs, userDocs, videoDocs, walletDocs, ytDocs }
+export { adminDocs, auth0Docs, editorDocs, ownerDocs, requestDocs, videoDocs, walletDocs, ytDocs }
