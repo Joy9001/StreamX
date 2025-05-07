@@ -19,9 +19,13 @@ const requestDocs = {
 						type: 'string',
 						description: 'ID of the user who received the request',
 					},
+					video_id: {
+						type: 'string',
+						description: 'ID of the video associated with the request',
+					},
 					status: {
 						type: 'string',
-						enum: ['pending', 'accepted', 'rejected', 'completed'],
+						enum: ['pending', 'approved', 'rejected'],
 						description: 'Current status of the request',
 					},
 					description: {
@@ -31,6 +35,13 @@ const requestDocs = {
 					price: {
 						type: 'number',
 						description: 'Price or budget for the request',
+					},
+					messages: {
+						type: 'array',
+						description: 'Messages related to this request',
+						items: {
+							$ref: '#/components/schemas/Message',
+						},
 					},
 					createdAt: {
 						type: 'string',
@@ -51,22 +62,106 @@ const requestDocs = {
 						type: 'string',
 						description: 'The auto-generated id of the message',
 					},
-					requestId: {
-						type: 'string',
-						description: 'ID of the request this message belongs to',
-					},
-					senderId: {
+					sender_id: {
 						type: 'string',
 						description: 'ID of the user who sent the message',
 					},
-					content: {
+					sender_role: {
+						type: 'string',
+						enum: ['Owner', 'Editor'],
+						description: 'Role of the sender',
+					},
+					sender_name: {
+						type: 'string',
+						description: 'Name of the sender',
+					},
+					message: {
 						type: 'string',
 						description: 'Content of the message',
+					},
+					timestamp: {
+						type: 'string',
+						format: 'date-time',
+						description: 'When the message was created',
+					},
+				},
+			},
+			ProcessedRequest: {
+				type: 'object',
+				properties: {
+					_id: {
+						type: 'string',
+						description: 'The auto-generated id of the request',
+					},
+					request_id: {
+						type: 'string',
+						description: 'The id of the request (same as _id)',
+					},
+					from: {
+						type: 'object',
+						properties: {
+							id: {
+								type: 'string',
+								description: 'ID of the user who created the request',
+							},
+							name: {
+								type: 'string',
+								description: 'Name of the user who created the request',
+							},
+						},
+					},
+					to: {
+						type: 'object',
+						properties: {
+							id: {
+								type: 'string',
+								description: 'ID of the user who received the request',
+							},
+							name: {
+								type: 'string',
+								description: 'Name of the user who received the request',
+							},
+						},
+					},
+					video: {
+						type: 'object',
+						properties: {
+							url: {
+								type: 'string',
+								description: 'URL of the video',
+							},
+							title: {
+								type: 'string',
+								description: 'Title of the video',
+							},
+							_id: {
+								type: 'string',
+								description: 'ID of the video',
+							},
+						},
+					},
+					description: {
+						type: 'string',
+						description: 'Description of the request',
+					},
+					price: {
+						type: 'number',
+						description: 'Price or budget for the request',
+					},
+					status: {
+						type: 'string',
+						enum: ['pending', 'approved', 'rejected'],
+						description: 'Current status of the request',
 					},
 					createdAt: {
 						type: 'string',
 						format: 'date-time',
-						description: 'When the message was created',
+						description: 'When the request was created',
+					},
+					updatedAt: {
+						type: 'string',
+						format: 'date-time',
+						description: 'When the request was last updated',
 					},
 				},
 			},
@@ -76,6 +171,7 @@ const requestDocs = {
 		'/requests/create': {
 			post: {
 				summary: 'Create a new request',
+				description: 'Creates a new request from an owner to an editor or vice versa',
 				tags: ['Requests'],
 				requestBody: {
 					required: true,
@@ -92,6 +188,10 @@ const requestDocs = {
 										type: 'string',
 										description: 'ID of the user receiving the request',
 									},
+									video_id: {
+										type: 'string',
+										description: 'ID of the video associated with the request',
+									},
 									description: {
 										type: 'string',
 										description: 'Description of the request',
@@ -100,8 +200,13 @@ const requestDocs = {
 										type: 'number',
 										description: 'Price or budget for the request',
 									},
+									status: {
+										type: 'string',
+										enum: ['pending', 'approved', 'rejected'],
+										description: 'Status of the request (defaults to pending)',
+									},
 								},
-								required: ['from_id', 'to_id', 'description'],
+								required: ['from_id', 'to_id', 'video_id', 'description', 'price'],
 							},
 						},
 					},
@@ -119,6 +224,234 @@ const requestDocs = {
 					},
 					400: {
 						description: 'Invalid request data',
+					},
+					500: {
+						description: 'Server error',
+					},
+				},
+			},
+		},
+		'/requests/to-id/{to_id}': {
+			get: {
+				summary: 'Get requests by recipient ID',
+				description: 'Get all requests received by a specific user',
+				tags: ['Requests'],
+				parameters: [
+					{
+						in: 'path',
+						name: 'to_id',
+						required: true,
+						schema: {
+							type: 'string',
+						},
+						description: 'ID of the user who received the requests',
+					},
+				],
+				responses: {
+					200: {
+						description: 'List of requests',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/ProcessedRequest',
+									},
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Requests not found',
+					},
+					500: {
+						description: 'Server error',
+					},
+				},
+			},
+		},
+		'/requests/from-id/{from_id}': {
+			get: {
+				summary: 'Get requests by sender ID',
+				description: 'Get all requests sent by a specific user',
+				tags: ['Requests'],
+				parameters: [
+					{
+						in: 'path',
+						name: 'from_id',
+						required: true,
+						schema: {
+							type: 'string',
+						},
+						description: 'ID of the user who sent the requests',
+					},
+				],
+				responses: {
+					200: {
+						description: 'List of requests',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'array',
+									items: {
+										$ref: '#/components/schemas/ProcessedRequest',
+									},
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Requests not found',
+					},
+					500: {
+						description: 'Server error',
+					},
+				},
+			},
+		},
+		'/requests/{id}/status': {
+			patch: {
+				summary: 'Update request status',
+				description: 'Update the status of a specific request',
+				tags: ['Requests'],
+				parameters: [
+					{
+						in: 'path',
+						name: 'id',
+						required: true,
+						schema: {
+							type: 'string',
+						},
+						description: 'Request ID',
+					},
+				],
+				requestBody: {
+					required: true,
+					content: {
+						'application/json': {
+							schema: {
+								type: 'object',
+								properties: {
+									status: {
+										type: 'string',
+										enum: ['pending', 'approved', 'rejected'],
+										description: 'New status for the request',
+									},
+								},
+								required: ['status'],
+							},
+						},
+					},
+				},
+				responses: {
+					200: {
+						description: 'Request updated successfully',
+						content: {
+							'application/json': {
+								schema: {
+									$ref: '#/components/schemas/Request',
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Request not found',
+					},
+					500: {
+						description: 'Server error',
+					},
+				},
+			},
+		},
+		'/requests/delete/{id}': {
+			delete: {
+				summary: 'Delete a request',
+				description: 'Delete a specific request by ID',
+				tags: ['Requests'],
+				parameters: [
+					{
+						in: 'path',
+						name: 'id',
+						required: true,
+						schema: {
+							type: 'string',
+						},
+						description: 'Request ID',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Request deleted successfully',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										message: {
+											type: 'string',
+											example: 'Request deleted successfully',
+										},
+										deletedRequest: {
+											$ref: '#/components/schemas/Request',
+										},
+									},
+								},
+							},
+						},
+					},
+					404: {
+						description: 'Request not found',
+					},
+					500: {
+						description: 'Server error',
+					},
+				},
+			},
+		},
+		'/requests/aggregate/{fromId}': {
+			get: {
+				summary: 'Get aggregated request statistics',
+				description: 'Get statistics about requests for a specific user',
+				tags: ['Requests'],
+				parameters: [
+					{
+						in: 'path',
+						name: 'fromId',
+						required: true,
+						schema: {
+							type: 'string',
+						},
+						description: 'ID of the user who created the requests',
+					},
+				],
+				responses: {
+					200: {
+						description: 'Aggregated request statistics',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'object',
+									properties: {
+										totalRequests: {
+											type: 'number',
+											description: 'Total number of requests',
+										},
+										totalPendingRequests: {
+											type: 'number',
+											description: 'Number of pending requests',
+										},
+										totalApprovedRequests: {
+											type: 'number',
+											description: 'Number of approved requests',
+										},
+										totalRejectedRequests: {
+											type: 'number',
+											description: 'Number of rejected requests',
+										},
+									},
+								},
+							},
+						},
 					},
 					500: {
 						description: 'Server error',
@@ -292,7 +625,7 @@ const requestDocs = {
 								properties: {
 									status: {
 										type: 'string',
-										enum: ['pending', 'accepted', 'rejected', 'completed'],
+										enum: ['pending', 'approved', 'rejected'],
 										description: 'New status for the request',
 									},
 								},
@@ -355,6 +688,8 @@ const requestDocs = {
 		'/requests/aggregate/{fromId}': {
 			get: {
 				summary: 'Get aggregated request data for a user',
+				description:
+					'Returns statistics about total, pending, approved, and rejected requests for a specific user',
 				tags: ['Requests'],
 				parameters: [
 					{
@@ -400,7 +735,7 @@ const requestDocs = {
 								schema: {
 									type: 'array',
 									items: {
-										$ref: '#/components/schemas/RequestMessage',
+										$ref: '#/components/schemas/Message',
 									},
 								},
 							},
@@ -435,16 +770,25 @@ const requestDocs = {
 							schema: {
 								type: 'object',
 								properties: {
-									senderId: {
+									sender_id: {
 										type: 'string',
 										description: 'ID of the user sending the message',
 									},
-									content: {
+									sender_role: {
+										type: 'string',
+										enum: ['Owner', 'Editor'],
+										description: 'Role of the sender',
+									},
+									sender_name: {
+										type: 'string',
+										description: 'Name of the sender',
+									},
+									message: {
 										type: 'string',
 										description: 'Message content',
 									},
 								},
-								required: ['senderId', 'content'],
+								required: ['sender_id', 'sender_role', 'sender_name', 'message'],
 							},
 						},
 					},
@@ -455,7 +799,7 @@ const requestDocs = {
 						content: {
 							'application/json': {
 								schema: {
-									$ref: '#/components/schemas/RequestMessage',
+									$ref: '#/components/schemas/Message',
 								},
 							},
 						},
@@ -475,6 +819,7 @@ const requestDocs = {
 		'/requests/from-to': {
 			post: {
 				summary: 'Get requests between two users',
+				description: 'Retrieves all requests exchanged between a specific sender and recipient',
 				tags: ['Requests'],
 				requestBody: {
 					required: true,
@@ -483,16 +828,16 @@ const requestDocs = {
 							schema: {
 								type: 'object',
 								properties: {
-									fromId: {
+									from_id: {
 										type: 'string',
 										description: 'ID of the sender',
 									},
-									toId: {
+									to_id: {
 										type: 'string',
 										description: 'ID of the receiver',
 									},
 								},
-								required: ['fromId', 'toId'],
+								required: ['from_id', 'to_id'],
 							},
 						},
 					},
@@ -528,7 +873,7 @@ const requestDocs = {
 							schema: {
 								type: 'object',
 								properties: {
-									requestId: {
+									id: {
 										type: 'string',
 										description: 'ID of the request',
 									},
@@ -537,7 +882,7 @@ const requestDocs = {
 										description: 'New price',
 									},
 								},
-								required: ['requestId', 'price'],
+								required: ['id', 'price'],
 							},
 						},
 					},
