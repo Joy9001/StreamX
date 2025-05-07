@@ -1,17 +1,7 @@
 import dotenv from 'dotenv'
 import swaggerJsdoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
-import {
-	adminDocs,
-	auth0Docs,
-	editorDocs,
-	ownerDocs,
-	requestDocs,
-	userDocs,
-	videoDocs,
-	walletDocs,
-	ytDocs,
-} from './swagger.js'
+import { adminDocs, auth0Docs, editorDocs, ownerDocs, requestDocs, videoDocs, walletDocs, ytDocs } from './swagger.js'
 
 dotenv.config()
 
@@ -41,7 +31,6 @@ const swaggerOptions = {
 				...videoDocs.components.schemas,
 				...editorDocs.components.schemas,
 				...adminDocs.components.schemas,
-				...userDocs.components.schemas,
 				...(walletDocs.components?.schemas || {}),
 				...(ownerDocs.components?.schemas || {}),
 			},
@@ -51,7 +40,6 @@ const swaggerOptions = {
 			...videoDocs.paths,
 			...editorDocs.paths,
 			...adminDocs.paths,
-			...userDocs.paths,
 			...auth0Docs.paths,
 			...walletDocs.paths,
 			...ytDocs.paths,
