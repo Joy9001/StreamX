@@ -12,7 +12,7 @@ function PaymentBalanceCard({ onToggleDepositForm, onToggleWithdrawForm }) {
             Current Balance
           </h2>
           <p className='mt-2 text-4xl font-bold text-indigo-600'>
-            ${loading ? '...' : walletBalance.toFixed(2)}
+            ₹{loading ? '...' : walletBalance.toFixed(2)}
           </p>
         </div>
         <div className='flex gap-4'>
