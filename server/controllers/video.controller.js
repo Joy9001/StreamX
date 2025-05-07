@@ -324,7 +324,7 @@ const recentController = async (req, res) => {
 
 const updateVideoOwnership = async (req, res) => {
 	const { videoId, userId, role } = req.body
-	console.log('Request data for video ownership update:', req.body)
+	console.log('Request data for video ownership update:', videoId, userId, role)
 
 	if (!userId) {
 		return res.status(StatusCodes.BAD_REQUEST).json({ message: 'New user ID (userId) is required' })
@@ -345,7 +345,7 @@ const updateVideoOwnership = async (req, res) => {
 			updateData = { ownerId: userId }
 		} else if (role === 'Editor') {
 			updateData = {
-				editorId: userId || null,
+				editorId: userId,
 				editorAccess: true,
 			}
 		}
