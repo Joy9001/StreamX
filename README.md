@@ -4,7 +4,7 @@
 
 ## 💡 Idea
 
-![StreamX Idea](Idea.png)
+![StreamX Idea](diagrams/Idea.png)
 
 ## 🚀 Key Features
 
