@@ -4,6 +4,8 @@
 
 ## 💡 Idea
 
+[🎥 Watch the demo video](https://drive.google.com/file/d/1VKoDKEOoBrhG98LhDV4S6-X4n2GTHUnH/view?usp=sharing)
+
 ![StreamX Idea](diagrams/Idea.png)
 
 ## 🚀 Key Features
